@@ -1,5 +1,74 @@
 # Session log
 
+## 2026-09-27: Bà Mối spec v2 (anonymous matchmaking) and architecture
+
+### What changed
+
+- Rewrote `docs/ba-moi-spec.md` as v2. Minh clarified that matchmaking is
+  anonymous by design and should work like Moon's Nhân Duyên:
+  - Each member talks to her own AI matchmaker, which puts a card with no
+    personal identifiers into a shared pool.
+  - A daily box, or a request such as "find me someone who…", brings back a
+    candidate described anonymously.
+  - An interest signal reaches the recipient through her own matchmaker's
+    summary.
+  - Mutual acceptance opens an anonymous chat.
+- Proposed architecture: self-hosted Discourse for the community (membership,
+  forum, events, identity through DiscourseConnect), with Bà Mối as a separate
+  service in this repository.
+
+### Research
+
+- **Forum platforms** (GitHub data from 2026-09-27):
+  - Discourse: GPL-2.0, 47.9k stars, active. It is the mature choice, with
+    invite-only mode, groups, chat, AI personas, and DiscourseConnect as both
+    identity provider and client.
+  - NodeBB: GPL-3.0, 15.2k stars.
+  - Flarum: MIT, 6.8k stars; 2.0 is still a release candidate.
+  - Forem: AGPL-3.0.
+  - Misago, HumHub and Apache Answer were considered and are a weaker fit.
+  - Discourse admins can read all private messages. That rules out running the
+    matchmaker inside forum messages.
+- **Matchmaking foundations.** None fits the anonymous-pool model:
+  - Compass (`CompassConnections/Compass`, AGPL-3.0, a fork of MIT Manifold
+    Love) is a public, searchable directory.
+  - Duolicious (AGPL-3.0) is quiz-based with public profiles.
+  - pH7 Dating CMS (MIT, PHP) is a classic dating site.
+
+  The building blocks come from standard open-source parts, Postgres with
+  pgvector, plus Moon's design.
+- **Moon's Nhân Duyên.** We studied Moon `main` at `8f07a25`, reusing the
+  design, not the code. The following was verified directly from the code:
+  - Opt-in profile with versioned consent, pause and delete
+    (`database/migration-074-nhan-duyen-foundation.sql`).
+  - Discoveries score both directions, and both must pass the threshold. The
+    same pair is never shown twice.
+  - Interests carry a payload written for the recipient.
+  - Signal responses are `pending`, `accepted`, `declined`, `dismissed` or
+    `expired` after 7 days (`migration-096`).
+  - Matches move from `mutual_interest` to `revealed` to `closed`.
+  - Anonymous conversations keep messages sanitized, and reports include
+    `contact_exchange` (`migration-094`, `migration-125`).
+  - The mutual score is the lower of the two directions. The daily box makes a
+    weighted random pick above the threshold (`lib/nhan-duyen/matching.ts`).
+  - The anonymous card, the rule of 5, and the leak check live in
+    `lib/nhan-duyen/privacy.ts`.
+  - Moon's chat assistant has no pool-search tool, so "ask Bà Mối to find
+    someone" is new here.
+- A deeper read-only study of Moon's flow was routed through agent-jobs to
+  Codex (decision `164863d7`, job `14aceefe`). Its findings will be checked
+  against the code and folded into the spec.
+
+### Verification
+
+- Documentation only; no code changed.
+
+### Next
+
+- Confirm the architecture with Minh.
+- Decide where Discourse runs for the demo, on what domain and email service.
+- Then build Bà Mối to spec v2.
+
 ## 2026-09-27: Bà Mối v1 spec
 
 ### What changed

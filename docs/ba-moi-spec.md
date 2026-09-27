@@ -1,148 +1,225 @@
-# Bà Mối v1 spec
+# Bà Mối spec
 
-Status: draft, 2026-09-27. We wrote this ourselves instead of waiting for Thảo:
-she reacts to things she can use, so a working prototype comes first and her
-feedback shapes v2.
+Status: draft v2, 2026-09-27. This version replaces the v1 draft, which had
+named introductions and contact exchange. Matchmaking in Thật Space is
+anonymous by design and follows the flow and rules of Moon's Nhân Duyên
+(`moon-ai-vn/moon2-app`, `lib/nhan-duyen`). It reuses that design, not that
+code.
 
-## What it is
+## The product in one paragraph
 
-Bà Mối is an AI matchmaker for Thật Space. A member chats with her for a few
-minutes, on a phone, in Vietnamese. Bà Mối builds a profile from the
-conversation, then introduces the member to three people who want the same
-kind of relationship. She explains why each pair fits and suggests how to
-start talking.
+Every member has her own AI matchmaker, Bà Mối. She talks with Bà Mối, who
+learns about her and puts an anonymous card, with nothing that identifies her,
+into a shared pool. She can tap the daily Duyên box to have Bà Mối bring back
+someone highly compatible, or ask Bà Mối directly: "find me someone who…". Bà
+Mối describes that person without revealing who they are. If she sends an
+interest signal, the other person's own Bà Mối tells them about her and how the
+two might fit. If both say yes, an anonymous chat opens. Nobody's identity is
+revealed unless both choose to reveal it.
 
-It answers the two complaints Thảo made about Moon AI on the 2026-09-25 call:
+## Architecture
 
-- **Matches ignored what people wanted.** Intent is a hard filter here, never a
-  score, so someone looking for friends is never offered marriage.
-- **Readings were too generic.** Every introduction cites specifics from both
-  profiles and comes with opening lines.
+- **The community runs on Discourse, self-hosted.** It handles membership
+  (invite-only, with approval), categories, chat, events for retreats and
+  workshops, moderation, the Vietnamese interface, and mobile. Thảo's
+  15-question set (`Bo_cau_hoi_That_Space`) becomes the signup fields. Discourse
+  is also the identity provider, via DiscourseConnect.
+- **Bà Mối is a separate service, this repository.** Members sign in with their
+  Thật Space account through DiscourseConnect and reach Bà Mối from a link in
+  the Discourse header. It has its own Postgres database, with pgvector for
+  trait search.
+- **Why the matchmaker doesn't live inside Discourse:**
+  - Discourse admins can read every private message, so conversations with Bà
+    Mối held in forum messages would be visible to Thảo.
+  - Forum identities (usernames, avatars, post history) must never reach the
+    pool.
+  - No forum plugin implements an anonymous pool with interest signals.
+- **No open-source matchmaking project fits this model.**
+  - Compass (AGPL-3.0, a fork of Manifold Love) is a public, searchable
+    directory.
+  - Duolicious (AGPL-3.0) matches on a quiz and shows public profiles.
+  - pH7 Dating CMS (MIT, PHP) is a classic dating site.
 
-Thảo's 15-question set (`Bo_cau_hoi_That_Space`) is for forum onboarding in
-phase 2. Bà Mối doesn't use it.
+  The AGPL licenses would also force Thảo to publish her modified source. The
+  foundation here is therefore Moon's Nhân Duyên design, rebuilt on standard
+  parts.
 
-## The conversation
+## Privacy rules
 
-Bà Mối asks one question at a time, with tap-to-answer options where they fit.
-Free text is always allowed. A member should finish in under 5 minutes. Bà Mối
-rephrases each question in her own voice; the wording below is the neutral
-default.
+1. **Private profile versus pool card.** Everything a member tells Bà Mối stays
+   in her private profile. Only Bà Mối and the member can use it. The pool gets
+   an anonymous card derived from it.
+2. **A pool card holds no personal identifiers:**
+   - an age band (18–24, then five-year bands, then 70+)
+   - a region (miền Bắc, miền Trung or miền Nam), shown only if at least 5 pool
+     members share it (k-anonymity)
+   - a name initial, under the same rule of 5
+   - gender and who she wants to meet
+   - intent
+   - hobbies and trait tags
+   - an astrology element
+   - a short summary written by Bà Mối
+3. **Every text Bà Mối writes about another person passes a leak check before
+   anyone sees it.** The check rejects birth dates, birth times, can-chi pairs,
+   and that person's name, city and other identifying terms. The summary
+   describes traits, never identifying facts: no employer, no named places, no
+   unique life events.
+4. **Reasoning about another person uses only their pool card, never their
+   private profile.** Bà Mối may use her own member's private profile with that
+   member.
+5. **Only the server can read the pool, signals and chats.** Members never query
+   them directly.
+6. **Thảo sees totals and reports, never conversations.** With a report, she
+   sees only the reported messages.
 
-| # | Asks for | Default wording | Answers |
-|---|---|---|---|
-| 1 | Name to show | Bạn muốn được gọi là gì? | Free text |
-| 2 | Intent | Bạn đang tìm kiếm điều gì? | Kết bạn · Hẹn hò vui vẻ, không ràng buộc · Mối quan hệ lâu dài · Kết hôn |
-| 3 | Own gender | Bạn là… | Nữ · Nam · Khác |
-| 4 | Who they want to meet | Bạn muốn gặp… | Nam · Nữ · Cả hai |
-| 5 | Birth date | Bạn sinh ngày nào? | Solar date. Must be 18 or older. Gives age and tuổi. |
-| 6 | City | Bạn đang sống ở đâu? | Hà Nội · TP.HCM · Đà Nẵng · Nơi khác (free text) |
-| 7 | Age range | Bạn muốn gặp người trong khoảng tuổi nào? | Range; default is own age ±5 |
-| 8 | Marital status | Tình trạng hôn nhân của bạn? | Độc thân · Đã ly hôn · Góa · Đã kết hôn |
-| 9 | Children | Bạn đã có con chưa? | Chưa có · Có, đang sống cùng · Có, không sống cùng |
-| 10 | Wants children (long-term and marriage only) | Bạn có muốn có con (thêm) không? | Có · Không · Chưa chắc |
-| 11 | Hobbies | Lúc rảnh bạn thích làm gì? | Up to 5: Du lịch · Đọc sách · Nấu ăn · Cà phê · Âm nhạc · Phim ảnh · Thể thao · Yoga, thiền · Nghệ thuật · Chụp ảnh · Thiên nhiên · Thú cưng · Tâm linh, Tử Vi · Khác |
-| 12 | Occupation (optional) | Bạn đang làm công việc gì? | Free text |
-| 13 | The open question | Bạn muốn mọi người biết điều gì nhất về bạn? | Free text. Bà Mối may ask one follow-up. |
+## Member journey
 
-Bà Mối then sums up the profile in 3–4 sentences and asks whether she got it
-right. The member confirms or corrects it before seeing introductions.
+1. **Join.** She opts in and accepts a versioned consent. She must be 18 or
+   older and give a birth date and gender. She can pause, hide herself from
+   discovery, or delete everything at any time.
+2. **Talk to Bà Mối.** A conversation of about 5 minutes, in Vietnamese, one
+   question at a time, with tap-to-answer options:
 
-## Matching
+   | # | Asks for | Default wording | Answers |
+   |---|---|---|---|
+   | 1 | Intent | Bạn đang tìm kiếm điều gì? | Kết bạn · Hẹn hò vui vẻ, không ràng buộc · Mối quan hệ lâu dài · Kết hôn |
+   | 2 | Own gender | Bạn là… | Nữ · Nam · Khác |
+   | 3 | Who she wants to meet | Bạn muốn gặp… | Nam · Nữ · Cả hai |
+   | 4 | Birth date | Bạn sinh ngày nào? | Must be 18 or older. Gives her age band and tuổi. |
+   | 5 | Region | Bạn đang sống ở đâu? | City; only the region reaches the pool |
+   | 6 | Age range | Bạn muốn gặp người trong khoảng tuổi nào? | Default: own age ±5 |
+   | 7 | Marital status | Tình trạng hôn nhân của bạn? | Độc thân · Đã ly hôn · Góa · Đã kết hôn |
+   | 8 | Children | Bạn đã có con chưa? | Chưa có · Có, đang sống cùng · Có, không sống cùng |
+   | 9 | Wants children (long-term and marriage only) | Bạn có muốn có con (thêm) không? | Có · Không · Chưa chắc |
+   | 10 | Hobbies | Lúc rảnh bạn thích làm gì? | Up to 5, plus free text |
+   | 11 | The open question | Bạn muốn mọi người biết điều gì nhất về bạn? | Free text; Bà Mối may ask one follow-up |
 
-**Hard filters.** A pair is considered only if all of these hold in both
-directions:
+   Bà Mối then shows the member her own anonymous card, exactly as others will
+   see it, and asks her to confirm or correct it.
+3. **The Duyên box.** One free opening per Vietnamese calendar day. Bà Mối
+   takes candidates who pass the hard filters and clear the mutual threshold,
+   and makes a weighted random pick: higher scores are more likely, but it isn't
+   always the top one. She then tells the member about that person. An opening
+   that finds no one does not use up the day's turn. The same person is never
+   brought twice.
+4. **Ask Bà Mối.** For example: "Tìm cho mình một người thích leo núi, sống ở
+   miền Nam, muốn nghiêm túc." Bà Mối turns the request into hard filters plus a
+   semantic query over pool cards, ranks results by mutual score, and presents
+   one person at a time. If no one fits, she offers to watch the pool and
+   notify the member when someone new does. This is new: Moon's chat has no
+   pool search. It shares the box's dedupe and a daily limit.
+5. **Interest.** She taps "Muốn làm quen" to send an interest signal. The
+   recipient's Bà Mối writes, from the recipient's point of view, an anonymous
+   summary of the sender and how the two might fit, and notifies them. The
+   recipient accepts, declines, or dismisses. An unanswered signal expires after
+   7 days. The sender is never told "declined"; the answer is simply "chưa có
+   duyên".
+6. **Match and anonymous chat.** When both say yes, a match opens a chat.
+   Each person appears under an alias built from their card (for example
+   "M., 30–34, miền Bắc"). Either person can mute, clear, block or report.
+   Sharing contact details before a reveal is a report reason.
+7. **Reveal, which is optional.** Each person can choose to reveal her Thật
+   Space profile. Identities are exchanged only when both have chosen to.
 
-1. **Intent.** Friendship matches only friendship, and casual matches only
-   casual. Long-term and marriage match each other.
-2. **Gender.** Each person is someone the other wants to meet. "Khác" matches
-   only people who chose "Cả hai".
-3. **Age.** Each is inside the other's range, and both are 18 or older.
-4. **Marital status.** Married members get friendship introductions only. This
-   is our default; Thảo decides.
+## Matching rules
 
-**Score.** Pairs that pass get a score out of 100:
+**Hard filters, checked in both directions:**
 
-| Signal | Default weight | How |
-|---|---|---|
-| Open answers | 25 | Bà Mối judges how the two people's own words fit, and gives a reason |
-| Shared hobbies | 25 | Overlap between the chosen hobbies |
-| Tuổi hợp | 20 | Can chi and ngũ hành nạp âm from the lunar birth year, computed by code, not the AI. People born before Tết belong to the previous year. |
-| Same city | 15 | |
-| Children | 15 | Long-term and marriage only: whether they have or want children. For other intents this weight goes to the other signals. |
+- Intent. Friendship matches only friendship, and casual only casual.
+  Long-term and marriage match each other.
+- Gender. Each person is someone the other wants to meet. "Khác" matches only
+  people who chose "Cả hai".
+- Age. Each is inside the other's range, and both are 18 or older.
+- Both are opted in, discoverable, not paused, and not deleted.
+- Neither has blocked the other, and this pair hasn't already been shown,
+  declined or matched.
+- Married members get friendship only. This is our default; Thảo decides.
 
-Thảo can change the weights.
+**Score.** Compatibility is scored in each direction, A→B and B→A, because
+preferences differ. The mutual score is the lower of the two, and a pair must
+clear the threshold in both directions, as in Moon. The signals are:
 
-## Introductions
+- how well each person's open answer fits the other's card
+- shared hobbies
+- tuổi hợp: can chi and ngũ hành from the lunar birth year, computed by code;
+  anyone born before Tết belongs to the previous year
+- plans for children (long-term and marriage only)
+- region
 
-Each member gets their top 3 matches. An introduction shows:
+Weights and the threshold are settings.
 
-- Name, age, city, intent, and the person's answer to the open question in
-  their own words
-- The score, broken down by signal
-- **Why you two:** 2–3 reasons, each citing something specific from both
-  profiles
-- **One thing to be aware of**, said kindly
-- **Three opening lines**, each mentioning something concrete about the other
-  person
-- Buttons: **Muốn làm quen** (I'd like to meet), **Bỏ qua** (skip), **Báo cáo**
-  (report)
+**Changes invalidate stale results.** If a member changes her birth date,
+intent, gender or who she wants to meet, her open discoveries are voided and
+her scores recomputed.
 
-When both people tap Muốn làm quen, each chooses a contact to share (Zalo,
-phone or Instagram) and sees the other's. Nothing is shared until both agree.
+## States (named as in Moon)
 
-## Bà Mối's voice
+- **Discovery:** `active` → `interest_sent` → `matched`, or `void`
+- **Signal response:** `pending` → `accepted`, `declined`, `dismissed`, or
+  `expired` after 7 days
+- **Match:** `mutual_interest` → `revealed` → `closed`
+- **Conversation:** `active` → `closed` or `blocked`
+- **Message:** `sent`, `blocked` (stopped by moderation), or `deleted`
+  (recalled)
 
-Warm, witty and discreet, like a matchmaker who has seen everything. Never
-preachy, never generic. She calls herself "bà" and the member "con" by default.
-A second preset uses "chị" and "em" so Thảo can compare the two.
+## Notifications
 
-## Thảo's screen
+- `interest_received`, `mutual_match`, `message_received`, a gentle
+  `message_reminder`, and `watch_fulfilled`.
+- Delivered on the web and as a Discourse notification. Zalo and Telegram come
+  later.
+- Each notification is sent exactly once (idempotent) and is tracked as
+  delivered, clicked and read.
 
-- Counts: members, finished profiles, introductions, mutual matches
-- Breakdown by intent, gender preference and city
-- The voice preset and the matching weights
-- An inbox for feedback, which comes from a Góp ý button on every screen, and
-  for reports
+## Safety
 
-She sees totals and reported profiles, never conversations.
+- 18 or older only. Consent is versioned; a new version asks again.
+- Report reasons: harassment, contact exchange, unsafe, spam, other.
+- Block ends the chat for both.
+- Limits per day on box openings, searches and interest signals.
+- Messages are stored sanitized and checked by moderation before delivery.
 
-## Privacy and safety
+## Thảo's view
 
-- 18 or older only, checked from the birth date.
-- A consent screen before the conversation explains what is collected, why,
-  who sees it, and how to delete it.
-- Who someone wants to meet can reveal their sexual orientation, which
-  Vietnam's data-protection rules treat as sensitive. Profiles therefore appear
-  only inside an introduction, never in a list anyone can browse.
-- Members can delete their data at any time.
-- The demo uses clearly labeled sample profiles. No real member data goes in
-  until Thảo approves a pilot.
+- Pool size by intent, gender and region, hidden whenever a group has fewer
+  than 5 people.
+- Signals sent, match rate, and active chats.
+- The reports queue.
+- Settings: Bà Mối's voice preset, score weights and threshold.
+- No access to conversations with Bà Mối or chats between members.
 
-## Not in v1
+## Not in v2
 
-- Photos. Illustrated avatars instead, because photos need moderation.
-- In-app chat. Contact exchange instead.
-- Full Tử Vi chart readings.
-- The forum and Thảo's 15-question onboarding (phase 2).
-- Payments, notifications, hosting in Vietnam.
+- Photos
+- Full Tử Vi chart readings
+- Payments (Moon's paid boxes are left out)
+- Zalo and Telegram delivery
+- Hosting in Vietnam, which the design must allow
 
 ## Done means
 
 1. A new member finishes the conversation in under 5 minutes on a phone.
-2. Tests show no introduction ever breaks a hard filter.
-3. Tuổi (can chi, ngũ hành) matches a trusted reference, including birthdays
-   around Tết.
-4. Every introduction has at least two reasons citing both profiles and three
-   opening lines about the other person.
-5. Under-18s can't continue, and no contact is shared without both people
-   agreeing.
-6. Thảo's screen shows numbers and feedback, not conversations.
+2. Tests prove no discovery or search result ever breaks a hard filter.
+3. Tests prove pool cards and Bà Mối's texts about other people pass the leak
+   check, and that the rule of 5 holds.
+4. Tuổi matches a trusted reference, including birthdays around Tết.
+5. The full loop works between two test members: box or search, interest,
+   the recipient's summary, acceptance, and anonymous chat.
+6. Thảo's view shows totals and reports, not conversations.
 
-## Questions for Thảo, once she has played with it
+## Open questions
 
-- Thật Space is a women's community. Where do the men in the pool come from?
+For us:
+
+- Can any Moon code be reused, given Linh's share of Moon AI? The default is
+  design only.
+- Where will Discourse run for the demo, and on what domain and email service?
+
+For Thảo, once she has played with it:
+
+- Where do the men in the pool come from? Are they invited as members, in a
+  group that can't see the women-only categories?
 - Should married members be limited to friendship?
 - Is casual dating right for the Thật Space brand?
 - Which voice: bà and con, or chị and em?
-- Should profiles have photos, and who moderates them?
+- Should Discourse membership be paid?
