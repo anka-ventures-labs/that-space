@@ -1,0 +1,184 @@
+# Progress Log
+Run: 7b613403-5162-4615-b6df-71f56c1abfd1
+Task: Build Thật Space — Vietnamese women's community platform frontend demo
+Started: 2026-02-23
+
+## Codebase Patterns
+
+- **Next.js 14 App Router** — all pages in `src/app/`, all components in `src/components/`
+- **Tailwind brand colors**: use `primary` (#5C3D2E), `secondary` (#C4A882), `cream` (#F5F0E8) — all defined in `tailwind.config.ts`. Can also use inline hex values (e.g. `text-[#5C3D2E]`) for one-offs.
+- **Fonts**: `--font-playfair` (Playfair Display, headings) and `--font-inter` (Inter, body) CSS vars injected by `app/layout.tsx`. Use `font-[family-name:var(--font-playfair)]` in Tailwind classes.
+- **Server vs Client Components**: pages default to Server Components. Mark `"use client"` only when needed (hooks, event handlers). Navbar is `"use client"` due to `usePathname`/`useState`.
+- **Images**: logo at `/public/logo.jpg` → served as `/logo.jpg`. Always use `next/image` `<Image>` component.
+- **Testing**: jest + @testing-library/react + jest-environment-jsdom. Config in `jest.config.ts` (uses `next/jest.js` createJestConfig). Tests in `__tests__/`. Mock `next/image` and `next/link` in tests. Run: `npm test`.
+- **Typecheck**: `npx tsc --noEmit`. Must pass before committing.
+- **Build**: `npm run build`. All 5 pages present in build output.
+- **`@/` alias maps to `./src/*`** — `lib/` is at the project root, NOT inside `src/`. Use relative imports like `../../../../lib/forum-data` from `src/app/forum/[slug]/page.tsx`. Test files in `__tests__/` use `../lib/forum-data`.
+- **`generateStaticParams()` must derive from data** — must import and map from the data file (not hardcode slugs) to keep static export in sync with data. Add explicit return type `{ slug: string }[]` to avoid TS errors.
+- **`data-testid` on reply cards** — use `data-testid="reply-card"` on each reply `<div>` to allow `getAllByTestId("reply-card")` in tests; more reliable than filtering by role/text content when there are many similar elements.
+
+---
+
+## 2026-02-23 - US-001: Scaffold Next.js 14 + Tailwind CSS project with brand configuration
+
+- Fixed `app/layout.tsx`: added missing `import Image from "next/image"`, switched `Lato` → `Inter` (as per story AC), updated CSS variable references
+- Updated `tailwind.config.ts`: added `primary: '#5C3D2E'` and `secondary: '#C4A882'` to meet AC (kept existing `cream`, `brown.dark`, `brown.light`)
+- Installed testing deps: `@testing-library/react`, `@testing-library/jest-dom`, `jest`, `jest-environment-jsdom`, `@types/jest`, `ts-jest`
+- Created `jest.config.ts` using `next/jest.js` createJestConfig with jsdom environment
+- Created `jest.setup.ts` importing `@testing-library/jest-dom`
+- Added `test` script to `package.json`
+- Created `__tests__/smoke.test.tsx` with 4 tests: brand text, tagline, CTA button, feature cards
+- All 4 smoke tests pass; build passes; typecheck passes
+
+**Files changed**: `src/app/layout.tsx`, `tailwind.config.ts`, `package.json`, `jest.config.ts`, `jest.setup.ts`, `__tests__/smoke.test.tsx`
+
+**Learnings:**
+- Pre-existing repo had most of the scaffold already done but had a bug: `Image` was used in layout.tsx without being imported — caused TypeScript build failure
+- `next/jest.js` createJestConfig handles Next.js transforms but doesn't auto-mock `next/link` — need explicit jest.mock() for it
+- The `priority` prop on `next/image` passes through to the mock img causing a console warning — harmless but could be filtered in jest.setup if desired
+
+---
+
+## 2026-02-23 - US-002: Build global layout: sticky navigation bar and shared footer
+
+- Created `src/components/Footer.tsx`: centred logo image, tagline, copyright © 2024 Thật Space; uses brand cream background and primary text colours
+- Updated `src/app/layout.tsx`: replaced inline `<footer>` block with `<Footer />` component; removed unused `Image` import
+- Wrote `__tests__/Navbar.test.tsx` (8 tests): logo src, all 4 nav links, hamburger button aria-label, sticky/top-0 CSS classes, active link class applied when pathname matches, non-active links don't get active class, hamburger toggles mobile menu, mobile menu closes on link click
+- Wrote `__tests__/Footer.test.tsx` (4 tests): logo src, copyright text, tagline text, footer HTML element
+- All 16 tests pass; typecheck clean; build passes
+
+**Files changed**: `src/components/Footer.tsx` (new), `src/app/layout.tsx`, `__tests__/Navbar.test.tsx` (new), `__tests__/Footer.test.tsx` (new)
+
+**Learnings:**
+- Navbar was already scaffolded from US-001; this story componentised the Footer and added full test coverage
+- `hover:border-b-2` in Tailwind className strings contain the substring `border-b-2` — test active-state checks must look for ` border-b-2 border-[#C4A882]` (with leading space) to avoid false positives from hover utility classes
+- The Navbar `aria-label="Toggle menu"` (not "Open menu") — tests should use `/toggle menu/i` regex for flexibility
+
+---
+
+## 2026-02-23 13:13 - US-003: Build Landing Page (/)
+
+- Fixed `app/page.tsx`: moved h1 to wrap the tagline "A private space for women to connect, grow, and discover" (was previously on "Thật Space"). "Thật Space" is now a styled `<p>` for visual hierarchy.
+- Page already had full implementation from prior scaffold: hero section (logo via `next/image`, h1 tagline, "Join the Community" CTA linking to /forum), 3 feature cards (Forum → /forum, Tử Vi Horoscope → /tuvi, Matchmaking → /matchmaking), 3 Vietnamese testimonials (Nguyễn Thanh Hà, Trần Minh Châu, Lê Phương Linh), CTA banner.
+- Created `__tests__/LandingPage.test.tsx`: 14 tests covering h1 tagline, logo src, CTA link href, all 3 feature card titles, card hrefs, 2+ Vietnamese testimonial names, no Lorem ipsum text.
+- All 30 tests pass (14 new + 16 existing); typecheck clean; build passes.
+
+**Files changed**: `src/app/page.tsx`, `__tests__/LandingPage.test.tsx` (new)
+
+**Learnings:**
+- When a page has a branding name (e.g. "Thật Space") AND a tagline, put the SEO-important tagline in `<h1>` and the brand name in a styled `<p>` or `<span>` — avoids AC conflicts
+- The `priority` prop on `next/image` causes a harmless `console.error` in tests because the mock passes it to a real `<img>`. Acceptable — tests still pass.
+- Use `element.closest("a")` to find the wrapping Link card from a child text element in tests.
+
+---
+
+## 2026-02-23 13:35 - US-004: Build Forum listing page (/forum) with category sidebar and thread list
+
+- Created `lib/forum-data.ts`: exports `forumThreads` array (10 threads) with id, slug, title, authorName, timestamp, replyCount, category fields. Also exports `forumCategories` const array of 4 category strings.
+- Rewrote `src/app/forum/page.tsx`: imports threads from lib/forum-data.ts; uses exactly 4 sidebar categories (Introductions, Life & Growth, Relationships, Spirituality); renders each thread with title as a `<Link href="/forum/[slug]">` element; shows authorName, timestamp, replyCount badge per thread row.
+- Created `__tests__/ForumPage.test.tsx` (16 tests): sidebar renders all 4 categories (scoped via `within(aside)`), 8+ thread links pointing to /forum/[slug], each thread in forum-data has all required fields, no Lorem ipsum, Vietnamese author names present.
+- All 46 tests pass; typecheck clean; build passes with 18 static pages.
+
+**Files changed**: `lib/forum-data.ts` (new), `src/app/forum/page.tsx` (rewritten), `__tests__/ForumPage.test.tsx` (new)
+
+**Learnings:**
+- When category names appear in both sidebar AND in thread category badges, `screen.getByText("Introductions")` throws "Found multiple elements" — use `within(screen.getByRole("complementary"))` to scope queries to the `<aside>` element
+- `screen.getByRole("complementary")` selects the `<aside>` element (ARIA landmark role)
+- Thread titles as individual `<Link>` elements (not wrapping whole card) allows `screen.getByRole("link", { name: threadTitle })` in tests, which is cleaner than `element.closest("a")`
+---
+
+## 2026-02-23 - US-005: Build Forum thread detail page (/forum/[slug])
+
+- Extended `lib/forum-data.ts`: added `ForumReply` interface `{authorName, timestamp, body}`; added `body` (string) and `replies: ForumReply[]` fields to `ForumThread` interface and all 10 thread objects. All copy is Vietnamese community content (no Lorem ipsum).
+- Rewrote `src/app/forum/[slug]/page.tsx`:
+  - Imports `forumThreads` from relative path `../../../../lib/forum-data`
+  - `generateStaticParams()` derives slug list from `forumThreads.map(t => ({slug: t.slug}))` — no hardcoded slugs
+  - Layout: breadcrumb (Forum › category › title), h1 thread title, original post body card, replies list with `data-testid="reply-card"` on each reply div, static reply textarea + "Đăng phản hồi" button, back link to /forum
+  - 404 fallback rendered inline for unknown slugs
+- Created `__tests__/ForumThreadPage.test.tsx` (19 tests): thread title as h1, ≥3 reply cards via getAllByTestId, reply textarea present, links to /forum in breadcrumb and back link, reply author names and bodies rendered, generateStaticParams returns all slugs, data structure validation (body + replies on every thread), no Lorem ipsum.
+- All 65 tests pass; typecheck clean; build passes with 18 static pages.
+
+**Files changed**: `lib/forum-data.ts` (extended), `src/app/forum/[slug]/page.tsx` (rewritten), `__tests__/ForumThreadPage.test.tsx` (new)
+
+**Learnings:**
+- `@/` alias maps to `./src/*` only — `lib/` is at project root, use relative imports from deep app routes
+- Add `data-testid="reply-card"` to reply elements for reliable `getAllByTestId` in tests
+- Explicit return type `{ slug: string }[]` on `generateStaticParams()` avoids implicit `any` TS errors
+---
+
+## 2026-02-23 - US-006: Build Tử Vi Horoscope page (/tuvi)
+
+- Rewrote `src/app/tuvi/page.tsx`: static Server Component (no `"use client"` needed since no hooks/interactivity). Includes:
+  - h1 'Tử Vi — Lá Số Tử Vi' with intro paragraph explaining Tử Vi as Vietnamese astrological system based on birth time
+  - Static birth info form with `<input type="text">` (name), `<input type="date">` (date of birth), `<input type="time">` (time of birth), `<input type="text">` (place of birth). Labelled with `htmlFor`/`id` pairs for accessibility and testability.
+  - 'Generate Reading' button (`type="button"`, no action)
+  - Mock reading result card with decorative lotus SVG, 'Your Reading' title, three subsections: 'Love & Relationships', 'Career & Purpose', 'Spiritual Outlook' (each 3–4 sentences, all original Vietnamese community copy)
+  - 'Download PDF Report' button (static, no action)
+  - All copy in Vietnamese — no Lorem ipsum
+- Created `__tests__/TuviPage.test.tsx` (14 tests): h1 contains 'Tử Vi', full title match, name/date/time/place inputs exist with correct types, 'Generate Reading' button, 'Your Reading' section, three subsections visible, 'Download PDF Report' button, no Lorem ipsum, intro text check.
+- All 79 tests pass (65 existing + 14 new); typecheck clean; build passes with /tuvi as static page.
+
+**Files changed**: `src/app/tuvi/page.tsx` (rewritten), `__tests__/TuviPage.test.tsx` (new)
+
+**Learnings:**
+- Previous scaffold had `<select>` for time-of-birth — replaced with `<input type="time">` to satisfy AC and enable `getByLabelText` in tests
+- Subsection headings using English labels ('Love & Relationships', 'Career & Purpose', 'Spiritual Outlook') alongside Vietnamese content satisfies both AC (English keywords in tests) and brand authenticity
+- Server Component (no "use client") is simpler: static page with no interactivity required for demo — avoid `useState` when not needed
+- `type="button"` on non-submit buttons avoids accidental form submission in static forms
+---
+
+## 2026-02-23 - US-007: Build Matchmaking page (/matchmaking) with profile cards and compatibility modal
+
+- Created `lib/matchmaking-data.ts`: exports `matchmakingProfiles` array (6 profiles) with id, name, initials, avatarColor, sign, bio, and compatibility (score, details with Love/Communication/Spirituality labels + stars, description) fields. All English category labels for testability.
+- Rewrote `src/app/matchmaking/page.tsx`: "use client" component. h1 = 'Tìm Duyên — Spiritual Matchmaking', 2-paragraph intro about Tử Vi soul-level compatibility. 6 profile cards in responsive grid (1/2/3 cols), each with colored avatar circle (initials, inline style hex color), name, star sign, 2-line bio (line-clamp-2), 'View Compatibility' button. Modal with useState showing: "[score]% Compatible" score, star ratings for Love/Communication/Spirituality (★★★★☆ style), compatibility description, 'Close' button.
+- Created `__tests__/MatchmakingPage.test.tsx` (18 tests): h1 text, exactly 6 profile cards, each card has 'View Compatibility' button, all 6 profile names rendered, modal hidden initially, clicking first card shows modal, score appears (e.g. "92% Compatible"), Love/Communication/Spirituality labels in modal, Close button present, Close button dismisses modal, each of 6 profiles opens its own score. Data tests: 6 profiles exported, all required fields, all have Love+Communication+Spirituality details, unique ids.
+
+**Files changed**: `lib/matchmaking-data.ts` (new), `src/app/matchmaking/page.tsx` (rewritten), `__tests__/MatchmakingPage.test.tsx` (new)
+
+**Learnings:**
+- Existing matchmaking page used emoji avatars and Vietnamese button text — had to rewrite for AC compliance (English labels, initials-based avatars, 'View Compatibility' text)
+- `data-testid` was not needed here — `getAllByText("View Compatibility")` and `getAllByRole("button", { name: /view compatibility/i })` both work reliably for the 6 cards
+- For colored avatar circles with hex values, `style={{ backgroundColor: profile.avatarColor }}` is cleaner than generating dynamic Tailwind classes (which are purged in production builds)
+- `fireEvent.click()` from @testing-library/react works fine for useState-based modal toggles in client components
+- The "each profile can open its own modal" test renders a new <MatchmakingPage /> per iteration to avoid stale state — use unmount() to avoid DOM leaks
+---
+
+## 2026-02-23 - US-008: Build Profile page (/profile) with readings and matches sections
+
+- Rewrote `src/app/profile/page.tsx`: fully static Server Component with:
+  - Profile header: large colored circle avatar with initials 'NT', member name ("Nguyễn Thị Lan") as h1, star sign (♓ Song Ngư), join date, 3-line bio
+  - 'My Readings' section (h2): 2 reading cards each with date, Vietnamese title (e.g. "Tháng 1 — Tử Vi Reading"), 1–2 sentence excerpt, entire card is a `<Link href="/tuvi">`
+  - 'My Matches' section (h2): 3 matched profile mini-cards with colored initials avatar, name, star sign, compatibility score, and 'View Match' `<Link href="/matchmaking">` button
+  - Match data reuses avatar color + initials + sign pattern from matchmaking data (Trần Minh Châu, Nguyễn Bảo Anh, Võ Thanh Thảo)
+- Created `__tests__/ProfilePage.test.tsx` (12 tests): h1 member name, 'My Readings' h2, exactly 2 reading titles, exactly 2 reading card links to /tuvi, 'My Matches' h2, exactly 3 'View Match' links, all 3 links to /matchmaking, 3 match names, star signs, no Lorem ipsum, sign+joinDate, reading links to /tuvi.
+- All 109 tests pass; typecheck clean; build passes with 18 static pages.
+
+**Files changed**: `src/app/profile/page.tsx` (rewritten), `__tests__/ProfilePage.test.tsx` (new)
+
+**Learnings:**
+- When reading excerpt text contains the member's star sign string (e.g. "Song Ngư"), `getByText(/Song Ngư/i)` throws "Found multiple elements" — use `getAllByText` or scope to specific DOM regions
+- Section headings should use the exact AC English labels ('My Readings', 'My Matches') for reliable test queries with `getByRole("heading", { name: ... })`
+- Reading cards as full `<Link>` wrappers are both accessible and easy to test via `getAllByRole("link")` filtered by href="/tuvi"
+- For match avatar colors with hex values, always use `style={{ backgroundColor: ... }}` (not dynamic Tailwind classes which get purged)
+---
+
+## 2026-02-23 - US-009: Polish, mobile responsiveness audit, and final integration check
+
+- Updated `next.config.js`: added `images: { unoptimized: true }` to ensure logo.jpg renders correctly in static export environments where the Next.js image optimization server is unavailable.
+- Verified no `Lorem ipsum` present in any source file: `grep -r "Lorem ipsum" src/ lib/` returned clean.
+- Confirmed all nav links route to real pages (verified by build output showing all 6 routes: /, /forum, /forum/[slug], /tuvi, /matchmaking, /profile).
+- Created `__tests__/integration.test.tsx` (14 tests):
+  - **Route components**: all 5 main route components + forum/[slug] dynamic route can be imported and are functions
+  - **forum-data.ts**: exports ≥8 threads (actual: 10), each thread has required fields, forumCategories is non-empty, no Lorem ipsum
+  - **matchmaking-data.ts**: exports exactly 6 profiles, each with required fields, compatibility data, and unique ids
+- All 123 tests pass (109 pre-existing + 14 new integration tests).
+- `npx tsc --noEmit` passes with 0 errors.
+- `npm run build` exits 0, generates 18 static pages.
+
+**Files changed**: `next.config.js` (images.unoptimized added), `__tests__/integration.test.tsx` (new)
+
+**Learnings:**
+- `images: { unoptimized: true }` in next.config.js is the clean way to handle image rendering in static/demo deployments — no CDN required
+- Integration tests importing page components directly (without rendering) are fast and reliable: just `expect(typeof Component).toBe("function")` confirms the module resolves and exports a valid React component
+- All previous stories had solid test coverage — US-009 audit confirmed no regressions; 123/123 tests pass in < 2 seconds
+---
