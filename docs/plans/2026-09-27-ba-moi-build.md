@@ -30,6 +30,9 @@ Supabase pg_cron + pg_net ──every 5 min──▶ /cron/retry-posts (also kee
 
 ## Service API (tool contract)
 
+As built, with every argument, result and error code:
+[`docs/ba-moi-service-api.md`](../ba-moi-service-api.md).
+
 Every endpoint is `POST /api/ba-moi/v1/<name>`. Request bodies are validated
 with `zod`.
 

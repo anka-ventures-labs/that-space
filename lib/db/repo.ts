@@ -90,6 +90,11 @@ export async function recordConsent(db: Db, memberId: string, version: string, a
   )
 }
 
+/** The member's own thread with Bà Mối, where her notifications go. */
+export async function setPersonaTopic(db: Db, memberId: string, topicId: number): Promise<void> {
+  await db.query(`update members set persona_topic_id = $2, updated_at = now() where id = $1`, [memberId, topicId])
+}
+
 export async function setMemberStatus(db: Db, memberId: string, status: MemberStatus): Promise<void> {
   await db.query(`update members set status = $2, updated_at = now() where id = $1`, [memberId, status])
 }
@@ -573,11 +578,20 @@ export interface RelayTopic {
 const RELAY_TOPIC_COLS = `match_id as "matchId", member_id as "memberId", discourse_topic_id as "discourseTopicId",
   alias_for_other as "aliasForOther"`
 
-export async function insertRelayTopic(db: Db, t: { matchId: string; memberId: string; aliasForOther: string }): Promise<void> {
-  await db.query(
-    `insert into relay_topics (match_id, member_id, alias_for_other) values ($1, $2, $3) on conflict do nothing`,
+/** Returns false when the member already has a relay topic for this match. */
+export async function insertRelayTopic(db: Db, t: { matchId: string; memberId: string; aliasForOther: string }): Promise<boolean> {
+  const rows = await db.query(
+    `insert into relay_topics (match_id, member_id, alias_for_other) values ($1, $2, $3) on conflict do nothing
+     returning member_id`,
     [t.matchId, t.memberId, t.aliasForOther],
   )
+  return rows.length > 0
+}
+
+export async function getRelayTopic(db: Db, matchId: string, memberId: string): Promise<RelayTopic | null> {
+  const [row] = await db.query<RelayTopic>(
+    `select ${RELAY_TOPIC_COLS} from relay_topics where match_id = $1 and member_id = $2`, [matchId, memberId])
+  return row ?? null
 }
 
 export async function setRelayTopicDiscourseId(db: Db, matchId: string, memberId: string, discourseTopicId: number): Promise<void> {

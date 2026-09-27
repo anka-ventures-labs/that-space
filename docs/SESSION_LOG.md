@@ -1,5 +1,127 @@
 # Session log
 
+## 2026-09-27: W-C service API, relay and outbox
+
+### What changed
+
+- **Routes** (Next.js route handlers, Node runtime, pinned to `sin1`):
+  - `app/api/ba-moi/v1/[tool]` for the 12 tools
+  - `webhooks/discourse` for the relay
+  - `cron/retry-posts` for the outbox retry
+- **`lib/service/`:**
+  - `dispatch.ts`: the tool envelope. It checks the secret with a hashed,
+    timing-safe compare, validates with zod, and resolves the member from the
+    tool context only.
+  - `handlers/`:
+    - onboarding: `status`, `consent`, `profile_update`, `card_preview`,
+      `card_confirm`
+    - discovery: `box_open`, `search`
+    - signals: `interest`, `signals`, `signal_respond`
+    - matches: `matches`, `match_action`, and opening a match
+  - `pairs.ts`: pair scoring, and the fit facts the persona may see.
+  - `cards.ts`: the card under the rule of 5, a template summary, and the leak
+    and contact check.
+  - `profile.ts`: interview merging and validation.
+  - `relay-policy.ts` and `relay.ts`: the webhook relay.
+  - `outbox.ts`: database first, Discourse second, with a keyed retry queue.
+  - `copy.ts`: every Vietnamese sentence the service writes, including the
+    versioned consent text.
+  - `deps.ts`: environment and dependencies.
+- **`lib/discourse/`:** a two-call API client, and webhook HMAC verification
+  over the raw body.
+- **`lib/matching/score.ts`:** gained `openAnswerFit` (the spec's keyword
+  fallback, since the service never calls a model), `sharedHobbies`,
+  `mentionsPhrase` and `foldText`.
+- **Docs:**
+  - `docs/ba-moi-service-api.md` is the contract for W-E.
+  - `.env.example` lists the runtime variables.
+  - Spec: privacy rule 5 is updated, and "watch the pool" is marked as not in
+    this version.
+- **Tests:**
+  - `tests/helpers/service.ts`: PGlite through postgres.js, a fake Discourse
+    that can fail on demand, a settable clock, and a seeded random source.
+  - `tests/fixtures/discourse/`: a `post_created` payload and a tool call, in
+    the documented shapes. W-D replaces them with captured ones.
+- **`vitest.config.ts`:** 30-second test and hook timeouts, because PGlite
+  suites slow down several times when files run in parallel.
+
+### Decisions
+
+- **Only card-visible facts reach the persona.** Scores read private profiles,
+  but the fit carries only the other card's contents and relationship labels:
+  tier, shared hobbies, astrology labels, and same region when the card shows
+  it. Children plans count in the score but are never disclosed (spec privacy
+  rules 3 and 4).
+- **Searches match only what cards show,** so a search can't reveal a hidden
+  region. Her keywords count as her interests while that search is scored.
+  Without that, a person matching exactly what she asked for scored below the
+  threshold on her usual hobbies (a test caught this).
+- **Limits per Vietnam day:**
+  - 1 box
+  - 6 search results (3 per search, so two full searches for a demo tester)
+  - 5 new interests
+
+  Repeating a yes already sent is free.
+- **The sender hears only "chưa có duyên"** for a decline or a dismiss, so the
+  two can't be told apart.
+- **Consent is versioned in code.** `status` returns the exact text for the
+  persona to show, so the version recorded is the text shown.
+- **The persona's thread is remembered only from private-message tool calls.**
+  Otherwise a notice could land in a public topic. If there is no such thread,
+  Bà Mối opens a new private message.
+- **Revealing:** the first ask notifies the other side once; the second ask
+  swaps profile links. Ending or blocking tells the other side only that the
+  chat ended.
+- **The relay has two loop guards:** the bot-user list and the author check
+  (the sender must own the relay topic). Either one alone stops a loop.
+- **Watching the pool for a search** is deferred. The spec now says so, and the
+  persona must not promise it.
+
+### Found and fixed
+
+- **Nested BBCode quotes left a fragment.** Stripping is now innermost-first,
+  and stray tags are removed.
+- **An outbox test assumed which relay thread opens first.** That depends on
+  UUID order, so the test now finds the side that failed.
+- **Timeouts under parallel files.** See the Vitest timeouts above.
+
+### Verification
+
+- **`npx vitest run`:** 24 files, 272 tests, passing on two runs in a row. The
+  service tests cover:
+  - the auth matrix: missing, wrong or malformed secret; identity forged in
+    args is ignored; the persona thread only from private messages; a generic
+    500 when the database is down; log lines carry ids only
+  - consent gating and pause
+  - interview merging, validation and the default age range
+  - card previews, and the leak and contact refusals
+  - re-confirmation after key changes
+  - deletion, with notices to the other side
+  - the box: one per Vietnam day, never the same person, a no-match uses the
+    turn, and a failure gives the turn back
+  - the search limit and criteria
+  - the full signal loop, decline, crossing, expiry, samples and the interest
+    limit
+  - the relay: signature, ignored events, bots, strangers, both directions,
+    holds, stripping, length and rate limits, replays, reveal, end, block
+  - the outbox under a Discourse outage, recovered by the cron retry
+- **"Done means" 3 (no result ever breaks a hard filter, either way):** covered
+  by a seeded 40-member property test that checks against an independent
+  oracle. A mutation check confirmed it fails when one direction of the gender
+  filter is removed.
+- **`tsc`, `next lint` and `npm run build`** are clean. The three API routes are
+  dynamic. No Supabase key or password appears in `.next` output.
+
+### Next
+
+- **W-D:** Discourse on the ASUS, once Atum has moved off.
+- **W-E:** the persona and tool scripts, from `docs/ba-moi-service-api.md`.
+  This needs the OpenRouter key.
+- **W-F:**
+  - the Vercel preview (local prebuilt)
+  - the pg_cron and pg_net retry job, which needs the service URL
+  - the Muse Spark code review
+
 ## 2026-09-27: Fix: `lib/matching/derive.ts` was missing from 03b257f
 
 The W-B commit `03b257f` imports `lib/matching/derive.ts` but didn't contain it:

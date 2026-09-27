@@ -1,0 +1,126 @@
+# Bà Mối service API (as built in W-C)
+
+The contract the Discourse AI persona's tools call. The persona writes every
+sentence the member reads in conversation. The service returns facts, plus
+`message_vi` fallbacks with errors. Source: `lib/service/`.
+
+## Calling convention
+
+`POST /api/ba-moi/v1/<tool>`, with header `Authorization: Bearer $BA_MOI_TOOL_SECRET`.
+
+```json
+{
+  "auth": { "user_id": 101, "username": "lan", "name": "Lan", "topic_id": 4001, "private_message": true },
+  "args": { }
+}
+```
+
+**The `auth` object:**
+- The tool script builds `auth` only from Discourse AI's tool `context`, never
+  from the model's arguments.
+- The member is resolved from `auth.user_id` alone.
+- Unknown keys in `args`, such as a model-invented `user_id`, are stripped.
+- `topic_id` is remembered as her thread with Bà Mối only when
+  `private_message` is true. Notifications go to that thread. If she has none,
+  Bà Mối opens a new private message titled "Bà Mối có tin cho bạn".
+
+**Status codes:**
+- 401: a missing or wrong secret.
+- 404: an unknown tool.
+- 400: a malformed body or envelope.
+- 500: an internal failure (`error: "internal"`).
+- 200: every tool outcome, including `ok: false`. `invalid_args` carries
+  `issues: [{ path, message }]` so the model can correct its call.
+
+Every failure has the shape `{ ok: false, error, message_vi }`.
+
+## Tools
+
+| Tool | Args | Success |
+|---|---|---|
+| `status` | none | `opted_in`, `consent` (`{ version, text }` until she agrees to this version; show it word for word), `paused`, `missing` (interview fields still needed), `married_friendship_only`, `card` (`none`, `needs_confirmation` or `confirmed`), `box_available`, `next_box_at`, `search_results_left`, `interests_left`, `pending_signals`, `open_matches` |
+| `consent` | `action`: `opt_in` (needs `adult_confirmed: true`), `pause`, `resume`, or `delete` (needs `confirm: true`) | `opted_in`, `paused` or `deleted` |
+| `profile_update` | Any of: `intent`, `gender`, `seeking`, `birth_date` (YYYY-MM-DD), `birth_time` (HH:MM, or `null` for "không nhớ"), `city`, `age_min`, `age_max`, `marital`, `children`, `wants_children`, `hobbies` (1–8), `open_answer`, `occupation` | `missing`, `card_needs_confirmation`, `age_range` (defaults to her age ±5 once the birth date is known) |
+| `card_preview` | none | `card`, `template_summary`, `current_summary`, `confirmed`, `summary_max_length` |
+| `card_confirm` | `summary_text` (10–400 characters, written by the persona) | `card`, `in_pool` |
+| `box_open` | none | `result`: `match` (with `introduction`), `no_match` or `cooldown`, plus `next_box_at` |
+| `search` | Any of: `keywords` (up to 5 phrases, matched against card hobbies and summary), `region`, `age_min`, `age_max`, `element` | `results` (up to 3 introductions, best first) and `search_results_left` |
+| `interest` | `discovery_id` | `result`: `sent`, `already_sent`, `matched`, `already_matched` or `sample` |
+| `signals` | none | `signals: [{ signal_id, card, fit, expires_at }]`: the sender's card and the fit from her side |
+| `signal_respond` | `signal_id`, `response` (`accept`, `decline` or `dismiss`) | `result`: `matched`, `declined` or `dismissed` |
+| `matches` | none | `matches: [{ match_id, alias, state, i_asked_to_reveal, they_asked_to_reveal, chat_url }]` |
+| `match_action` | `match_id`, `action` (`end`, `block` or `reveal`) | `result`: `ended`, `blocked`, `waiting_for_other` or `revealed` |
+
+**An introduction** is `{ discovery_id, card, fit, is_sample }`.
+- **`card`** is the other person's anonymous card:
+  - `ageBand`, `gender`, `seeking`, `intent`, `hobbies`
+  - `element` (nạp âm)
+  - `dayMaster`
+  - `summary`
+  - `region` and `initial`, only under the rule of 5
+  - `isSample`
+- **`fit`** is `{ tier, tier_label, shared_hobbies, astrology, same_region }`:
+  - `astrology` holds relationship labels only.
+  - `same_region` is null when the card hides the region.
+  - Nothing else about the other person reaches the persona.
+  - The persona says "a good match" (`tier_label`), never a number, and never
+    "the best".
+- **When `is_sample` is true,** the persona must say it's a sample profile.
+  Interest in a sample returns `sample` and notifies no one.
+
+**Error codes:**
+- `consent_required`, `adult_required`, `paused`
+- `profile_incomplete` (with `missing`), `card_unconfirmed`
+- `under_18`, `invalid_birth_date`, `age_range_invalid`
+- `summary_leaks` (with `violations`, for example `dob`, `forbidden_term:<her
+  term>` or `contact:phone`)
+- `not_found`, `stale` (the person changed their profile after being shown),
+  `gone`
+- `daily_limit`, `expired`, `already_answered`, `closed`, `confirm_required`
+- `invalid_args`, `internal`
+
+## Rules the service enforces
+
+- **Daily limits** reset at midnight in Vietnam (UTC+7):
+  - one box
+  - 6 search results
+  - 5 new interests
+  - A no-match still uses the box.
+- **What searches can match:** only what cards show, so a search can't reveal
+  what a card hides. Her keywords count as her interests while that search is
+  scored.
+- **Answers to a signal:**
+  - A decline is final.
+  - The sender hears only "chưa có duyên", for a decline or a dismiss.
+  - Two yeses, crossing or answered, open the match once.
+- **Changing a hard-filter answer** voids open discoveries both ways. That
+  covers birth date or time, intent, gender, who she's seeking, marital status
+  and age range. Except for the age range, it also un-confirms her card until
+  she confirms it again.
+
+## Notices the service posts
+
+The wording lives in `lib/service/copy.ts`.
+
+- **Bà Mối, in her thread:**
+  - a signal received
+  - "chưa có duyên"
+  - a match opened
+- **Thư Duyên, in the relay threads:**
+  - the intro and rules
+  - relayed messages, as `**<alias>:**` then the text
+  - held-message notices: contact details, attachment, too long, too fast
+  - "wants to reveal"
+  - revealed, with the other's profile link
+  - ended, and the block confirmation
+
+  The other side is only told the chat ended, never that they were blocked.
+
+## Webhook and cron
+
+- **`POST /api/ba-moi/v1/webhooks/discourse`:** the relay. It has one
+  subscription, the `post` event. The policy is in the build plan.
+- **`GET` or `POST /api/ba-moi/v1/cron/retry-posts`:** needs
+  `Authorization: Bearer $CRON_SECRET`. Supabase pg_cron calls it every 5
+  minutes through pg_net. It retries queued Discourse posts, and a post is dead
+  after 10 attempts. The job is set up in W-F, once the service URL exists.

@@ -30,7 +30,7 @@ npm run dev        # http://localhost:3000
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Vitest: page tests, matching core and data layer (224 tests) |
+| `npm test` | Vitest: page tests, matching core, data layer and service (272 tests) |
 | `npm run typecheck` | Typecheck |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
 | `npm run build` | Production build (18 static pages) |
@@ -55,6 +55,9 @@ components/       Navbar (client component) and Footer
 lib/              Demo data: forum threads, matchmaking profiles
 lib/matching/     Bà Mối matching core: lunar calendar, tuổi, day pillar, filters, scores, privacy
 lib/db/           Bà Mối data layer: postgres.js client, repository, sample members
+lib/service/      Bà Mối service: tool handlers, relay, outbox, Vietnamese copy
+lib/discourse/    Discourse API client and webhook signature check
+app/api/ba-moi/   Route handlers: /v1/<tool>, /v1/webhooks/discourse, /v1/cron/retry-posts
 supabase/         Supabase CLI config and SQL migrations
 scripts/          One-off scripts (seed-samples.ts, run with tsx)
 __tests__/        Vitest + Testing Library page tests (jsdom)
@@ -98,6 +101,9 @@ npm run seed:samples                   # 30 labelled sample members
   member data.
 - Tests never touch Supabase: `tests/helpers/pglite-db.ts` gives each suite an
   in-memory PGlite with the same migrations.
+- The service API the persona calls is documented in
+  [docs/ba-moi-service-api.md](docs/ba-moi-service-api.md). Its environment
+  variables are listed in `.env.example`.
 
 ## Deployment
 

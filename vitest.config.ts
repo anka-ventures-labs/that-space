@@ -11,6 +11,10 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     globals: false,
     reporters: 'default',
+    // Data-layer and service suites each boot PGlite (Postgres in WASM), which
+    // runs several times slower while other files run in parallel.
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
   },
   // Next compiles JSX with the automatic runtime, so components need no
   // `import React`; tests render them the same way.

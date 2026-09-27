@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   THRESHOLD, TIER_LABELS, WEIGHTS, astrologyBlend, childrenFit, directionalScore, hobbyOverlap,
-  mutualScore, regionFit, tierFor,
+  mutualScore, openAnswerFit, regionFit, sharedHobbies, tierFor,
 } from '@/lib/matching/score'
 import { candidateWeight, dailyOpeningConsumesTurn, pickWeighted } from '@/lib/matching/pick'
 
@@ -79,5 +79,23 @@ describe('Duyên box pick (Moon)', () => {
     expect(dailyOpeningConsumesTurn('no_match')).toBe(true)
     expect(dailyOpeningConsumesTurn('void')).toBe(false)
     expect(dailyOpeningConsumesTurn(null)).toBe(false)
+  })
+})
+
+describe('open answer fallback and shared hobbies', () => {
+  it('counts hobbies on their card that her answer mentions, as whole words and without accents', () => {
+    const card = { hobbies: ['thiền', 'trà đạo', 'vẽ tranh'] }
+    expect(openAnswerFit(null, card)).toBe(0.5)
+    expect(openAnswerFit('Mình mê leo núi', card)).toBe(0.4)
+    expect(openAnswerFit('Muốn có bạn ngồi thiền cuối tuần', card)).toBeCloseTo(0.8)
+    expect(openAnswerFit('Tra dao va ngoi thien', card)).toBe(1)
+    expect(openAnswerFit('Thích bơi lội', { hobbies: ['bơi'] })).toBeCloseTo(0.8)
+    expect(openAnswerFit('Mình là kỹ sư', { hobbies: ['sư'] })).toBe(0.4) // too short to count
+    expect(openAnswerFit('Mình thích trà sữa', { hobbies: ['trà đạo'] })).toBe(0.4)
+  })
+
+  it('lists their hobbies she shares, as written on their card', () => {
+    expect(sharedHobbies(['Yoga', 'đọc sách'], ['doc sach', 'bơi', 'yoga'])).toEqual(['doc sach', 'yoga'])
+    expect(sharedHobbies([], ['yoga'])).toEqual([])
   })
 })

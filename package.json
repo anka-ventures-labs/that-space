@@ -18,7 +18,8 @@
     "next": "15.5.26",
     "postgres": "^3.4.9",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

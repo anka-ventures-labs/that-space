@@ -82,10 +82,10 @@ matchmaking logic and thin glue are ours.
    checks every summary it stores.
 4. **Reasoning about another person uses only their pool card**, never their
    private profile.
-5. **The service is the only way into the database.** It uses the service
-   role, which bypasses row-level security. Protection comes from having no
-   anon or authenticated policies and never shipping the anon key to any
-   client.
+5. **The service is the only way into the database.** It connects as the
+   database owner through Supabase's pooler. Row-level security is on with no
+   policies, and the public API roles (anon, authenticated) hold no privileges
+   at all, so the public key opens nothing.
 6. **In the beta, Discourse admins can read members' direct messages with Bà
    Mối and the relayed chats.** Minh agreed to this for testing with Thảo's
    friends. The service never exposes private profiles.
@@ -137,7 +137,8 @@ matchmaking logic and thin glue are ours.
    - The persona turns the request into structured filters.
    - The service returns up to 3 anonymous cards, ranked by mutual score. They
      count as shown, and a daily limit applies.
-   - If none fit, Bà Mối offers to watch the pool and notify her.
+   - If none fit, Bà Mối suggests the Duyên box or another search later.
+     Watching the pool and notifying her later is not in this version.
 5. **Interest.** "Muốn làm quen" sends a signal.
    - The service builds the recipient's view: the sender's anonymous card plus
      how the two fit, seen from the recipient's side. It posts this into the
@@ -257,6 +258,7 @@ her scores recomputed.
 - Payments
 - Outgoing email (recruitment is by invite link)
 - Hosting in Vietnam (planned: the AWS Hanoi Local Zone)
+- Watching the pool for a search and notifying her when someone new fits
 
 ## Done means
 

@@ -3,7 +3,7 @@
  * preferences differ; the mutual score is the lower of the two (Moon's rule),
  * and a pair must clear THRESHOLD in both directions.
  */
-import type { Children, Intent, Region, WantsChildren } from './types'
+import type { Children, Intent, PoolCard, Region, WantsChildren } from './types'
 
 /** Beta constants; scores are logged server-side for tuning later. */
 export const WEIGHTS = {
@@ -32,18 +32,48 @@ export function tierFor(mutual: number, threshold = THRESHOLD): Tier | null {
   return 'hop'
 }
 
-function normalizeHobby(value: string): string {
+/** Lowercase, accents folded, đ as d: for comparing Vietnamese words typed with or without diacritics. */
+export function foldText(value: string): string {
   return value.trim().toLocaleLowerCase('vi-VN').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd')
 }
 
 /** Overlap relative to the smaller list, 0..1. Empty lists are neutral (0.5). */
 export function hobbyOverlap(a: string[], b: string[]): number {
-  const sa = new Set(a.map(normalizeHobby).filter(Boolean))
-  const sb = new Set(b.map(normalizeHobby).filter(Boolean))
+  const sa = new Set(a.map(foldText).filter(Boolean))
+  const sb = new Set(b.map(foldText).filter(Boolean))
   if (sa.size === 0 || sb.size === 0) return 0.5
   let shared = 0
   for (const h of sa) if (sb.has(h)) shared++
   return shared / Math.min(sa.size, sb.size)
+}
+
+/** Their hobbies that she shares, as written on their card. */
+export function sharedHobbies(mine: string[], theirs: string[]): string[] {
+  const own = new Set(mine.map(foldText))
+  return theirs.filter((h) => own.has(foldText(h)))
+}
+
+function asWords(value: string): string {
+  return ` ${foldText(value).replace(/[^a-z0-9]+/g, ' ').trim()} `
+}
+
+/** Whether `text` contains `phrase` as whole words, ignoring case and accents. */
+export function mentionsPhrase(text: string, phrase: string): boolean {
+  const needle = asWords(phrase)
+  return needle.trim().length > 0 && asWords(text).includes(needle)
+}
+
+/**
+ * How well another person's card answers her open answer, 0..1. The service
+ * never calls a model, so this is the spec's keyword fallback: each hobby on
+ * their card that her answer mentions counts. No answer is neutral (0.5); an
+ * answer their card doesn't touch scores a little lower (0.4).
+ */
+export function openAnswerFit(answer: string | null | undefined, card: Pick<PoolCard, 'hobbies'>): number {
+  const text = answer ? asWords(answer) : ''
+  if (!text.trim()) return 0.5
+  const hits = card.hobbies.map(asWords).filter((phrase) => phrase.trim().length >= 3 && text.includes(phrase)).length
+  return hits === 0 ? 0.4 : Math.min(1, 0.6 + 0.2 * hits)
 }
 
 export interface ChildrenInfo {
