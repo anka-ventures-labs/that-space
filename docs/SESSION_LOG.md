@@ -1,5 +1,33 @@
 # Session log
 
+## 2026-09-27: Discourse on the ASUS later; Supabase and model-key findings
+
+### Decisions
+
+- **Discourse goes on the ASUS** once Minh moves Atum to AWS. There is no EC2
+  instance for Discourse. Bà Mối is built first without Discourse; sign-in and
+  the chat relay are wired up when the ASUS is free.
+- **The ASUS is already on the tailnet,** so Tailscale needs no new login. Its
+  Funnel address will be repointed from Atum to Discourse.
+- **Minh will create the Google OAuth client for Thật Space.**
+
+### Findings (read-only)
+
+- **Supabase:** one organization, `minhnkn22@gmail.com's Org`, with six active
+  projects: Atum Platform, `moon-dev`, `atum-dev-isolated`, `andy-prod`,
+  `atum-prod` and `taylor-prod`.
+  - The free plan allows two active projects, so this organization is on a
+    paid plan, and a new project there adds about $10 a month.
+  - A free Thật Space project needs a separate free-plan organization. That is
+    waiting for Minh.
+- **Model keys:** Vercel project `moon-app` has only `GEMINI_API_KEY` among its
+  model-provider variables.
+- **Docker on the ASUS:** the account `minhnkn` has no Docker access there.
+
+### Verification
+
+- Documentation only; no code changed.
+
 ## 2026-09-27: Bà Mối becomes the sign-in, reusing Moon's auth
 
 ### Decision

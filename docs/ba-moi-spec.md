@@ -47,9 +47,10 @@ revealed unless both choose to reveal it.
   Thảo's January proposal promised her the full source code, and a whole-app
   fork would hand her Moon. This repository moves to Moon's stack (Next.js 15,
   Supabase, Vercel AI SDK).
-- **Claude, not Gemini.** Moon's narratives run on Gemini. Bà Mối points the
-  model registry at Claude, because Thảo specifically did not want Google
-  holding her members' data.
+- **Model: Claude by default, Gemini as the cheap alternative.** Moon's
+  narratives run on Gemini. Thảo specifically did not want Google holding her
+  members' data, so the model registry defaults to Claude. Moon's Gemini key is
+  the fallback for the beta if Minh prefers it (see Hosting).
 - **Anonymous chat runs on Discourse private messages, through a relay.**
   Each member messages only the Bà Mối bot, in a private message per match.
   Discourse's `post_created` webhook, which also fires for private messages,
@@ -83,16 +84,27 @@ revealed unless both choose to reveal it.
 ## Hosting (demo: as cheap as possible)
 
 - **Bà Mối:** Vercel, on the existing team, at `that-space-demo.vercel.app`. Its
-  database is a free Supabase project in Singapore.
-- **Discourse:** a `t3.small` on AWS EC2 in Singapore (2 GB of RAM plus swap,
-  Discourse's documented minimum), costing about $22 a month with its disk. That
-  is paid from account `486408348462`'s free-plan credit ($159.64 left, valid
-  until 2027-03-25), which also funds `atum-staging` (a `t4g.small`, about $15 a
-  month). Together they run about four months on the credit. The account must
-  move to a paid plan before the credit or the plan runs out, or AWS closes it.
-- **Discourse's address:** Tailscale Funnel on that instance, at
-  `https://<node>.tail349cbf.ts.net`. That means free HTTPS, no DNS and no open
-  ports. A real domain can replace it later.
+  database is a Supabase project in Singapore.
+  - The existing Supabase organization is on a paid plan, with six active
+    projects. A project there adds about $10 a month.
+  - A separate free-plan organization for Thật Space keeps it free, and makes
+    handing it to Thảo easy later.
+- **Discourse:** the ASUS (Ubuntu 26.04, 4 cores, 3.2 GB of RAM), once Atum
+  moves to AWS. Until then, Bà Mối is built and tested without it.
+  - The account `minhnkn` has no Docker access on the ASUS, so installing
+    Discourse needs sudo, or that account added to the `docker` group.
+- **Discourse's address:** the ASUS's existing Tailscale Funnel,
+  `https://ubuntu-asus.tail349cbf.ts.net`, repointed from Atum to Discourse.
+  That gives free HTTPS, with no DNS and no open ports. A real domain can
+  replace it later.
+- **The AI model:** Bà Mối's matchmaker conversation and write-ups call a
+  model from the server, so the deployed app needs a paid API key.
+  - Moon's Vercel project has only `GEMINI_API_KEY`. Reusing it costs nothing
+    to set up and is the cheapest option.
+  - Thảo named Google as a concern, which points to Claude, with a new
+    Anthropic key.
+  - The key isn't needed until the AI features go live. Moon's template
+    fallbacks cover everything before that.
 - **No email in the beta.** Thảo shares invite links over Zalo or Messenger,
   and friends sign in with Google through Bà Mối. Neither Discourse nor Bà Mối
   sends email. Notifications arrive in Discourse and as push notifications from
