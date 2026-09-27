@@ -16,8 +16,12 @@
   - Discourse runs on an EC2 `t3.small` in Singapore, about $22 a month, paid
     from the AWS free-plan credit.
   - Discourse is reachable through Tailscale Funnel (free HTTPS, no DNS).
-  - Email goes through Google Workspace SMTP with an app password. SES isn't
-    needed.
+  - The beta has no outgoing email, because recruitment is manual. Thảo
+    shares invite links, and an admin activates each account by hand.
+    Discourse supports this.
+  - Supabase's default email can't serve Discourse: only team addresses, 2 an
+    hour, and only Supabase Auth mail. Supabase is only Bà Mối's database;
+    sign-in goes through DiscourseConnect.
 
 ### Checked (read-only)
 

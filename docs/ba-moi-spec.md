@@ -87,10 +87,19 @@ revealed unless both choose to reveal it.
 - **Discourse's address:** Tailscale Funnel on that instance, at
   `https://<node>.tail349cbf.ts.net`. That means free HTTPS, no DNS and no open
   ports. A real domain can replace it later.
-- **Email:** Discourse needs outgoing mail for invites and sign-ups. It sends
-  through the existing Google Workspace account (`anka.vc`) using an app
-  password, which is free. SES (Amazon's email service) isn't needed for the
-  demo.
+- **No outgoing email in the beta.** Recruitment is manual:
+  - Thảo shares Discourse invite links over Zalo or Messenger. After a friend
+    signs up, an admin activates the account with one click in the admin panel.
+  - Notifications arrive in Discourse and as push notifications from its
+    installable web app.
+  - "Forgot password" doesn't work without email, so an admin resets
+    passwords from the server.
+  - Add email (Google Workspace SMTP with an app password, or SES) when
+    recruitment stops being manual.
+  - Supabase's built-in email can't serve Discourse. It sends only Supabase's
+    own login emails, only to project-team addresses, at 2 per hour.
+- **Supabase is only Bà Mối's database.** Members sign in to Bà Mối through
+  DiscourseConnect, not Supabase Auth.
 - **Later:**
   - Discourse can move to the ASUS once Atum leaves it. It has 3.2 GB of RAM,
     only about 1.6 GB free today, and Funnel already serves Atum at the root of
