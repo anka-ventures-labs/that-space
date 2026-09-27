@@ -1,164 +1,101 @@
 # Bà Mối spec
 
-Status: draft v2, 2026-09-27. This version replaces the v1 draft, which had
-named introductions and contact exchange. Matchmaking in Thật Space is
-anonymous by design and follows the flow and rules of Moon's Nhân Duyên
-(`moon-ai-vn/moon2-app`, `lib/nhan-duyen`). Minh built Moon entirely, so Bà
-Mối reuses Moon's code as well as its design, ported selectively (see
-Architecture).
+Status: draft v3, 2026-09-27. v3 makes the design Discourse-native, replacing
+the v2 plan for a separate Bà Mối web app. Matchmaking is anonymous by design
+and follows the flow and rules of Moon's Nhân Duyên (`moon-ai-vn/moon2-app`,
+`lib/nhan-duyen`). Minh built Moon entirely, so we reuse its code as well as
+its design.
 
 ## The product in one paragraph
 
-Every member has her own AI matchmaker, Bà Mối. She talks with Bà Mối, who
-learns about her and puts an anonymous card, with nothing that identifies her,
-into a shared pool. She can tap the daily Duyên box to have Bà Mối bring back
-someone highly compatible, or ask Bà Mối directly: "find me someone who…". Bà
-Mối describes that person without revealing who they are. If she sends an
-interest signal, the other person's own Bà Mối tells them about her and how the
-two might fit. If both say yes, an anonymous chat opens. Nobody's identity is
-revealed unless both choose to reveal it.
+Thật Space is a private community for Vietnamese women, running on Discourse.
+Each member has her own AI matchmaker, Bà Mối, whom she messages directly
+inside the forum. Bà Mối learns about her and puts an anonymous card, with
+nothing that identifies her, into a shared pool. She can ask Bà Mối to open the
+daily Duyên box and bring back someone highly compatible, or ask "find me
+someone who…". Bà Mối describes that person without revealing who they are. If
+she sends an interest signal, the other person's Bà Mối tells them about her
+and how the two might fit. If both say yes, an anonymous chat opens, relayed by
+a bot. Nobody's identity is revealed unless both choose to reveal it.
 
 ## Architecture
 
-- **The community runs on Discourse, self-hosted.** It handles membership
-  (invite-only, with approval), categories, chat, events for retreats and
-  workshops, moderation, the Vietnamese interface, and mobile. Thảo's
-  15-question set (`Bo_cau_hoi_That_Space`) becomes the signup fields. Discourse
-  hands sign-in to Bà Mối through DiscourseConnect.
-- **Bà Mối is a separate service, this repository, and the sign-in for all of
-  Thật Space.** It reuses Moon's sign-in: Google through Supabase Auth now,
-  email codes later.
-  - Discourse creates a member's account, already active, the first time she
-    signs in through Bà Mối. Nobody activates accounts by hand.
-  - Invite-only is enforced here. Thảo's invite link carries a code, and Bà Mối
-    refuses new accounts without one.
-  - Members reach Bà Mối from a link in the Discourse header.
-  - It has its own Postgres database (Supabase), with pgvector for trait
-    search.
-- **Bà Mối is built by porting Moon's matchmaking stack.** Three parts come
-  over:
-  - `lib/nhan-duyen`: the pool, the box, signals, anonymous chat,
-    notifications and privacy guards
-  - the astrology engine: iztro charts and the compatibility engine
-  - the chat harness: Vercel AI SDK plus the model registry, for the matchmaker
-    persona
+Minh's principle: stay lean and stitch together mature solutions. Only the
+matchmaking logic and thin glue are ours.
 
-  The rest of Moon stays out: payments, tarot, Zalo and Telegram, affiliates.
-  Thảo's January proposal promised her the full source code, and a whole-app
-  fork would hand her Moon. This repository moves to Moon's stack (Next.js 15,
-  Supabase, Vercel AI SDK).
-- **Model: through OpenRouter.** Minh will provide a separate OpenRouter key.
-  The model registry calls OpenRouter through the Vercel AI SDK. The model
-  itself is a setting, defaulting to a Claude model because Thảo did not want
-  Google holding her members' data. Until the key exists, Moon's template
-  fallbacks cover every AI text.
-- **Anonymous chat runs on Discourse private messages, through a relay.**
-  Each member messages only the Bà Mối bot, in a private message per match.
-  Discourse's `post_created` webhook, which also fires for private messages,
-  sends each post to Bà Mối. Bà Mối re-posts it into the other member's thread
-  as the bot, under the sender's alias ("Chị L."), holding contact details until
-  a reveal. Members get Discourse's notifications, mobile experience and
-  unread tracking for free, and we build no chat UI.
-  - Discourse chat has no webhooks, so the relay uses private messages.
-  - Discourse admins can read the relayed threads. That is acceptable for the
-    beta with Thảo's friends. Moon's own anonymous chat can replace the relay
-    later if that promise returns.
-  - After a mutual reveal, the two are simply members and can message each
-    other directly.
-  - Bà Mối's bot also sends the notifications, which replace Moon's Zalo and
-    Telegram delivery.
-- **Why the matchmaker doesn't live inside Discourse:**
-  - Discourse admins can read every private message, so conversations with Bà
-    Mối held in forum messages would be visible to Thảo.
-  - Forum identities (usernames, avatars, post history) must never reach the
-    pool.
-  - No forum plugin implements an anonymous pool with interest signals.
-- **No open-source matchmaking project fits this model.**
-  - Compass (AGPL-3.0, a fork of Manifold Love) is a public, searchable
-    directory.
-  - Duolicious (AGPL-3.0) matches on a quiz and shows public profiles.
-  - pH7 Dating CMS (MIT, PHP) is a classic dating site.
-
-  The AGPL licenses would also force Thảo to publish her modified source. Moon's
-  Nhân Duyên is the foundation instead.
-
-## Hosting (demo: as cheap as possible)
-
-- **Bà Mối:** Vercel, on the existing team, at `that-space-demo.vercel.app`. Its
-  database is a Supabase project in Singapore.
-  - The existing Supabase organization is on a paid plan, with six active
-    projects. A project there adds about $10 a month.
-  - A separate free-plan organization for Thật Space keeps it free, and makes
-    handing it to Thảo easy later.
-- **Discourse:** the ASUS (Ubuntu 26.04, 4 cores, 3.2 GB of RAM), once Atum
-  moves to AWS. Until then, Bà Mối is built and tested without it.
-  - The account `minhnkn` has no Docker access on the ASUS, so installing
-    Discourse needs sudo, or that account added to the `docker` group.
-- **Discourse's address:** the ASUS's existing Tailscale Funnel,
-  `https://ubuntu-asus.tail349cbf.ts.net`, repointed from Atum to Discourse.
-  That gives free HTTPS, with no DNS and no open ports. A real domain can
-  replace it later.
-- **The AI model:** Bà Mối's matchmaker conversation and write-ups call a
-  model from the server through OpenRouter. The key is separate, and Minh will
-  provide it. It isn't needed until the AI features go live; Moon's template
-  fallbacks cover everything before that.
-- **No email in the beta.** Thảo shares invite links over Zalo or Messenger,
-  and friends sign in with Google through Bà Mối. Neither Discourse nor Bà Mối
-  sends email. Notifications arrive in Discourse and as push notifications from
-  its installable web app.
-  - Google sign-in needs a Google OAuth client for Thật Space, so Google's
-    consent screen doesn't say "Moon".
-  - Moon's email codes go through Supabase Auth, with Resend as its mail
-    server. They wait for a Thật Space sending domain.
-  - Moon's Zalo and Telegram codes are tied to Moon's own Zalo account and
-    Telegram bot, so they stay out.
-  - Supabase's built-in email can't substitute: it sends only to project-team
-    addresses, at 2 per hour.
-- **Later:**
-  - Discourse can move to the ASUS once Atum leaves it. It has 3.2 GB of RAM,
-    only about 1.6 GB free today, and Funnel already serves Atum at the root of
-    its address.
-  - For data in Vietnam, production can use the AWS Hanoi Local Zone
-    (`ap-southeast-1-han-1a`, not yet opted in).
+- **Discourse (self-hosted, official Docker install) is the whole member
+  experience:**
+  - Google login and invite-only membership.
+  - The forum.
+  - Members' profile pages with a portfolio of their work.
+  - Events for retreats and workshops.
+  - Direct messages with Bà Mối.
+  - The anonymous chats.
+  - Notifications, moderation, and Thảo's admin.
+- **Bà Mối is a Discourse AI persona** using Discourse AI's official OpenRouter
+  support. Her custom tools are official Discourse AI JavaScript tools that
+  call the Bà Mối service. The persona writes all the conversation. The service
+  returns only facts, never identities.
+- **The Bà Mối service is this repository:** Next.js 15 route handlers on
+  Vercel, plus a Supabase Postgres database. It holds:
+  - the members' private profiles
+  - the anonymous pool
+  - matching, which is Moon's code ported
+  - signals and matches
+  - the chat relay
+  
+  It has no user interface.
+- **The anonymous chat is a relay over Discourse private messages.**
+  - Each member of a match has a private-message thread with the relay bot.
+  - Discourse's `post_created` webhook sends each new post to the service.
+  - The service re-posts it into the other member's thread under the sender's
+    alias.
+  - Discourse chat has no webhooks, which is why the relay uses private
+    messages.
+- **Rejected options, and why:**
+  - A separate Bà Mối web app: more UI, sign-in and notification code, all of
+    which Discourse already provides.
+  - HumHub: it has profile walls, which Thảo turned out not to need, but no AI
+    persona system.
+  - Circle (demo only, no users; the subscription renews 2026-10-27): not
+    self-hosted and no walls. Cancel it before renewal.
+  - Compass, Duolicious and pH7: public directories, not an anonymous pool.
 
 ## Privacy rules
 
-1. **Private profile versus pool card.** Everything a member tells Bà Mối stays
-   in her private profile. Only Bà Mối and the member can use it. The pool gets
-   an anonymous card derived from it.
-2. **A pool card holds no personal identifiers:**
-   - an age band (18–24, then five-year bands, then 70+)
-   - a region (miền Bắc, miền Trung or miền Nam), shown only if at least 5 pool
-     members share it (k-anonymity)
-   - a name initial, under the same rule of 5
-   - gender and who she wants to meet
-   - intent
-   - hobbies and trait tags
-   - an astrology element
-   - a short summary written by Bà Mối
-3. **Every text Bà Mối writes about another person passes a leak check before
-   anyone sees it.** The check rejects birth dates, birth times, can-chi pairs,
-   and that person's name, city and other identifying terms. The summary
-   describes traits, never identifying facts: no employer, no named places, no
-   unique life events. After three failed attempts, a template card is used
-   instead, as in Moon.
-4. **Reasoning about another person uses only their pool card, never their
-   private profile.** Bà Mối may use her own member's private profile with that
-   member.
-5. **Only the server can read the pool, signals and chats.** Members never query
-   them directly.
-6. **Thảo sees totals and reports, never a member's conversation with Bà Mối.**
-   With a report, she sees only the reported messages. In the beta, chats
-   between members are relayed through Discourse private messages, which she
-   can read as a Discourse admin. That is agreed for testing with her friends.
+1. **Private profile versus pool card.** Everything a member tells Bà Mối is
+   stored in the service as her private profile. The pool gets only an
+   anonymous card derived from it.
+2. **A pool card holds no personal identifiers.**
+   - It includes: an age band (18–24, then five-year bands, then 70+), gender
+     and who she wants to meet, intent, hobbies, an astrology element and tuổi,
+     and a short summary.
+   - A region (miền Bắc, miền Trung or miền Nam) and a name initial appear only
+     when at least 5 pool members share them (the rule of 5).
+3. **Every text that describes one member to another passes the leak check**
+   (from Moon). It rejects birth dates, birth times, can-chi pairs, and the
+   person's name, city or other identifying terms. The persona only ever sees
+   pool cards, so it cannot leak what it was never given. The service still
+   checks every summary it stores.
+4. **Reasoning about another person uses only their pool card**, never their
+   private profile.
+5. **The service is the only way into the database.** Row-level security is on,
+   with no client policies, and only the server holds the service key.
+6. **In the beta, Discourse admins can read members' direct messages with Bà
+   Mối and the relayed chats.** Minh agreed to this for testing with Thảo's
+   friends. The service never exposes private profiles.
 
 ## Member journey
 
-1. **Join.** She opts in and accepts a versioned consent. She must be 18 or
-   older and give a birth date and gender. She can pause, hide herself from
-   discovery, or delete everything at any time.
-2. **Talk to Bà Mối.** A conversation of about 5 minutes, in Vietnamese, one
-   question at a time, with tap-to-answer options:
+1. **Join.** Thảo shares a Discourse invite link. Her friend signs in with
+   Google and answers Thảo's signup questions (her 15-question set, as
+   Discourse user fields). She opens a direct message with Bà Mối, who asks
+   for consent, which is versioned, then 18+ age, birth date and gender. She can
+   pause, hide herself from discovery, or delete her data at any time by
+   asking Bà Mối.
+2. **Talk to Bà Mối.** About 5 minutes, in Vietnamese, one question at a time.
+   Bà Mối rephrases each question in her own voice; this is the default
+   wording:
 
    | # | Asks for | Default wording | Answers |
    |---|---|---|---|
@@ -166,7 +103,7 @@ revealed unless both choose to reveal it.
    | 2 | Own gender | Bạn là… | Nữ · Nam · Khác |
    | 3 | Who she wants to meet | Bạn muốn gặp… | Nam · Nữ · Cả hai |
    | 4 | Birth date | Bạn sinh ngày nào? | Must be 18 or older. Gives her age band and tuổi. |
-   | 4b | Birth time (optional) | Bạn có biết giờ sinh không? | A time, or "Không nhớ". Used only for astrology, never shown to anyone. |
+   | 4b | Birth time (optional) | Bạn có biết giờ sinh không? | A time, or "Không nhớ". Used only for astrology. |
    | 5 | Region | Bạn đang sống ở đâu? | City; only the region reaches the pool |
    | 6 | Age range | Bạn muốn gặp người trong khoảng tuổi nào? | Default: own age ±5 |
    | 7 | Marital status | Tình trạng hôn nhân của bạn? | Độc thân · Đã ly hôn · Góa · Đã kết hôn |
@@ -175,77 +112,77 @@ revealed unless both choose to reveal it.
    | 10 | Hobbies | Lúc rảnh bạn thích làm gì? | Up to 5, plus free text |
    | 11 | The open question | Bạn muốn mọi người biết điều gì nhất về bạn? | Free text; Bà Mối may ask one follow-up |
 
-   Bà Mối then shows the member her own anonymous card, exactly as others will
-   see it, and asks her to confirm or correct it.
-3. **The Duyên box.** One free opening per Vietnamese calendar day, used up
-   even when no one qualifies, as in Moon. Bà Mối takes candidates who pass the
-   hard filters and clear the mutual threshold, and makes a weighted random
-   pick: higher scores are more likely, but it isn't always the top one, so the
-   copy says "a good match", never "the best". She then tells the member about
-   that person. The same person is never brought twice, and closing the card
-   without acting is not a decline.
-4. **Ask Bà Mối.** For example: "Tìm cho mình một người thích leo núi, sống ở
-   miền Nam, muốn nghiêm túc." Bà Mối turns the request into hard filters plus a
-   semantic query over pool cards, ranks results by mutual score, and presents
-   one person at a time. If no one fits, she offers to watch the pool and
-   notify the member when someone new does. This is new: Moon's chat has no
-   pool search. It shares the box's dedupe and a daily limit.
-5. **Interest.** She taps "Muốn làm quen" to send an interest signal. The
-   recipient's Bà Mối writes, from the recipient's point of view, an anonymous
-   summary of the sender and how the two might fit, and notifies them. Moon
-   builds this card from a template; here Bà Mối writes it, under the same leak
-   check. The recipient accepts, declines, or dismisses. An unanswered signal
-   expires after 7 days. A decline is final: that pair can never match. The
-   sender is never told "declined"; the answer is simply "chưa có duyên".
-6. **Match and anonymous chat.** When both say yes, a match opens a chat.
-   Each person appears as a form of address relative to the viewer, plus an
-   initial when the rule of 5 allows, such as "Chị L." or "Anh N.". Messages
-   are limited to 1,200 characters and 12 per minute per person.
-   - Either person can recall a message. It disappears for both but is kept on
-     the server as evidence.
-   - Either person can mute, clear her own history, end the chat, block or
-     report.
-   - Blocking also closes the match. Moon has only block; a normal way to end
-     a chat is new here.
-7. **Reveal, which is optional.** Each person can choose to reveal her Thật
-   Space profile. Identities are exchanged only when both have chosen to. Moon
-   defines a `revealed` state but never uses it; here it becomes a real step.
+   Bà Mối then shows her the anonymous card exactly as others will see it, and
+   she confirms or corrects it.
+3. **The Duyên box.** One opening per Vietnamese calendar day, used up even
+   when no one qualifies, as in Moon.
+   - The service takes candidates who pass the hard filters and clear the
+     mutual threshold, and makes a weighted random pick: higher scores are
+     likelier, but it isn't always the top one.
+   - Bà Mối presents the candidate as "a good match", never "the best".
+   - The same person is never brought twice, and letting a card go by is not a
+     decline.
+4. **Ask Bà Mối.** For example: "tìm cho mình một người thích leo núi, sống ở
+   miền Nam, muốn nghiêm túc".
+   - The persona turns the request into structured filters.
+   - The service returns up to 3 anonymous cards, ranked by mutual score. They
+     count as shown, and a daily limit applies.
+   - If none fit, Bà Mối offers to watch the pool and notify her.
+5. **Interest.** "Muốn làm quen" sends a signal.
+   - The service builds the recipient's view: the sender's anonymous card plus
+     how the two fit, seen from the recipient's side. It posts this into the
+     recipient's thread with Bà Mối.
+   - The recipient accepts, declines or dismisses. A signal left unanswered
+     expires after 7 days.
+   - A decline is final: that pair can never match. The sender only hears
+     "chưa có duyên".
+6. **Match and anonymous chat.** When both say yes, a match opens. The relay bot
+   starts a private-message thread with each of them. Each sees the other as a
+   form of address relative to herself, plus an initial when the rule of 5
+   allows ("Chị L.", "Anh N.").
+   - Text only. Messages are limited to 1,200 characters and 12 per minute.
+   - Before a reveal, a message containing a phone number, email address or
+     social handle is not relayed. The sender is told how to reveal instead.
+   - Either member can end the chat or block through Bà Mối. Blocking also
+     closes the match. Members can flag relayed messages with Discourse's own
+     flags.
+7. **Reveal, which is optional.** Each person can ask Bà Mối to reveal her.
+   When both have asked, the relay posts each one's Discourse profile link to
+   the other.
 
 ## Matching rules
 
 **Hard filters, checked in both directions:**
-
 - Intent. Friendship matches only friendship, and casual only casual.
   Long-term and marriage match each other.
 - Gender. Each person is someone the other wants to meet. "Khác" matches only
   people who chose "Cả hai".
 - Age. Each is inside the other's range, and both are 18 or older.
-- Both are opted in, discoverable, not paused, and not deleted.
+- Both are opted in, discoverable, and not paused or deleted.
 - Neither has blocked the other, and this pair hasn't already been shown,
   declined or matched.
 - Married members get friendship only. This is our default; Thảo decides.
 
-**Score.** Compatibility is scored in each direction, A→B and B→A, because
-preferences differ. The mutual score is the lower of the two, and a pair must
-clear the threshold in both directions, as in Moon. The signals are:
-
-- how well each person's open answer fits the other's card
+**Score.** Compatibility is scored in each direction, A→B and B→A. The mutual
+score is the lower of the two, and a pair must clear the threshold both ways.
+The signals are:
+- how well each person's open answer fits the other's card. The persona judges
+  this from the cards; the service falls back to keyword overlap when there's
+  no model
 - shared hobbies
 - astrology, computed by code:
-  - tuổi hợp for everyone: can chi and ngũ hành from the lunar birth year,
+  - tuổi hợp for everyone: can chi and ngũ hành nạp âm from the lunar year,
     using Moon's Vietnamese lunar calendar, so anyone born before Tết belongs to
     the previous year
-  - when both people gave a birth time and the intent is romantic (casual,
-    long-term or marriage), Moon's full Tử Vi and Bát Tự romantic score
-    replaces it
+  - when both people gave a birth time and the intent is romantic, Moon's full
+    Tử Vi and Bát Tự romantic score replaces it
 - plans for children (long-term and marriage only)
 - region
 
 Weights and the threshold are settings. Members see a tier label, never a
-number, and Bà Mối never quotes raw scores; Moon rejects them in its texts
-too.
+number.
 
-**Changes invalidate stale results.** If a member changes her birth date,
+**Changes invalidate stale results.** If a member changes her birth data,
 intent, gender or who she wants to meet, her open discoveries are voided and
 her scores recomputed.
 
@@ -254,83 +191,87 @@ her scores recomputed.
 - **Daily opening:** `pending` → `matched` or `no_match`
 - **Discovery:** `active` → `interest_sent` → `matched`, or `void`
 - **Signal response:** `pending` → `accepted`, `declined`, `dismissed`, or
-  `expired` after 7 days
+  `expired` after 7 days (checked when read)
 - **Match:** `mutual_interest` → `revealed` → `closed`
-- **Conversation:** `active` → `closed` or `blocked`
-- **Message:** `sent`, `blocked` (stopped by moderation), or `deleted`
-  (recalled)
+- **Relay message:** `relayed` or `held` (contact details before a reveal)
 
 ## Notifications
 
-- `interest_received`, `mutual_match`, `message_received`, a gentle
-  `message_reminder`, and `watch_fulfilled`.
-- Delivered inside Bà Mối and as private messages from Bà Mối's Discourse bot
-  account. Zalo and Telegram come later.
-- Each notification is sent exactly once (idempotent) and is tracked as
-  delivered, clicked and read.
-- Message notifications are grouped into 10-minute windows, and a muted chat
-  sends none.
+- The service posts into the member's thread with Bà Mối: interest received and
+  mutual match.
+- Relayed messages arrive as private-message replies.
+- Delivery uses Discourse's own notifications: in-app, and push from the
+  installable web app.
+
+## Community pieces (all Discourse configuration)
+
+- **Categories:** Giới thiệu, Chữa lành & Trưởng thành, Nghệ thuật & Sáng tạo
+  (Vẽ, Viết, Âm nhạc & Chuyển động, Cắm hoa), Tâm linh & Tử Vi, Các mối quan
+  hệ, Retreat & Workshop, Triển lãm (the artwork gallery), Góc Artist & Host,
+  Thông báo.
+- **Profile pages:** bio, header image, signup answers, a featured topic,
+  badges and activity.
+  - A "Tác phẩm" tab from the official User Portfolio component shows her
+    Triển lãm posts.
+  - Topic List Previews shows them as image tiles.
+- **Roles:** her question 1 answer puts each member in a group through the
+  official Automation plugin's add-to-group script.
+- **Events:** the official Calendar & Events plugin.
+- **Following people:** the official Follow plugin.
+- **Language and look:** Vietnamese, and a theme with the Thật Space palette,
+  Playfair Display and Inter, and her logo.
 
 ## Safety
 
-- 18 or older only. Consent is versioned; a new version asks again.
-- Report reasons: harassment, contact exchange, unsafe, spam, other.
-- Block ends the chat for both.
-- Limits per day on box openings, searches and interest signals.
-- Moon has no automated message moderation. Here, before a reveal, a message
-  containing a phone number, email address or social handle is held, and the
-  sender is asked to confirm. The recipient can still report it.
-- Thật Space membership, approved by Thảo, provides the accountability that
-  Moon gets by requiring a verified Zalo or Telegram account before chatting.
-- Thảo gets a queue for reviewing reports, which Moon lacks.
+- 18 or older only. Consent is versioned.
+- Daily limits on box openings, searches and interest signals.
+- Relay rate limits, and contact details held before a reveal.
+- Blocking works through Bà Mối. Flags and the review queue come from Discourse.
+- Discourse AI spam and toxicity detection covers the forum.
 
-## Thảo's view
+## Not in this version
 
-- Pool size by intent, gender and region, hidden whenever a group has fewer
-  than 5 people.
-- Signals sent, match rate, and active chats.
-- The reports queue.
-- Settings: Bà Mối's voice preset, score weights and threshold.
-- No access to conversations with Bà Mối. During the beta, chats between
-  members run through Discourse private messages, which she can read as a
-  Discourse admin.
-
-## Not in v2
-
-- Photos
-- Full Tử Vi chart readings
-- Payments (Moon's paid boxes are left out)
-- Zalo and Telegram delivery
-- Hosting in Vietnam, which the design must allow
+- Photos in matchmaking
+- Images in the relay (text only)
+- Syncing edits and deletes in the relay
+- Full Tử Vi readings
+- Payments
+- Outgoing email (recruitment is by invite link)
+- Hosting in Vietnam (planned: the AWS Hanoi Local Zone)
 
 ## Done means
 
-1. A friend with an invite link signs in with Google and lands in Discourse
-   with an active account. Without an invite code, sign-in is refused.
-2. A new member finishes the conversation in under 5 minutes on a phone.
-3. Tests prove no discovery or search result ever breaks a hard filter.
-4. Tests prove pool cards and Bà Mối's texts about other people pass the leak
-   check, and that the rule of 5 holds.
-5. Tuổi matches a trusted reference, including birthdays around Tết.
-6. The full loop works between two test members: box or search, interest,
-   the recipient's summary, acceptance, and anonymous chat relayed through
-   Discourse.
-7. Thảo's view in Bà Mối shows totals and reports, not conversations with Bà
-   Mối.
+1. A friend with an invite link signs in with Google, answers the signup
+   questions, and can message Bà Mối.
+2. The interview finishes in under 5 minutes on a phone, and the card she
+   confirms passes the leak check.
+3. Tests prove no discovery or search result ever breaks a hard filter, in
+   either direction.
+4. Tests prove the leak check and the rule of 5.
+5. Tuổi matches a trusted reference around Tết, including 1985 and 1990.
+6. Two test members complete the loop:
+   - box or search
+   - interest
+   - the recipient's view
+   - acceptance
+   - relayed chat in both directions
+   - contact details held
+   - reveal
+   - end or block
+7. The service rejects any call without the tool secret, and any webhook
+   without a valid signature.
 
 ## Open questions
 
-For us:
-
-- For after the demo, which domain: a subdomain of `anka.vc`, or Thảo's own?
+For Minh:
+- Which OpenRouter model for the persona? It must support tool calls. The
+  default is a Claude model.
 - Thảo's contract promises her the source code. Are the Moon-derived modules
   transferred to her, or licensed?
 
 For Thảo, once she has played with it:
-
-- Where do the men in the pool come from? Are they invited as members, in a
-  group that can't see the women-only categories?
+- Where do the men in the pool come from?
 - Should married members be limited to friendship?
-- Is casual dating right for the Thật Space brand?
+- Is casual dating right for the brand?
 - Which voice: bà and con, or chị and em?
-- Should Discourse membership be paid?
+- Should matchmaking have photos?
