@@ -6,7 +6,7 @@ already done: Next.js 15.5.26 and Vitest, commit `b779f4f`.
 
 ## Goal
 
-Thảo's friends can join the private Thật Space Discourse with Google, message
+Thảo's friends can join the private Thật Space Discourse, message
 Bà Mối, confirm an anonymous card, open the Duyên box or ask for someone, send
 and answer interest signals, and chat anonymously through the relay, all on a
 phone.
@@ -16,7 +16,7 @@ phone.
 ```
 Member (browser or installable app)
   └─ Discourse on the ASUS (Docker; Tailscale Funnel at https://ubuntu-asus.tail349cbf.ts.net)
-       ├─ Google login, invites, forum, profiles and portfolio, events
+       ├─ email and password login, invites, forum, profiles and portfolio, events
        ├─ Discourse AI persona "Bà Mối" (LLM through OpenRouter)
        │    └─ custom JS tools ──HTTPS + tool secret──▶ Bà Mối service
        └─ webhook post_created ──HTTPS + HMAC──▶ Bà Mối service /webhooks/discourse
@@ -89,7 +89,7 @@ Webhook: `POST /api/ba-moi/v1/webhooks/discourse`.
 | A | Matching core | `lib/matching/**` and `tests/unit/matching/**`. Ports Moon's privacy, matching and daily modules, the Vietnamese lunar calendar and can-chi tables. Adds the hard filters, directional scores and tiers. A2 adds Moon's full romantic score for an optional birth time | none | Table-driven filter tests in both directions; leak check and rule of 5; tuổi for 1985-02-01 (Ất Sửu, Vietnamese calendar), 1990-01-20 (Kỷ Tỵ) and 1990-01-27 (Canh Ngọ); nạp âm for 1984, 1990 and 1996; weighted pick with a seeded random source |
 | B | Data layer | `supabase/migrations/**`, `lib/db/**`, `scripts/seed-*.ts` | A (types) | Migrations apply to the Supabase project; repository tests pass against an in-memory fake; seed creates 30 labelled sample members |
 | C | Service API and relay | `app/api/ba-moi/**`, `lib/service/**`, `lib/discourse/**` and their tests | A, B | Every endpoint has handler tests using fakes; tests for auth rejection, webhook signature, loop prevention, idempotency, holding contact details, rate limits, and each state transition |
-| D | Discourse platform | Runbook `docs/discourse-setup.md` and theme settings. The ASUS install, Funnel, Google login, locale, categories, user fields, automation, plugins and components, theme | The ASUS free, Minh's Google OAuth client | The site loads over Funnel; invite plus Google login works; portfolio tab and tiles show; events work |
+| D | Discourse platform | Runbook `docs/discourse-setup.md` and theme settings. The ASUS install, Funnel, local login with admin activation (no email), locale, categories, user fields, automation, plugins and components, theme | The ASUS free | The site loads over Funnel; an invite plus local signup and admin activation works; test accounts are created active through the admin API; portfolio tab and tiles show; events work |
 | E | Persona and tools | `discourse/persona/*.md` (prompt) and `discourse/tools/*.js` (tool sources, kept in the repo and pasted into Discourse admin); bot users, webhook and API keys | C deployed, D, the OpenRouter key | Two test members complete the full loop in the spec's "Done means" |
 | F | Assembly | Security pass, a Vercel preview (local prebuilt after the native-runtime audit), one cross-family code review by Muse Spark through ACO, production promotion with Minh's approval | all | The review's blocking findings are fixed; Minh approves production |
 
@@ -161,9 +161,10 @@ is free (expected in 1–2 days). E follows D and the key. Then F.
 ## External dependencies (Minh)
 
 1. Atum off the ASUS, and sudo or Docker access for the `minhnkn` account.
-2. A Google OAuth client for Discourse, with redirect URI
-   `https://ubuntu-asus.tail349cbf.ts.net/auth/google_oauth2/callback`.
-3. An OpenRouter key, for a model that supports tool calls.
+2. An OpenRouter key, for a model that supports tool calls. Needed at
+   workstream E.
+3. Optional, at the end: a Google OAuth client for Discourse, with redirect
+   URI `https://ubuntu-asus.tail349cbf.ts.net/auth/google_oauth2/callback`.
 4. Approval for Vercel production promotion.
 
 ## Execution and review

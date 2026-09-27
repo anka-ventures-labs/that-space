@@ -25,7 +25,8 @@ matchmaking logic and thin glue are ours.
 
 - **Discourse (self-hosted, official Docker install) is the whole member
   experience:**
-  - Google login and invite-only membership.
+  - Invite-only membership with email and password login. Google login can
+    be added at the end.
   - The forum.
   - Members' profile pages with a portfolio of their work.
   - Events for retreats and workshops.
@@ -87,9 +88,10 @@ matchmaking logic and thin glue are ours.
 
 ## Member journey
 
-1. **Join.** Thảo shares a Discourse invite link. Her friend signs in with
-   Google and answers Thảo's signup questions (her 15-question set, as
-   Discourse user fields). She opens a direct message with Bà Mối, who asks
+1. **Join.** Thảo shares a Discourse invite link. Her friend creates an
+   account with email and password and answers Thảo's signup questions (her
+   15-question set, as Discourse user fields). With no outgoing email in the
+   beta, an admin activates the account with one click. She opens a direct message with Bà Mối, who asks
    for consent, which is versioned, then 18+ age, birth date and gender. She can
    pause, hide herself from discovery, or delete her data at any time by
    asking Bà Mối.
@@ -241,8 +243,9 @@ her scores recomputed.
 
 ## Done means
 
-1. A friend with an invite link signs in with Google, answers the signup
-   questions, and can message Bà Mối.
+1. A friend with an invite link creates an account with email and password,
+   is activated by an admin, answers the signup questions, and can message Bà
+   Mối.
 2. The interview finishes in under 5 minutes on a phone, and the card she
    confirms passes the leak check.
 3. Tests prove no discovery or search result ever breaks a hard filter, in
