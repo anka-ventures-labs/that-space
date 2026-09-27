@@ -56,8 +56,26 @@
   - Moon's chat assistant has no pool-search tool, so "ask Bà Mối to find
     someone" is new here.
 - A deeper read-only study of Moon's flow was routed through agent-jobs to
-  Codex (decision `164863d7`, job `14aceefe`). Its findings will be checked
-  against the code and folded into the spec.
+  Codex (decision `164863d7`, job `14aceefe`, model gpt-5.6-sol). Its claims
+  were checked against the code before being folded into the spec:
+  - A no-match opening uses up the day's box (`lib/nhan-duyen/daily.ts`,
+    `migration-100`).
+  - A decline is final (`tests/unit/nhan-duyen-service.test.ts`).
+  - The recipient's card is built from a template, with the rule-of-5 bucket
+    set to 1 and a leak check (`lib/nhan-duyen/service.ts`).
+  - Chat allows 1,200 characters per message and 12 messages a minute
+    (`lib/nhan-duyen/conversations.ts`).
+  - Sending requires a verified Zalo or Telegram account.
+  - Nothing at runtime ever sets `revealed`.
+  - AI-written cards get 3 attempts, then fall back to a template.
+- Gaps in Moon that the spec now fills:
+  - no way to end a chat except blocking
+  - no reveal step
+  - no automated message moderation
+  - no queue for reviewing reports
+  - no search by traits
+- Correction: an earlier message to Minh said a no-match opening keeps the
+  day's turn. It doesn't, and the spec now follows Moon.
 
 ### Verification
 

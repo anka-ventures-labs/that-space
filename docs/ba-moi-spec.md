@@ -63,7 +63,8 @@ revealed unless both choose to reveal it.
    anyone sees it.** The check rejects birth dates, birth times, can-chi pairs,
    and that person's name, city and other identifying terms. The summary
    describes traits, never identifying facts: no employer, no named places, no
-   unique life events.
+   unique life events. After three failed attempts, a template card is used
+   instead, as in Moon.
 4. **Reasoning about another person uses only their pool card, never their
    private profile.** Bà Mối may use her own member's private profile with that
    member.
@@ -96,12 +97,13 @@ revealed unless both choose to reveal it.
 
    Bà Mối then shows the member her own anonymous card, exactly as others will
    see it, and asks her to confirm or correct it.
-3. **The Duyên box.** One free opening per Vietnamese calendar day. Bà Mối
-   takes candidates who pass the hard filters and clear the mutual threshold,
-   and makes a weighted random pick: higher scores are more likely, but it isn't
-   always the top one. She then tells the member about that person. An opening
-   that finds no one does not use up the day's turn. The same person is never
-   brought twice.
+3. **The Duyên box.** One free opening per Vietnamese calendar day, used up
+   even when no one qualifies, as in Moon. Bà Mối takes candidates who pass the
+   hard filters and clear the mutual threshold, and makes a weighted random
+   pick: higher scores are more likely, but it isn't always the top one, so the
+   copy says "a good match", never "the best". She then tells the member about
+   that person. The same person is never brought twice, and closing the card
+   without acting is not a decline.
 4. **Ask Bà Mối.** For example: "Tìm cho mình một người thích leo núi, sống ở
    miền Nam, muốn nghiêm túc." Bà Mối turns the request into hard filters plus a
    semantic query over pool cards, ranks results by mutual score, and presents
@@ -110,16 +112,24 @@ revealed unless both choose to reveal it.
    pool search. It shares the box's dedupe and a daily limit.
 5. **Interest.** She taps "Muốn làm quen" to send an interest signal. The
    recipient's Bà Mối writes, from the recipient's point of view, an anonymous
-   summary of the sender and how the two might fit, and notifies them. The
-   recipient accepts, declines, or dismisses. An unanswered signal expires after
-   7 days. The sender is never told "declined"; the answer is simply "chưa có
-   duyên".
+   summary of the sender and how the two might fit, and notifies them. Moon
+   builds this card from a template; here Bà Mối writes it, under the same leak
+   check. The recipient accepts, declines, or dismisses. An unanswered signal
+   expires after 7 days. A decline is final: that pair can never match. The
+   sender is never told "declined"; the answer is simply "chưa có duyên".
 6. **Match and anonymous chat.** When both say yes, a match opens a chat.
-   Each person appears under an alias built from their card (for example
-   "M., 30–34, miền Bắc"). Either person can mute, clear, block or report.
-   Sharing contact details before a reveal is a report reason.
+   Each person appears as a form of address relative to the viewer, plus an
+   initial when the rule of 5 allows, such as "Chị L." or "Anh N.". Messages
+   are limited to 1,200 characters and 12 per minute per person.
+   - Either person can recall a message. It disappears for both but is kept on
+     the server as evidence.
+   - Either person can mute, clear her own history, end the chat, block or
+     report.
+   - Blocking also closes the match. Moon has only block; a normal way to end
+     a chat is new here.
 7. **Reveal, which is optional.** Each person can choose to reveal her Thật
-   Space profile. Identities are exchanged only when both have chosen to.
+   Space profile. Identities are exchanged only when both have chosen to. Moon
+   defines a `revealed` state but never uses it; here it becomes a real step.
 
 ## Matching rules
 
@@ -146,7 +156,9 @@ clear the threshold in both directions, as in Moon. The signals are:
 - plans for children (long-term and marriage only)
 - region
 
-Weights and the threshold are settings.
+Weights and the threshold are settings. Members see a tier label, never a
+number, and Bà Mối never quotes raw scores; Moon rejects them in its texts
+too.
 
 **Changes invalidate stale results.** If a member changes her birth date,
 intent, gender or who she wants to meet, her open discoveries are voided and
@@ -154,6 +166,7 @@ her scores recomputed.
 
 ## States (named as in Moon)
 
+- **Daily opening:** `pending` → `matched` or `no_match`
 - **Discovery:** `active` → `interest_sent` → `matched`, or `void`
 - **Signal response:** `pending` → `accepted`, `declined`, `dismissed`, or
   `expired` after 7 days
@@ -170,6 +183,8 @@ her scores recomputed.
   later.
 - Each notification is sent exactly once (idempotent) and is tracked as
   delivered, clicked and read.
+- Message notifications are grouped into 10-minute windows, and a muted chat
+  sends none.
 
 ## Safety
 
@@ -177,7 +192,12 @@ her scores recomputed.
 - Report reasons: harassment, contact exchange, unsafe, spam, other.
 - Block ends the chat for both.
 - Limits per day on box openings, searches and interest signals.
-- Messages are stored sanitized and checked by moderation before delivery.
+- Moon has no automated message moderation. Here, before a reveal, a message
+  containing a phone number, email address or social handle is held, and the
+  sender is asked to confirm. The recipient can still report it.
+- Thật Space membership, approved by Thảo, provides the accountability that
+  Moon gets by requiring a verified Zalo or Telegram account before chatting.
+- Thảo gets a queue for reviewing reports, which Moon lacks.
 
 ## Thảo's view
 
