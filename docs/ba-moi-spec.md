@@ -44,15 +44,21 @@ revealed unless both choose to reveal it.
 - **Claude, not Gemini.** Moon's narratives run on Gemini. Bà Mối points the
   model registry at Claude, because Thảo specifically did not want Google
   holding her members' data.
-- **Discourse messaging is used where it is safe:**
-  - Not for the anonymous stage. Its anonymous mode is for posting, admins can
-    see the real account behind an anonymous one, and admins can read private
-    messages. Moon's anonymous chat covers that stage.
-  - After a mutual reveal, the two are simply members and continue in
-    Discourse chat.
-  - As the notification channel. Bà Mối's bot account sends short notices
-    with no details, and the details stay in Bà Mối. This replaces Moon's Zalo
-    and Telegram delivery.
+- **Anonymous chat runs on Discourse private messages, through a relay.**
+  Each member messages only the Bà Mối bot, in a private message per match.
+  Discourse's `post_created` webhook, which also fires for private messages,
+  sends each post to Bà Mối. Bà Mối re-posts it into the other member's thread
+  as the bot, under the sender's alias ("Chị L."), holding contact details until
+  a reveal. Members get Discourse's notifications, mobile experience and
+  unread tracking for free, and we build no chat UI.
+  - Discourse chat has no webhooks, so the relay uses private messages.
+  - Discourse admins can read the relayed threads. That is acceptable for the
+    beta with Thảo's friends. Moon's own anonymous chat can replace the relay
+    later if that promise returns.
+  - After a mutual reveal, the two are simply members and can message each
+    other directly.
+  - Bà Mối's bot also sends the notifications, which replace Moon's Zalo and
+    Telegram delivery.
 - **Why the matchmaker doesn't live inside Discourse:**
   - Discourse admins can read every private message, so conversations with Bà
     Mối held in forum messages would be visible to Thảo.
@@ -68,18 +74,29 @@ revealed unless both choose to reveal it.
   The AGPL licenses would also force Thảo to publish her modified source. Moon's
   Nhân Duyên is the foundation instead.
 
-## Hosting
+## Hosting (demo: as cheap as possible)
 
-- **Bà Mối:** Vercel, on the existing team, with functions in Singapore. Its
-  database is a new Supabase project in Singapore.
-- **Discourse:** AWS EC2 (Docker, about 4 GB of RAM) in account `486408348462`.
-  Its email goes through SES, which is still in sandbox mode: 200 emails a day,
-  only to verified recipients. Real members need SES production access.
-- **Data in Vietnam:** AWS has a Hanoi Local Zone (`ap-southeast-1-han-1a`) that
-  the account hasn't opted into yet. The demo runs in Singapore; production can
-  move to Hanoi.
-- **Domain:** `anka.vc` DNS is at GoDaddy, so a demo subdomain needs records
-  added there. Thảo may have her own domain.
+- **Bà Mối:** Vercel, on the existing team, at `that-space-demo.vercel.app`. Its
+  database is a free Supabase project in Singapore.
+- **Discourse:** a `t3.small` on AWS EC2 in Singapore (2 GB of RAM plus swap,
+  Discourse's documented minimum), costing about $22 a month with its disk. That
+  is paid from account `486408348462`'s free-plan credit ($159.64 left, valid
+  until 2027-03-25), which also funds `atum-staging` (a `t4g.small`, about $15 a
+  month). Together they run about four months on the credit. The account must
+  move to a paid plan before the credit or the plan runs out, or AWS closes it.
+- **Discourse's address:** Tailscale Funnel on that instance, at
+  `https://<node>.tail349cbf.ts.net`. That means free HTTPS, no DNS and no open
+  ports. A real domain can replace it later.
+- **Email:** Discourse needs outgoing mail for invites and sign-ups. It sends
+  through the existing Google Workspace account (`anka.vc`) using an app
+  password, which is free. SES (Amazon's email service) isn't needed for the
+  demo.
+- **Later:**
+  - Discourse can move to the ASUS once Atum leaves it. It has 3.2 GB of RAM,
+    only about 1.6 GB free today, and Funnel already serves Atum at the root of
+    its address.
+  - For data in Vietnam, production can use the AWS Hanoi Local Zone
+    (`ap-southeast-1-han-1a`, not yet opted in).
 
 ## Privacy rules
 
@@ -107,8 +124,10 @@ revealed unless both choose to reveal it.
    member.
 5. **Only the server can read the pool, signals and chats.** Members never query
    them directly.
-6. **Thảo sees totals and reports, never conversations.** With a report, she
-   sees only the reported messages.
+6. **Thảo sees totals and reports, never a member's conversation with Bà Mối.**
+   With a report, she sees only the reported messages. In the beta, chats
+   between members are relayed through Discourse private messages, which she
+   can read as a Discourse admin. That is agreed for testing with her friends.
 
 ## Member journey
 
@@ -216,9 +235,8 @@ her scores recomputed.
 
 - `interest_received`, `mutual_match`, `message_received`, a gentle
   `message_reminder`, and `watch_fulfilled`.
-- Delivered inside Bà Mối, and as a short message with no details from Bà Mối's
-  Discourse bot account. Details stay in Bà Mối, because Discourse admins can
-  read messages. Zalo and Telegram come later.
+- Delivered inside Bà Mối and as private messages from Bà Mối's Discourse bot
+  account. Zalo and Telegram come later.
 - Each notification is sent exactly once (idempotent) and is tracked as
   delivered, clicked and read.
 - Message notifications are grouped into 10-minute windows, and a muted chat
@@ -244,7 +262,9 @@ her scores recomputed.
 - Signals sent, match rate, and active chats.
 - The reports queue.
 - Settings: Bà Mối's voice preset, score weights and threshold.
-- No access to conversations with Bà Mối or chats between members.
+- No access to conversations with Bà Mối. During the beta, chats between
+  members run through Discourse private messages, which she can read as a
+  Discourse admin.
 
 ## Not in v2
 
@@ -269,7 +289,7 @@ her scores recomputed.
 
 For us:
 
-- Which hostname for the demo: a subdomain of `anka.vc`, or Thảo's own domain?
+- For after the demo, which domain: a subdomain of `anka.vc`, or Thảo's own?
 - Thảo's contract promises her the source code. Are the Moon-derived modules
   transferred to her, or licensed?
 

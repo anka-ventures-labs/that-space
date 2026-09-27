@@ -1,5 +1,50 @@
 # Session log
 
+## 2026-09-27: Cheapest demo hosting and chat through a Discourse relay
+
+### Decisions
+
+- **Thảo may read member chats during the beta** with her friends. So the
+  anonymous chat runs on Discourse private messages through a relay: each
+  member messages only the Bà Mối bot, and Bà Mối re-posts under aliases.
+  - Discourse's `post_created` webhook fires for private messages.
+  - Discourse chat has no webhooks, so the relay can't use chat.
+  - This removes the need to port Moon's chat UI and notification delivery.
+- **Hosting at the lowest cost:**
+  - Bà Mối stays on Vercel at `that-space-demo.vercel.app`, with a free
+    Supabase project.
+  - Discourse runs on an EC2 `t3.small` in Singapore, about $22 a month, paid
+    from the AWS free-plan credit.
+  - Discourse is reachable through Tailscale Funnel (free HTTPS, no DNS).
+  - Email goes through Google Workspace SMTP with an app password. SES isn't
+    needed.
+
+### Checked (read-only)
+
+- **ASUS (`anka-asus-ci`, 192.168.1.21):**
+  - Ubuntu 26.04, 4 cores, 3.2 GiB RAM with about 1.6 GiB free, 370 GB of free
+    disk.
+  - Funnel already serves `https://ubuntu-asus.tail349cbf.ts.net`, proxying the
+    root to `127.0.0.1:8787` (Atum).
+  - Too tight for Discourse until Atum moves off.
+  - `ubuntu-asus` is reached over Tailscale SSH, and the tailnet policy doesn't
+    let this Mac log in as its local user. The LAN alias works.
+- **AWS account `486408348462`:**
+  - Free plan, $159.64 of credit left, valid until 2027-03-25.
+  - Runs `atum-staging`, a `t4g.small`.
+  - Free-plan instance types in Singapore include `t3.small` (2 GiB) and
+    `c7i-flex.large` (4 GiB).
+  - On-demand prices: `t3.small` $0.0264 an hour (about $19 a month),
+    `c7i-flex.large` $0.0978 an hour (about $71 a month), `t4g.small` $0.0212 an
+    hour.
+- **Discourse AI custom tools** get the invoking username and user ID. They can
+  make HTTP requests with headers and post as the bot. Limits: 2 seconds of
+  script time and 20 requests per run.
+
+### Verification
+
+- Documentation only; no code changed.
+
 ## 2026-09-27: Moon code reuse, Discourse messaging, hosting
 
 ### Decisions
