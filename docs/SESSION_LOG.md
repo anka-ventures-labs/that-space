@@ -1,5 +1,118 @@
 # Session log
 
+## 2026-09-27: W-B data layer, live on Supabase
+
+### What changed
+
+- **Migrations** (`supabase/migrations/`):
+  - `20260927160000_ba_moi_core.sql` creates the 11 tables from the plan. Every
+    idempotent write has a unique constraint behind it, and RLS is on
+    everywhere with no policies.
+  - `20260927170000_revoke_client_roles.sql` revokes all table and sequence
+    privileges from `anon` and `authenticated`, including Supabase's default
+    grants for future tables.
+- **`lib/db/db.ts`:** a two-method `Db` interface over postgres.js. `getDb()`
+  reads `DATABASE_URL` (the transaction pooler, port 6543) with prepared
+  statements off and one connection.
+- **`lib/db/repo.ts`:** the repository. It covers:
+  - members and consent
+  - profiles, with invalidation on change
+  - cards and the pool, including rule-of-5 bucket counts
+  - exclusions
+  - the daily box
+  - discoveries
+  - interests and signals, under a pair lock
+  - matches and reveal
+  - blocks
+  - relay topics and messages
+  - the pending-post retry queue
+
+  Results come back in camelCase through quoted aliases.
+- **`lib/matching/derive.ts`:** derived profile fields. `privacy.ts` gained
+  `initialOf`, so bucket counts use the same initial the card shows.
+- **Samples:** `lib/db/samples.ts` and `scripts/seed-samples.ts`
+  (`npm run seed:samples`) create 30 labelled sample members. They are women,
+  men and "Khác", across every intent and all three regions.
+- **`.env.example`** was created.
+- **Dependencies:** `postgres` was added. Dev dependencies added:
+  `@electric-sql/pglite`, `@electric-sql/pglite-socket` and `tsx`.
+
+### Decisions
+
+- **postgres.js through the pooler, not supabase-js.** The service needs
+  transactions, advisory locks and `ON CONFLICT`. With postgres.js, tests and
+  production also share one driver.
+- **No `deleted` member status.** Deleting removes the rows, as the spec says.
+- **Two invalidation lists:**
+  - A change to any hard-filter input voids open discoveries both ways.
+  - A change to anything except the age range also un-confirms the card,
+    because its summary may be stale.
+- **A pair advisory lock** on `interest` and `signal_respond`. Under READ
+  COMMITTED, two crossing yeses could otherwise both miss each other and never
+  match.
+- **Pending posts: the lease is the backoff.** A claim counts the attempt, so a
+  worker that dies mid-send can't loop forever.
+- **The samples include men and "Khác".** The spec leaves "where do the men come
+  from" to Thảo. Samples are labelled and never answer signals.
+
+### Found and fixed
+
+- **Double-encoded jsonb.** The first live seed failed with "cannot extract
+  elements from a scalar". The transaction rolled back, so nothing was written.
+  - Cause: postgres.js asks the server for parameter types, then JSON-encodes
+    jsonb values itself, so the pre-stringified JSON was encoded twice.
+    PGlite's own driver passes strings through, so the tests missed it.
+  - Fix: parameters are plain values now, and the test database is reached
+    through postgres.js over `pglite-socket` with the production options.
+  - A mutation check confirmed the harness now reproduces the live error.
+- **Supabase's default grants.** A new project gives 154 table privileges to
+  `anon` and `authenticated`. RLS blocked them, but the revoke migration now
+  removes them. The test database simulates those default grants, and without
+  the migration the test sees the same 154.
+
+### Deviation from the plan
+
+The plan calls for a `pg_dump` before each schema change. None was taken:
+- the first migration went onto an empty database
+- the second changes only privileges, over 30 reproducible sample rows
+
+The next migration that touches member data needs one.
+
+### Verification
+
+- **`npx vitest run`:** 19 files, 224 tests. The data-layer tests cover:
+  - RLS, policies and grants
+  - the sample and Discourse-account constraint
+  - the profile round trip with derived fields
+  - invalidation both ways, with signals left untouched
+  - one box per Vietnam day across midnight UTC+7 (three concurrent claims,
+    one winner)
+  - duplicate and crossing interests: one row and one match
+  - expired, wrong-recipient and declined signals
+  - the reveal state machine
+  - the pool and rule-of-5 buckets, and exclusions
+  - relay replays
+  - the pending-post lease, backoff and dead letter
+  - deletion cascades
+  - the sample pool
+- **Concurrency tests** share one connection. They prove idempotency under
+  concurrent calls. Under true parallelism in Postgres, the unique constraints
+  and the pair lock are what hold.
+- **`tsc` and `next lint`** are clean.
+- **Live Supabase:**
+  - both migrations applied with `supabase db push`
+  - 11 tables with RLS, 0 policies, and 0 grants to the client roles
+  - 30 samples
+  - The REST API with the publishable key returns 401, "permission denied for
+    table members".
+
+### Next
+
+W-C: the service API route handlers, the Discourse client, the webhook relay,
+and the pending-post cron route, plus the pg_cron + pg_net job that calls it.
+That job is also what keeps the free project from pausing. Until it runs, the
+project pauses after 7 idle days.
+
 ## 2026-09-27: W-A matching core (ported from Moon), with the day pillar added
 
 ### What changed

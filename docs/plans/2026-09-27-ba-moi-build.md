@@ -23,7 +23,7 @@ Member (browser or installable app)
        └─ webhook post_created ──HTTPS + HMAC──▶ Bà Mối service /webhooks/discourse
 Bà Mối service (this repo, Next.js 15 route handlers on Vercel, region sin1)
   ├─ lib/matching/*  pure TypeScript, ported from Moon
-  ├─ lib/db/*        Supabase Postgres through the service role (project ref from env)
+  ├─ lib/db/*        Supabase Postgres via postgres.js on the transaction pooler (DATABASE_URL)
   └─ lib/discourse/* API client, posting as the "Bà Mối" persona user or the "Thư Duyên" relay bot
 Supabase pg_cron + pg_net ──every 5 min──▶ /cron/retry-posts (also keeps the free project awake)
 ```
@@ -69,7 +69,7 @@ with `zod`.
 | `card_confirm` | Runs the leak check on `summary_text` (returning violations when it fails), then stores the card and makes her discoverable |
 | `box_open` | Claims the day's turn atomically, then filters, scores and makes the weighted pick. Returns `{ discovery_id, card, fit }`, `no_match` or `cooldown` |
 | `search` | Takes structured criteria and returns up to 3 `{ discovery_id, card, fit }`, recorded as discoveries. Daily limit |
-| `interest` | Takes `discovery_id`. Creates the interest and a pending signal response, then posts the recipient's view into the recipient's Bà Mối thread |
+| `interest` | Takes `discovery_id`. Creates the interest (its status is the recipient's pending answer), then posts the recipient's view into the recipient's Bà Mối thread |
 | `signals` | Lists pending inbound signals, expiring overdue ones as it reads |
 | `signal_respond` | `accept`, `decline` or `dismiss`. Rejects signals that have expired. On mutual interest it creates the match, then both relay topics |
 | `matches` | Lists matches, with alias, state and relay topic URL |
@@ -113,11 +113,16 @@ with `zod`.
 10. Each relayed message gets a per-match `seq` for ordering. Replays are
     absorbed by the uniqueness of `source_post_id`.
 
-## Data model (Supabase; the database holds no anon or authenticated policies)
+## Data model (Supabase; the public Data API roles get nothing)
 
-The service uses only the service role, which bypasses RLS. Protection comes
-from RLS being on with no anon or authenticated policies, and from the anon key
-never being shipped to any client. Constraints:
+The service connects as the database owner through Supabase's transaction
+pooler (`DATABASE_URL`, port 6543; postgres.js with prepared statements off,
+one connection per function instance), which bypasses RLS. The public Data API
+gets nothing: RLS is on for every table with no policies, and migration
+`20260927170000_revoke_client_roles.sql` revokes every table and sequence
+privilege from `anon` and `authenticated`, including Supabase's default grants
+for future tables. Checked live: the REST API with the publishable key returns
+"permission denied". Constraints:
 
 - `members`: `discourse_user_id` is unique, `status` is checked, and
   `is_sample` flags sample members.
@@ -142,10 +147,24 @@ never being shipped to any client. Constraints:
 - `blocks`: unique `(blocker_id, blocked_id)`.
 - `pending_posts`: `idempotency_key` unique, with `attempts`, `next_at` and a
   `status` of pending, sent or dead (dead after 10 attempts).
-- **Invalidation.** A `profile_update` that changes birth data, intent, gender
-  or who she wants to meet voids `active` discoveries where she is the viewer or
-  the candidate. Signals and matches that already exist are not voided
-  retroactively.
+- **Invalidation.** A `profile_update` that changes a hard-filter input (birth
+  date or time, intent, gender, who she wants to meet, marital status, or her
+  age range) voids `active` discoveries where she is the viewer or the
+  candidate. Changing any of these except the age range also takes her card out
+  of the pool until she re-confirms it, because its summary may be stale.
+  Signals and matches that already exist are not voided retroactively.
+- **Signals live in `interests`.** An interest is the sender's yes; its status
+  is the recipient's answer. There is no separate signal-response table.
+- **Pair lock.** `interest` and `signal_respond` take a transaction-scoped
+  advisory lock on the unordered pair, so two crossing yeses always produce
+  exactly one match. A yes that meets a live yes the other way matches at once.
+- **Retry lease.** Claiming a pending post counts the attempt and sets the next
+  try (1, 2, 4 … minutes, capped at an hour) in one statement with
+  `FOR UPDATE SKIP LOCKED`, so a worker that dies mid-send neither double-sends
+  nor retries forever.
+- **Sample members** (`lib/db/samples.ts`, `npm run seed:samples`): 30
+  labelled profiles (women, men and "Khác", every intent) with confirmed cards,
+  so the first box isn't empty. Reseeding replaces them.
 - **Weights, threshold and daily limits** are constants in code for the beta,
   and scores are logged server-side for tuning later.
 
@@ -178,7 +197,7 @@ is collected and stored now, and used later.
 
 ## Security
 
-- **Secrets:** `SUPABASE_SERVICE_ROLE_KEY`, `BA_MOI_TOOL_SECRET`,
+- **Secrets:** `DATABASE_URL` (holds the database password), `BA_MOI_TOOL_SECRET`,
   `DISCOURSE_WEBHOOK_SECRET`, `DISCOURSE_API_KEY` (scoped to the bot users) and
   `CRON_SECRET` live in Vercel env and `.env.local` only.
 - **The tool secret is visible in the Discourse admin.** For the beta, Minh
@@ -210,7 +229,11 @@ is collected and stored now, and used later.
 
 ## Testing
 
-- **Unit:** Vitest for A, B (using fakes) and C, with the fixtures.
+- **Unit:** Vitest for A and C (C with the fixtures). B runs against PGlite,
+  an in-memory Postgres with the real migrations and Supabase's client roles
+  and default grants, reached through postgres.js over `pglite-socket` with the
+  production options. Tests and production therefore share one driver path;
+  this caught a jsonb double-encoding bug that PGlite's own driver hid.
 - **Integration:** a script runs the full loop against the Supabase project,
   with a fake Discourse client.
 - **End to end:** on the real Discourse with three test accounts.

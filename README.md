@@ -30,10 +30,11 @@ npm run dev        # http://localhost:3000
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Vitest + Testing Library suite (123 tests) |
+| `npm test` | Vitest: page tests, matching core and data layer (224 tests) |
 | `npm run typecheck` | Typecheck |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
 | `npm run build` | Production build (18 static pages) |
+| `npm run seed:samples` | Replace the 30 labelled sample members in the Supabase pool (reads `DATABASE_URL` from `.env.local`) |
 
 ## Pages
 
@@ -52,7 +53,13 @@ npm run dev        # http://localhost:3000
 app/              App Router routes
 components/       Navbar (client component) and Footer
 lib/              Demo data: forum threads, matchmaking profiles
+lib/matching/     Bà Mối matching core: lunar calendar, tuổi, day pillar, filters, scores, privacy
+lib/db/           Bà Mối data layer: postgres.js client, repository, sample members
+supabase/         Supabase CLI config and SQL migrations
+scripts/          One-off scripts (seed-samples.ts, run with tsx)
 __tests__/        Vitest + Testing Library page tests (jsdom)
+tests/unit/       Vitest unit tests (node); tests/unit/db runs on PGlite
+tests/helpers/    Test database: PGlite + migrations, reached through postgres.js
 public/logo.jpg   Brand logo, served at /logo.jpg
 ```
 
@@ -71,6 +78,26 @@ public/logo.jpg   Brand logo, served at /logo.jpg
   expected.
 - `progress-7b613403-….txt` is the log of the agent run that built the demo. It
   records the user stories (US-001 to US-009) and codebase patterns.
+
+## Bà Mối data (Supabase)
+
+The service's database is a free Supabase project in its own organization.
+Copy `.env.example` to `.env.local` and fill it in; never commit it.
+
+```bash
+set -a; . ./.env.local; set +a        # SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
+supabase link --project-ref "$SUPABASE_PROJECT_REF"
+supabase db push                       # applies supabase/migrations/*.sql
+npm run seed:samples                   # 30 labelled sample members
+```
+
+- The service connects through the transaction pooler (`DATABASE_URL`, port
+  6543) with postgres.js and prepared statements off. RLS is on everywhere with
+  no policies, and the public Data API roles hold no privileges.
+- Migrations are additive. Take a `pg_dump` before any change that touches
+  member data.
+- Tests never touch Supabase: `tests/helpers/pglite-db.ts` gives each suite an
+  in-memory PGlite with the same migrations.
 
 ## Deployment
 
@@ -104,6 +131,10 @@ See [docs/SESSION_LOG.md](docs/SESSION_LOG.md).
   Next.js. That one is build-time only and concerns processing attacker-supplied
   CSS source maps. The upgrade from 14.2.5 cleared its critical and runtime
   advisories.
+- Dev tooling: `npm audit` also reports advisories in Vitest 2.1.9 and its
+  Vite and esbuild. They affect the Vitest UI and dev servers, which this repo
+  doesn't run (`vitest run` only). The fix is Vitest 5, a major upgrade that
+  replaces `environmentMatchGlobs`; it's deferred.
 - `logo.jpg` at the repository root duplicates `public/logo.jpg`. Only the
   `public/` copy is served.
 - The footer copyright reads "© 2024".

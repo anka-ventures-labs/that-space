@@ -78,10 +78,16 @@ export function regionForCity(city: string | null | undefined): Region | null {
   return 'Việt Nam'
 }
 
+/** The rule-of-5 bucket for a name: its first letter, uppercased. */
+export function initialOf(name: string | null | undefined): string | null {
+  const first = name ? Array.from(name.trim().normalize('NFC'))[0] : undefined
+  return first ? first.toLocaleUpperCase('vi-VN') : null
+}
+
 export function nameInitial(name: string | null | undefined, bucketSize: number, minK = MIN_K_ANONYMITY): string | null {
-  if (!name || bucketSize < minK) return null
-  const first = Array.from(name.trim())[0]
-  return first ? `${first.toLocaleUpperCase('vi-VN')}.` : null
+  if (bucketSize < minK) return null
+  const initial = initialOf(name)
+  return initial ? `${initial}.` : null
 }
 
 export interface CardInput {
