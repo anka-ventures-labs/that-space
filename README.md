@@ -16,6 +16,7 @@ Live demo: https://that-space-demo.vercel.app
   matchmaking compatibility modal are interactive.
 - Testimonial and member names are fictional. Replace them with real, consented
   content before any public launch.
+- Next: Bà Mối, an AI matchmaker. See [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
 
 ## Getting started
 

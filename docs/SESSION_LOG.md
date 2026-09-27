@@ -1,5 +1,40 @@
 # Session log
 
+## 2026-09-27: Bà Mối v1 spec
+
+### What changed
+
+- Added `docs/ba-moi-spec.md`, a short spec for Bà Mối, an AI matchmaker for
+  Thật Space, and linked it from the README.
+
+### Why
+
+- On the 2026-09-25 call, Thảo and Minh agreed to build a custom AI matchmaker
+  for Thật Space instead of integrating Moon AI. Thảo was to send a spec first.
+- Minh decided not to wait. Thảo reacts to things she can use rather than
+  writing specs, so a working prototype comes first and her feedback shapes v2.
+- Thảo's 15-question set in Drive (`Bo_cau_hoi_That_Space`) is forum onboarding
+  (art, healing, retreats), not dating, so it stays with the phase 2 forum.
+- The spec starts from intent (friendship, casual, long-term, marriage) and who
+  someone wants to meet, then standard dating questions and one open question.
+  It answers Thảo's two complaints about Moon AI: matches ignored intent, and
+  readings were too generic.
+
+### Background sources (Minh's Google Drive)
+
+- "Thật Space - Forum Development Proposal" and
+  "Womens_Forum_Software_Specification.docx" (January 2026)
+- Fathom recaps of the calls with Thao Nguyen on 2026-03-23 and 2026-09-25
+
+### Verification
+
+- Documentation only; no code changed.
+
+### Next
+
+- Build to the spec on `feat/ba-moi`. Start with the Next.js security upgrade
+  and the tuổi (can chi) engine, which depend on nothing else.
+
 ## 2026-09-27: Recover source from Vercel and create the repository
 
 ### What changed
