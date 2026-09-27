@@ -1,5 +1,13 @@
 # Session log
 
+## 2026-09-27: Fix: `lib/matching/derive.ts` was missing from 03b257f
+
+The W-B commit `03b257f` imports `lib/matching/derive.ts` but didn't contain it:
+the file was left out of an explicit `git add` list. This commit adds the file
+unchanged. On its own, `03b257f` doesn't build; this commit does.
+- Verified in a clean worktree at this commit: `tsc` is clean, and
+  `tests/unit/db` and `tests/unit/matching` pass.
+
 ## 2026-09-27: W-B data layer, live on Supabase
 
 ### What changed
