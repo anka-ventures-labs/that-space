@@ -1,5 +1,31 @@
 # Session log
 
+## 2026-09-27: Research — could Bà Mối live inside Discourse?
+
+Minh's standing principle: lean and clean, reusing and stitching together
+mature solutions before writing our own. So, before building sign-in, chat or
+admin, we checked:
+
+- **Discourse AI (official)** has native OpenRouter support
+  (meta.discourse.org/t/341531).
+  - AI personas can be messaged directly, as bots.
+  - Custom tools get the member's `username` and `user_id`, can make HTTP
+    requests with headers, and can post as the bot. Limits: 2 seconds of
+    script time and 20 requests per run (meta.discourse.org/t/314103).
+  - OpenRouter models must support tool use.
+- **Supabase Auth** can act as an OAuth 2.1 / OpenID Connect provider at no
+  extra charge (supabase.com/docs/guides/auth/oauth-server). It isn't needed
+  if Discourse's built-in Google login and invites handle sign-in.
+- **The Mac mini** has 8 GB of RAM, 13 GB of free disk, and colima stopped. It
+  is not a viable Discourse host. The ASUS stays the target, with a temporary
+  AWS instance as an option.
+- **Proposed: a Discourse-native Bà Mối,** waiting on Minh's decision.
+  - Discourse carries the member experience: Google login, invites, the forum,
+    the Bà Mối persona in direct messages, anonymous chat through the relay,
+    notifications, moderation and admin.
+  - This repository becomes a headless API with Supabase: Moon's matching,
+    privacy and astrology logic, the pool, signals and the relay webhook.
+
 ## 2026-09-27: W1 foundation — Next.js 15.5 and Vitest, Moon's layout
 
 ### What changed
