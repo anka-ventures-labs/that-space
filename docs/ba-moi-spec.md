@@ -24,11 +24,17 @@ revealed unless both choose to reveal it.
   (invite-only, with approval), categories, chat, events for retreats and
   workshops, moderation, the Vietnamese interface, and mobile. Thảo's
   15-question set (`Bo_cau_hoi_That_Space`) becomes the signup fields. Discourse
-  is also the identity provider, via DiscourseConnect.
-- **Bà Mối is a separate service, this repository.** Members sign in with their
-  Thật Space account through DiscourseConnect and reach Bà Mối from a link in
-  the Discourse header. It has its own Postgres database, with pgvector for
-  trait search.
+  hands sign-in to Bà Mối through DiscourseConnect.
+- **Bà Mối is a separate service, this repository, and the sign-in for all of
+  Thật Space.** It reuses Moon's sign-in: Google through Supabase Auth now,
+  email codes later.
+  - Discourse creates a member's account, already active, the first time she
+    signs in through Bà Mối. Nobody activates accounts by hand.
+  - Invite-only is enforced here. Thảo's invite link carries a code, and Bà Mối
+    refuses new accounts without one.
+  - Members reach Bà Mối from a link in the Discourse header.
+  - It has its own Postgres database (Supabase), with pgvector for trait
+    search.
 - **Bà Mối is built by porting Moon's matchmaking stack.** Three parts come
   over:
   - `lib/nhan-duyen`: the pool, the box, signals, anonymous chat,
@@ -87,19 +93,18 @@ revealed unless both choose to reveal it.
 - **Discourse's address:** Tailscale Funnel on that instance, at
   `https://<node>.tail349cbf.ts.net`. That means free HTTPS, no DNS and no open
   ports. A real domain can replace it later.
-- **No outgoing email in the beta.** Recruitment is manual:
-  - Thảo shares Discourse invite links over Zalo or Messenger. After a friend
-    signs up, an admin activates the account with one click in the admin panel.
-  - Notifications arrive in Discourse and as push notifications from its
-    installable web app.
-  - "Forgot password" doesn't work without email, so an admin resets
-    passwords from the server.
-  - Add email (Google Workspace SMTP with an app password, or SES) when
-    recruitment stops being manual.
-  - Supabase's built-in email can't serve Discourse. It sends only Supabase's
-    own login emails, only to project-team addresses, at 2 per hour.
-- **Supabase is only Bà Mối's database.** Members sign in to Bà Mối through
-  DiscourseConnect, not Supabase Auth.
+- **No email in the beta.** Thảo shares invite links over Zalo or Messenger,
+  and friends sign in with Google through Bà Mối. Neither Discourse nor Bà Mối
+  sends email. Notifications arrive in Discourse and as push notifications from
+  its installable web app.
+  - Google sign-in needs a Google OAuth client for Thật Space, so Google's
+    consent screen doesn't say "Moon".
+  - Moon's email codes go through Supabase Auth, with Resend as its mail
+    server. They wait for a Thật Space sending domain.
+  - Moon's Zalo and Telegram codes are tied to Moon's own Zalo account and
+    Telegram bot, so they stay out.
+  - Supabase's built-in email can't substitute: it sends only to project-team
+    addresses, at 2 per hour.
 - **Later:**
   - Discourse can move to the ASUS once Atum leaves it. It has 3.2 GB of RAM,
     only about 1.6 GB free today, and Funnel already serves Atum at the root of
@@ -285,14 +290,18 @@ her scores recomputed.
 
 ## Done means
 
-1. A new member finishes the conversation in under 5 minutes on a phone.
-2. Tests prove no discovery or search result ever breaks a hard filter.
-3. Tests prove pool cards and Bà Mối's texts about other people pass the leak
+1. A friend with an invite link signs in with Google and lands in Discourse
+   with an active account. Without an invite code, sign-in is refused.
+2. A new member finishes the conversation in under 5 minutes on a phone.
+3. Tests prove no discovery or search result ever breaks a hard filter.
+4. Tests prove pool cards and Bà Mối's texts about other people pass the leak
    check, and that the rule of 5 holds.
-4. Tuổi matches a trusted reference, including birthdays around Tết.
-5. The full loop works between two test members: box or search, interest,
-   the recipient's summary, acceptance, and anonymous chat.
-6. Thảo's view shows totals and reports, not conversations.
+5. Tuổi matches a trusted reference, including birthdays around Tết.
+6. The full loop works between two test members: box or search, interest,
+   the recipient's summary, acceptance, and anonymous chat relayed through
+   Discourse.
+7. Thảo's view in Bà Mối shows totals and reports, not conversations with Bà
+   Mối.
 
 ## Open questions
 

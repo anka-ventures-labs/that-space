@@ -1,5 +1,42 @@
 # Session log
 
+## 2026-09-27: Bà Mối becomes the sign-in, reusing Moon's auth
+
+### Decision
+
+- Bà Mối is the identity provider for Thật Space, and Discourse hands sign-in
+  to it through DiscourseConnect.
+  - Friends sign in with Google, via Supabase Auth ported from Moon.
+  - Discourse creates their accounts already active, so nobody activates
+    accounts by hand and the beta needs no email.
+  - Invite-only is enforced in Bà Mối by an invite code in Thảo's link.
+- This replaces the earlier plan of manual activation in Discourse.
+
+### What Moon has (checked read-only on `origin/main` at `8f07a25`)
+
+- **Google sign-in** through Supabase Auth: `lib/auth/google-sign-in.ts`
+  (`signInWithOAuth`), plus account linking in `lib/auth/google-link-handler.ts`
+  (`linkIdentity`).
+- **OTP sign-in** in `lib/otp/*` and `app/api/auth/otp/{send,verify,status}`. It
+  tries Zalo, then Telegram, then email, with hashing and rate limits.
+  - Email codes use Supabase `signInWithOtp` and `verifyOtp`.
+  - Resend is configured as the custom mail server inside Supabase Auth, per
+    `lib/otp/send-email.ts`.
+- **Magic links** through Supabase `admin.generateLink`.
+
+### For Thật Space
+
+- **Carries over:** the Google sign-in code.
+- **Needs setting up:** a Google OAuth client for Thật Space; Moon's client
+  would show "Moon" on Google's consent screen.
+- **Waits:** email codes, which need a Thật Space sending domain on Resend.
+- **Stays out:** Zalo and Telegram codes, which are tied to Moon's own Zalo
+  account and Telegram bot.
+
+### Verification
+
+- Documentation only; no code changed.
+
 ## 2026-09-27: Cheapest demo hosting and chat through a Discourse relay
 
 ### Decisions
