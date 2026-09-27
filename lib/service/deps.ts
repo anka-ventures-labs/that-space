@@ -11,7 +11,9 @@ const EnvSchema = z.object({
   DISCOURSE_WEBHOOK_SECRET: z.string().min(16),
   CRON_SECRET: z.string().min(32),
   DISCOURSE_URL: z.url(),
-  DISCOURSE_API_KEY: z.string().min(16),
+  /** Single-user API keys: one for Bà Mối's bot user, one for Thư Duyên. */
+  DISCOURSE_PERSONA_API_KEY: z.string().min(16),
+  DISCOURSE_RELAY_API_KEY: z.string().min(16),
   BA_MOI_PERSONA_USERNAME: z.string().min(1).default('ba_moi'),
   BA_MOI_RELAY_USERNAME: z.string().min(1).default('thu_duyen'),
   /** Discourse user ids of the bot users, comma-separated. Their posts are never relayed. */
@@ -54,7 +56,10 @@ export function getDeps(): ServiceDeps {
   const env = parsed.data
   deps = {
     db: getDb(),
-    discourse: createDiscourseClient({ baseUrl: env.DISCOURSE_URL, apiKey: env.DISCOURSE_API_KEY }),
+    discourse: createDiscourseClient({
+      baseUrl: env.DISCOURSE_URL,
+      apiKeys: { [env.BA_MOI_PERSONA_USERNAME]: env.DISCOURSE_PERSONA_API_KEY, [env.BA_MOI_RELAY_USERNAME]: env.DISCOURSE_RELAY_API_KEY },
+    }),
     config: {
       toolSecret: env.BA_MOI_TOOL_SECRET,
       webhookSecret: env.DISCOURSE_WEBHOOK_SECRET,

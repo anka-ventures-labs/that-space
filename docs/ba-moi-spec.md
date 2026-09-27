@@ -232,7 +232,9 @@ her scores recomputed.
   badges and activity.
   - A "Tác phẩm" tab from the User Portfolio component (in the `discourse`
     GitHub org) shows her Triển lãm posts.
-  - Topic List Previews (community, by Pavilion) shows them as image tiles.
+  - Discourse's official Topic Thumbnails component shows them as image
+    tiles. Pavilion's Topic List Previews was the first choice, but its
+    repository is gone.
   - Component versions are pinned.
 - **Roles:** her question 1 answer puts each member in a group through the
   official Automation plugin's add-to-group script.

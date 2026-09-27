@@ -32,8 +32,10 @@ const EnvelopeSchema = z.object({
     username: z.string().trim().min(1).max(60),
     name: z.string().trim().max(120).nullish(),
     topic_id: z.number().int().positive().nullish(),
-    /** Whether the conversation is a private message; only then is it her thread with Bà Mối. */
+    /** Whether the conversation is a private message; only then can it be her thread with Bà Mối. */
     private_message: z.boolean().nullish(),
+    /** The private message's usernames, comma-separated (Discourse AI's context.participants). */
+    participants: z.string().max(2000).nullish(),
   }),
   args: z.record(z.string(), z.unknown()).nullish(),
 })
@@ -43,6 +45,16 @@ export function bearerMatches(header: string | null, secret: string): boolean {
   if (!secret || !header?.startsWith('Bearer ')) return false
   const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest()
   return timingSafeEqual(digest(header.slice('Bearer '.length)), digest(secret))
+}
+
+/**
+ * Her own thread with Bà Mối: a private message with just her and the bot.
+ * A thread she shares with anyone else never receives her notifications.
+ */
+export function personaThread(auth: { topic_id?: number | null; private_message?: boolean | null; participants?: string | null }): number | null {
+  if (auth.private_message !== true || !auth.topic_id) return null
+  const people = (auth.participants ?? '').split(',').map((p) => p.trim()).filter(Boolean)
+  return people.length === 2 ? auth.topic_id : null
 }
 
 function failure(error: ErrorCode, extra: Record<string, unknown> = {}) {
@@ -82,7 +94,7 @@ export async function handleToolRequest(name: string, request: Request, deps: Se
       discourseUserId: auth.user_id,
       username: auth.username,
       displayName: auth.name || auth.username,
-      personaTopicId: auth.private_message === true ? auth.topic_id ?? null : null,
+      personaTopicId: personaThread(auth),
     })
     memberId = member.id
     const result = await tool.run({ deps, member, now: deps.now(), requestId }, args.data as never)

@@ -1,5 +1,104 @@
 # Session log
 
+## 2026-09-27: W-D and W-E prepared ahead of the ASUS, and per-bot API keys
+
+### Why now
+
+- A read-only check of the ASUS found Atum's services still running and no
+  Docker, so installing Discourse waits for Minh.
+- Everything that doesn't need a live forum was prepared instead.
+- The agent-jobs route for this research (decision `5b993044`) was `direct`.
+  It was done in this session, and feedback was sent: completed.
+
+### Findings from Discourse's source (`discourse/discourse` main, 2026-09-25)
+
+- **Bundled in core:** Discourse AI (personas are now called agents),
+  Automation, Chat, and calendar and events (`discourse-events`). The old
+  `discourse-calendar` repository is archived. `discourse-follow` and
+  `discourse-user-portfolio` are separate and active.
+- **Pavilion's Topic List Previews repository is gone.** The spec now uses
+  Discourse's official Topic Thumbnails component.
+- **AI tool scripts:**
+  - They get 2 seconds of their own time and up to 20 HTTP requests.
+  - HTTP wait doesn't count toward the 2 seconds, which answers the plan's
+    latency question without a probe.
+  - `context` has `user_id`, `username`, `topic_id`, `private_message` and
+    `participants`.
+  - `secrets.get(alias)` reads Discourse's AI secret store, so the tool secret
+    never appears in a script.
+- **The admin API covers everything we install:**
+  - `ai-secrets`
+  - `ai-tools` (with `secret_contracts` and `secret_bindings`)
+  - `ai-agents` (with `create-user`)
+
+  So installing needs no pasting into admin screens.
+- **Parameter types:** tool parameters can be string, boolean, integer, number
+  or array, but the admin API drops `item_type`. So list parameters are sent as
+  comma-separated strings and split in the script.
+- **The `post_created` webhook fires for private-message posts** (no
+  private-message exclusion in `WebHook.enqueue_post_hooks`). This confirms the
+  relay design.
+
+### What changed
+
+- **`discourse/tools/`:**
+  - `tool.js`: one shared script. Identity comes from `context` only and the
+    secret from the secret store. Lists are split, "không nhớ" becomes null,
+    and failures become friendly results.
+  - `tools.json`: the 12 tool definitions.
+- **`discourse/persona/ba-moi.md`:** the Bà Mối system prompt, in Vietnamese so
+  Thảo can edit it. It follows the spec's journey and privacy rules and uses the
+  neutral "Bà / bạn" voice until Thảo chooses.
+- **`lib/discourse/install.ts` and `scripts/install-discourse-ai.ts`**
+  (`npm run discourse:install`): idempotent install of the secret, tools and
+  agent through the admin API. `--check` reports drift by checksum, which makes
+  the repo copy canonical.
+- **`docs/discourse-setup.md`:** the W-D runbook. It covers:
+  - swap, Docker and `app.yml` with no SSL, localhost-only
+  - Funnel
+  - bundled and pinned add-ons, and site settings
+  - bots, keys, the webhook and agent install
+  - probes and operations
+- **`scripts/probe-discourse.ts`** (`npm run discourse:probe`): read-only checks
+  of the Funnel health, each bot key's identity and scope, the webhook, and
+  that the service refuses unauthenticated calls.
+- **Security: one single-user API key per bot.** `DISCOURSE_PERSONA_API_KEY`
+  and `DISCOURSE_RELAY_API_KEY` replace one `DISCOURSE_API_KEY`. With an
+  all-users key in Vercel, a leak could post as any member or admin. Now a
+  leaked key posts only as its bot. The client refuses any username it has no
+  key for.
+- **Security: her Bà Mối thread is remembered only when its participants are
+  exactly her and the bot.** A thread she shares with someone else never
+  receives her notifications.
+
+### Verification
+
+- **`npx vitest run`:** 26 files, 281 tests. New since W-C:
+  - the tool script run in a `node:vm` sandbox with Discourse's globals:
+    - identity from context only; forged ids land in `args`, which the
+      service strips
+    - the secret from the store
+    - list splitting
+    - failure handling
+    - rendering refuses unsafe URLs
+  - a contract test that `tools.json` names exactly the service's tools and
+    parameters, with the same required ones
+  - the admin payloads
+  - the per-bot key client, including prototype-name safety
+  - the one-on-one thread rule
+- **`tsc`, `next lint` and `npm run build`** are clean.
+- **Not yet run against a live Discourse:** the installer, the probe and the
+  runbook. They're verified in W-D and W-E, and this log gets corrected where
+  reality differs.
+
+### Next
+
+1. Minh confirms Atum is off the ASUS. Then W-D, following
+   `docs/discourse-setup.md`.
+2. W-F's Vercel preview gives `BA_MOI_SERVICE_URL`.
+3. Minh's OpenRouter key, then `npm run discourse:install`, then the "Done
+   means" loop with two test members.
+
 ## 2026-09-27: W-C service API, relay and outbox
 
 ### What changed

@@ -1,7 +1,8 @@
 /**
  * The two Discourse API calls the service makes: start a private message and
- * reply in a topic, each as a named bot user (Api-Username). The API key
- * should be scoped to the bot users only.
+ * reply in a topic, each as one of the bot users. Each bot has its own
+ * single-user API key, so a leaked key can only ever post as that bot, never
+ * as a member or an admin.
  */
 
 export interface DiscourseClient {
@@ -20,7 +21,8 @@ export class DiscourseError extends Error {
 
 export function createDiscourseClient(options: {
   baseUrl: string
-  apiKey: string
+  /** Single-user API keys, by the bot username each belongs to. */
+  apiKeys: Record<string, string>
   fetchImpl?: typeof fetch
   timeoutMs?: number
 }): DiscourseClient {
@@ -29,12 +31,14 @@ export function createDiscourseClient(options: {
   const baseUrl = options.baseUrl.replace(/\/+$/, '')
 
   async function createPost(asUsername: string, body: Record<string, unknown>): Promise<{ id: number; topic_id: number }> {
+    const apiKey = Object.hasOwn(options.apiKeys, asUsername) ? options.apiKeys[asUsername] : undefined
+    if (!apiKey) throw new DiscourseError(`No API key for ${asUsername}`, null)
     let response: Response
     try {
       response = await fetchImpl(`${baseUrl}/posts.json`, {
         method: 'POST',
         headers: {
-          'Api-Key': options.apiKey,
+          'Api-Key': apiKey,
           'Api-Username': asUsername,
           'Content-Type': 'application/json',
           Accept: 'application/json',

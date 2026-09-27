@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { getMemberByDiscourseId } from '@/lib/db/repo'
-import { bearerMatches, handleToolRequest } from '@/lib/service/dispatch'
+import { bearerMatches, handleToolRequest, personaThread } from '@/lib/service/dispatch'
 import toolCall from '../../fixtures/discourse/tool_call.json'
 import { TOOL_SECRET, createHarness, testUser, type Harness } from '../../helpers/service'
 
@@ -62,12 +62,16 @@ describe('tool auth and envelope', () => {
     expect((await getMemberByDiscourseId(h.db, attacker.user_id))?.status).toBe('paused')
   })
 
-  it('remembers her Bà Mối thread only from a private message', async () => {
+  it('remembers her Bà Mối thread only from a private message between her and the bot', async () => {
     const user = testUser('mai')
-    await h.call('status', user, {}, { auth: { user_id: user.user_id, username: user.username, topic_id: 777, private_message: false } })
+    const auth = { user_id: user.user_id, username: user.username, topic_id: 777 }
+    await h.call('status', user, {}, { auth: { ...auth, private_message: false, participants: null } })
+    await h.call('status', user, {}, { auth: { ...auth, private_message: true, participants: 'mai, ba_moi, friend' } })
     expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBeNull()
     await h.call('status', user)
     expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBe(user.topic_id)
+    expect(personaThread({ topic_id: 5, private_message: true, participants: 'mai,ba_moi' })).toBe(5)
+    expect(personaThread({ topic_id: 5, private_message: true })).toBeNull()
   })
 
   it('fails closed with a generic message when the database is down', async () => {

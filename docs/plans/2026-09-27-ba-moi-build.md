@@ -48,8 +48,9 @@ with `zod`.
   - The persona writes all the prose, so the service never calls an LLM.
   - The tool script turns failures and timeouts into a friendly Vietnamese
     message and doesn't retry blindly.
-  - Whether HTTP wait counts against Discourse's 2-second script budget is
-    measured by a probe in W-E.
+  - HTTP wait does not count against Discourse's 2-second script budget:
+    requests run as attached functions. This was answered from source
+    (`lib/agents/tool_runner.rb`), so no probe is needed.
 - **Idempotency is semantic, enforced by unique constraints and
   `INSERT … ON CONFLICT`:**
   - one opening per member per Vietnamese day
@@ -203,7 +204,17 @@ is collected and stored now, and used later.
 - **Secrets:** `DATABASE_URL` (holds the database password), `BA_MOI_TOOL_SECRET`,
   `DISCOURSE_WEBHOOK_SECRET`, `DISCOURSE_API_KEY` (scoped to the bot users) and
   `CRON_SECRET` live in Vercel env and `.env.local` only.
-- **The tool secret is visible in the Discourse admin.** For the beta, Minh
+- **As built:**
+  - The tool secret lives in Discourse's AI secret store and is bound to each
+    tool by alias. The scripts read it with `secrets.get`, so it isn't in
+    their text.
+  - The service posts with one single-user API key per bot
+    (`DISCOURSE_PERSONA_API_KEY`, `DISCOURSE_RELAY_API_KEY`). A leaked key
+    can't impersonate members.
+  - The all-users admin key is used only by `npm run discourse:install`, from
+    a trusted machine.
+- **The tool secret is visible in the Discourse admin** (superseded by the
+  secret store above). For the beta, Minh
   decides who holds admin; the default is Minh as admin and Thảo as moderator
   until she needs admin. The rotation runbook is in W-E: set the new secret in
   Vercel, update the tool, confirm the old one is rejected.

@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed:samples": "tsx --env-file=.env.local scripts/seed-samples.ts"
+    "seed:samples": "tsx --env-file=.env.local scripts/seed-samples.ts",
+    "discourse:install": "tsx --env-file=.env.local scripts/install-discourse-ai.ts",
+    "discourse:probe": "tsx --env-file=.env.local scripts/probe-discourse.ts"
   },
   "dependencies": {
     "libphonenumber-js": "^1.13.14",

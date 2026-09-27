@@ -118,7 +118,9 @@ export async function createHarness(options: { now?: Date; seed?: number } = {})
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
     const secret = extra.secret === undefined ? TOOL_SECRET : extra.secret
     if (secret !== null) headers.Authorization = `Bearer ${secret}`
-    const auth = extra.auth ?? { user_id: user.user_id, username: user.username, topic_id: user.topic_id, private_message: true }
+    const auth = extra.auth ?? {
+      user_id: user.user_id, username: user.username, topic_id: user.topic_id, private_message: true, participants: `${user.username}, ba_moi`,
+    }
     const response = await handleToolRequest(tool, new Request(`https://svc.test/api/ba-moi/v1/${tool}`, {
       method: 'POST', headers, body: JSON.stringify({ auth, args }),
     }), deps)
