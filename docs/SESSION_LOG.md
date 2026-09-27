@@ -1,5 +1,29 @@
 # Session log
 
+## 2026-09-27: Plan review (Muse Spark 1.3) folded into the Discourse-native plan
+
+- **The review.** Muse Spark 1.3 (`opencode-go/muse-spark-1.3-contributor`)
+  reviewed the plan through OpenCode in ACO: router decision `94ba596c`, job
+  `4f6d35a0`. Verdict: "proceed with changes", with 9 blocking findings.
+- **Accepted:** the `auth` envelope built only from the tool context; the
+  webhook HMAC rules (`sha256=`, raw body, timing-safe compare); the relay
+  anonymity policy; contact detection with `libphonenumber-js` and
+  `linkify-it`; database constraints and atomic claims; pg_cron retries for
+  pending posts, with a dead letter; payload fixtures plus a probe script; the
+  latency budget; secret rotation; the consent disclosure.
+- **Rejected, with evidence:** the claim that 1985-02-01 is Giáp Tý. Moon's
+  Vietnamese lunar algorithm (UTC+7) gives Tết Ất Sửu on 1985-01-21, and the
+  Chinese calendar (UTC+8) gives 1985-02-20. Vietnam uses UTC+7, so
+  1985-02-01 is Ất Sửu.
+- **Verified:**
+  - Discourse signs webhooks as `sha256=` plus an HMAC of the raw payload.
+  - Free Supabase projects pause after 7 days idle and need a dashboard
+    restore.
+  - No chat-message webhook events were found; this is re-checked on the
+    installed Discourse.
+- **Deferred:** A2, Moon's full romantic score, until after the loop works. The
+  birth time is still collected.
+
 ## 2026-09-27: Research — could Bà Mối live inside Discourse?
 
 Minh's standing principle: lean and clean, reusing and stitching together

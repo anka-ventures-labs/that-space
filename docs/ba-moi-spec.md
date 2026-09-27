@@ -80,8 +80,10 @@ matchmaking logic and thin glue are ours.
    checks every summary it stores.
 4. **Reasoning about another person uses only their pool card**, never their
    private profile.
-5. **The service is the only way into the database.** Row-level security is on,
-   with no client policies, and only the server holds the service key.
+5. **The service is the only way into the database.** It uses the service
+   role, which bypasses row-level security. Protection comes from having no
+   anon or authenticated policies and never shipping the anon key to any
+   client.
 6. **In the beta, Discourse admins can read members' direct messages with Bà
    Mối and the relayed chats.** Minh agreed to this for testing with Thảo's
    friends. The service never exposes private profiles.
@@ -91,10 +93,14 @@ matchmaking logic and thin glue are ours.
 1. **Join.** Thảo shares a Discourse invite link. Her friend creates an
    account with email and password and answers Thảo's signup questions (her
    15-question set, as Discourse user fields). With no outgoing email in the
-   beta, an admin activates the account with one click. She opens a direct message with Bà Mối, who asks
-   for consent, which is versioned, then 18+ age, birth date and gender. She can
-   pause, hide herself from discovery, or delete her data at any time by
-   asking Bà Mối.
+   beta, an admin activates the account with one click.
+
+   She then opens a direct message with Bà Mối, who asks for consent, which is
+   versioned. The consent text says that in the beta, admins can read her
+   messages with Bà Mối and her relayed chats, and that deleting removes her
+   matchmaking data but not those messages. Then Bà Mối asks for 18+ age, birth
+   date and gender. She can pause, hide herself from discovery, or delete her
+   data at any time by asking Bà Mối.
 2. **Talk to Bà Mối.** About 5 minutes, in Vietnamese, one question at a time.
    Bà Mối rephrases each question in her own voice; this is the default
    wording:
@@ -143,8 +149,10 @@ matchmaking logic and thin glue are ours.
    form of address relative to herself, plus an initial when the rule of 5
    allows ("Chị L.", "Anh N.").
    - Text only. Messages are limited to 1,200 characters and 12 per minute.
-   - Before a reveal, a message containing a phone number, email address or
-     social handle is not relayed. The sender is told how to reveal instead.
+     `@mentions` and quotes are stripped. Edits and deletes aren't synced.
+   - Before a reveal, a message containing a phone number, email address,
+     social handle, link or attachment is not relayed. The sender is told how
+     to reveal instead.
    - Either member can end the chat or block through Bà Mối. Blocking also
      closes the match. Members can flag relayed messages with Discourse's own
      flags.
@@ -213,9 +221,10 @@ her scores recomputed.
   Thông báo.
 - **Profile pages:** bio, header image, signup answers, a featured topic,
   badges and activity.
-  - A "Tác phẩm" tab from the official User Portfolio component shows her
-    Triển lãm posts.
-  - Topic List Previews shows them as image tiles.
+  - A "Tác phẩm" tab from the User Portfolio component (in the `discourse`
+    GitHub org) shows her Triển lãm posts.
+  - Topic List Previews (community, by Pavilion) shows them as image tiles.
+  - Component versions are pinned.
 - **Roles:** her question 1 answer puts each member in a group through the
   official Automation plugin's add-to-group script.
 - **Events:** the official Calendar & Events plugin.
