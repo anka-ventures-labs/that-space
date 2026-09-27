@@ -1,5 +1,43 @@
 # Session log
 
+## 2026-09-27: Moon code reuse, Discourse messaging, hosting
+
+### Decisions
+
+- **Moon reuse.** Minh built Moon entirely; no co-owner is involved. Bà Mối
+  therefore reuses Moon's code, not only its design.
+- **What comes over:** `lib/nhan-duyen`, the astrology engine (iztro plus the
+  compatibility engine) and the chat harness (Vercel AI SDK with the model
+  registry).
+- **What stays out:** payments, tarot, Zalo and Telegram, affiliates. Thảo's
+  January proposal promised her the full source code.
+- **Stack.** This repository moves to Moon's stack: Next.js 15.5, Supabase,
+  AI SDK 6.
+- **Model.** Bà Mối uses Claude through the model registry, not Gemini, because
+  Thảo did not want Google holding member data.
+- **Discourse messaging.**
+  - Not used for the anonymous stage: anonymous mode is for posting, admins can
+    link anonymous accounts to real ones, and admins can read private messages.
+  - Used after a mutual reveal.
+  - Used as the notification channel, with short notices that carry no details.
+
+### Hosting facts (checked 2026-09-27, read-only)
+
+- **Vercel:** team `minh-nguyens-projects-3a747261`. Domains `anka.vc` and
+  `atumplatform.com`, both with DNS hosted elsewhere; `anka.vc` DNS is at
+  GoDaddy (`domaincontrol.com`).
+- **AWS:** account `486408348462` (Minh Anka), reachable locally as the IAM
+  user `coding-agent`.
+  - EC2 reads work in `ap-southeast-1`.
+  - SES in `ap-southeast-1` is in sandbox mode: 200 emails a day, no production
+    access.
+  - The Hanoi Local Zone `ap-southeast-1-han-1a` exists, but the account has
+    not opted in.
+
+### Verification
+
+- Documentation only; no code changed.
+
 ## 2026-09-27: Bà Mối spec v2 (anonymous matchmaking) and architecture
 
 ### What changed

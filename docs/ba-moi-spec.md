@@ -3,8 +3,9 @@
 Status: draft v2, 2026-09-27. This version replaces the v1 draft, which had
 named introductions and contact exchange. Matchmaking in Thật Space is
 anonymous by design and follows the flow and rules of Moon's Nhân Duyên
-(`moon-ai-vn/moon2-app`, `lib/nhan-duyen`). It reuses that design, not that
-code.
+(`moon-ai-vn/moon2-app`, `lib/nhan-duyen`). Minh built Moon entirely, so Bà
+Mối reuses Moon's code as well as its design, ported selectively (see
+Architecture).
 
 ## The product in one paragraph
 
@@ -28,6 +29,30 @@ revealed unless both choose to reveal it.
   Thật Space account through DiscourseConnect and reach Bà Mối from a link in
   the Discourse header. It has its own Postgres database, with pgvector for
   trait search.
+- **Bà Mối is built by porting Moon's matchmaking stack.** Three parts come
+  over:
+  - `lib/nhan-duyen`: the pool, the box, signals, anonymous chat,
+    notifications and privacy guards
+  - the astrology engine: iztro charts and the compatibility engine
+  - the chat harness: Vercel AI SDK plus the model registry, for the matchmaker
+    persona
+
+  The rest of Moon stays out: payments, tarot, Zalo and Telegram, affiliates.
+  Thảo's January proposal promised her the full source code, and a whole-app
+  fork would hand her Moon. This repository moves to Moon's stack (Next.js 15,
+  Supabase, Vercel AI SDK).
+- **Claude, not Gemini.** Moon's narratives run on Gemini. Bà Mối points the
+  model registry at Claude, because Thảo specifically did not want Google
+  holding her members' data.
+- **Discourse messaging is used where it is safe:**
+  - Not for the anonymous stage. Its anonymous mode is for posting, admins can
+    see the real account behind an anonymous one, and admins can read private
+    messages. Moon's anonymous chat covers that stage.
+  - After a mutual reveal, the two are simply members and continue in
+    Discourse chat.
+  - As the notification channel. Bà Mối's bot account sends short notices
+    with no details, and the details stay in Bà Mối. This replaces Moon's Zalo
+    and Telegram delivery.
 - **Why the matchmaker doesn't live inside Discourse:**
   - Discourse admins can read every private message, so conversations with Bà
     Mối held in forum messages would be visible to Thảo.
@@ -40,9 +65,21 @@ revealed unless both choose to reveal it.
   - Duolicious (AGPL-3.0) matches on a quiz and shows public profiles.
   - pH7 Dating CMS (MIT, PHP) is a classic dating site.
 
-  The AGPL licenses would also force Thảo to publish her modified source. The
-  foundation here is therefore Moon's Nhân Duyên design, rebuilt on standard
-  parts.
+  The AGPL licenses would also force Thảo to publish her modified source. Moon's
+  Nhân Duyên is the foundation instead.
+
+## Hosting
+
+- **Bà Mối:** Vercel, on the existing team, with functions in Singapore. Its
+  database is a new Supabase project in Singapore.
+- **Discourse:** AWS EC2 (Docker, about 4 GB of RAM) in account `486408348462`.
+  Its email goes through SES, which is still in sandbox mode: 200 emails a day,
+  only to verified recipients. Real members need SES production access.
+- **Data in Vietnam:** AWS has a Hanoi Local Zone (`ap-southeast-1-han-1a`) that
+  the account hasn't opted into yet. The demo runs in Singapore; production can
+  move to Hanoi.
+- **Domain:** `anka.vc` DNS is at GoDaddy, so a demo subdomain needs records
+  added there. Thảo may have her own domain.
 
 ## Privacy rules
 
@@ -179,8 +216,9 @@ her scores recomputed.
 
 - `interest_received`, `mutual_match`, `message_received`, a gentle
   `message_reminder`, and `watch_fulfilled`.
-- Delivered on the web and as a Discourse notification. Zalo and Telegram come
-  later.
+- Delivered inside Bà Mối, and as a short message with no details from Bà Mối's
+  Discourse bot account. Details stay in Bà Mối, because Discourse admins can
+  read messages. Zalo and Telegram come later.
 - Each notification is sent exactly once (idempotent) and is tracked as
   delivered, clicked and read.
 - Message notifications are grouped into 10-minute windows, and a muted chat
@@ -231,9 +269,9 @@ her scores recomputed.
 
 For us:
 
-- Can any Moon code be reused, given Linh's share of Moon AI? The default is
-  design only.
-- Where will Discourse run for the demo, and on what domain and email service?
+- Which hostname for the demo: a subdomain of `anka.vc`, or Thảo's own domain?
+- Thảo's contract promises her the source code. Are the Moon-derived modules
+  transferred to her, or licensed?
 
 For Thảo, once she has played with it:
 
