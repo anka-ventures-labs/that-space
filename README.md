@@ -30,8 +30,8 @@ npm run dev        # http://localhost:3000
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Jest + Testing Library suite (123 tests) |
-| `npx tsc --noEmit` | Typecheck |
+| `npm test` | Vitest + Testing Library suite (123 tests) |
+| `npm run typecheck` | Typecheck |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
 | `npm run build` | Production build (18 static pages) |
 
@@ -49,24 +49,26 @@ npm run dev        # http://localhost:3000
 ## Layout and conventions
 
 ```text
-src/app/          App Router routes
-src/components/   Navbar (client component) and Footer
+app/              App Router routes
+components/       Navbar (client component) and Footer
 lib/              Demo data: forum threads, matchmaking profiles
-__tests__/        Jest + Testing Library tests
+__tests__/        Vitest + Testing Library page tests (jsdom)
 public/logo.jpg   Brand logo, served at /logo.jpg
 ```
 
-- `@/*` maps to `src/*`. `lib/` sits at the repository root, so routes import it
-  with relative paths such as `../../../../lib/forum-data`.
+- `@/*` maps to the repository root, as in Moon, so code imports `@/lib/...`,
+  `@/components/...` and `@/app/...`.
 - Brand colors live in `tailwind.config.ts`: `primary` `#5C3D2E`, `secondary`
   `#C4A882`, `cream` `#F5F0E8`. Playfair Display (headings) and Inter (body) are
-  exposed as CSS variables by `src/app/layout.tsx`.
+  exposed as CSS variables by `app/layout.tsx`.
 - `/forum/[slug]` derives `generateStaticParams()` from `lib/forum-data.ts`, so a
   thread added there gets its own page at build time.
 - `next.config.js` sets `images.unoptimized` so the logo renders without the
   image optimization server.
-- Tests mock `next/image` and `next/link`. The `console.error` about the
-  `priority` prop, caused by the image mock, is expected.
+- Tests run on Vitest: page tests in `__tests__/` use jsdom, and unit tests in
+  `tests/unit/` use node. They mock `next/image` and `next/link`. The
+  `console.error` about the `priority` prop, caused by the image mock, is
+  expected.
 - `progress-7b613403-….txt` is the log of the agent run that built the demo. It
   records the user stories (US-001 to US-009) and codebase patterns.
 
@@ -97,10 +99,11 @@ See [docs/SESSION_LOG.md](docs/SESSION_LOG.md).
 
 ## Known issues
 
-- `next@14.2.5` has published security advisories. `npm audit --omit=dev`
-  reports 1 critical and 2 high findings. The fix is a patch upgrade to
-  `next@14.2.35` with a matching `eslint-config-next`. The live demo still runs
-  14.2.5.
+- `next@15.5.26`: `npm audit --omit=dev` reports one moderate Next.js advisory,
+  fixed only in Next.js 16, and a high advisory in the PostCSS bundled inside
+  Next.js. That one is build-time only and concerns processing attacker-supplied
+  CSS source maps. The upgrade from 14.2.5 cleared its critical and runtime
+  advisories.
 - `logo.jpg` at the repository root duplicates `public/logo.jpg`. Only the
   `public/` copy is served.
 - The footer copyright reads "© 2024".

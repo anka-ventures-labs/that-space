@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { forumThreads, type ForumThread, type ForumReply } from "../../../../lib/forum-data";
+import { forumThreads, type ForumThread, type ForumReply } from "@/lib/forum-data";
 
 export function generateStaticParams(): { slug: string }[] {
   return forumThreads.map((thread: ForumThread) => ({ slug: thread.slug }));
 }
 
-export default function ThreadPage({ params }: { params: { slug: string } }) {
-  const thread = forumThreads.find((t) => t.slug === params.slug);
+export default async function ThreadPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const thread = forumThreads.find((t) => t.slug === slug);
 
   if (!thread) {
     return (

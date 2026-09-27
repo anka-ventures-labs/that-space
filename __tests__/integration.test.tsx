@@ -6,19 +6,20 @@
  * 3. lib/matchmaking-data.ts exports exactly 6 profiles
  */
 
+import { describe, it, expect } from "vitest";
 // Import the data modules directly from their paths
 import { forumThreads, forumCategories } from "../lib/forum-data";
 import { matchmakingProfiles } from "../lib/matchmaking-data";
 
 // Import the 5 main route page components
-import HomePage from "../src/app/page";
-import ForumPage from "../src/app/forum/page";
-import TuviPage from "../src/app/tuvi/page";
-import MatchmakingPage from "../src/app/matchmaking/page";
-import ProfilePage from "../src/app/profile/page";
+import HomePage from "@/app/page";
+import ForumPage from "@/app/forum/page";
+import TuviPage from "@/app/tuvi/page";
+import MatchmakingPage from "@/app/matchmaking/page";
+import ProfilePage from "@/app/profile/page";
 
 // Optionally import forum thread detail (dynamic route)
-import ForumThreadPage from "../src/app/forum/[slug]/page";
+import ForumThreadPage from "@/app/forum/[slug]/page";
 
 describe("Integration: route page components can be imported", () => {
   it("HomePage is importable and is a function", () => {

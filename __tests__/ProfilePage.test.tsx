@@ -1,9 +1,10 @@
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
-import ProfilePage from "../src/app/profile/page";
+import ProfilePage from "@/app/profile/page";
 
 // Mock next/link
-jest.mock("next/link", () => {
-  return function MockLink({
+vi.mock("next/link", () => {
+  return { default: function MockLink({
     href,
     children,
     className,
@@ -17,7 +18,7 @@ jest.mock("next/link", () => {
         {children}
       </a>
     );
-  };
+  } };
 });
 
 describe("ProfilePage", () => {

@@ -2,11 +2,10 @@
  * Tests for Footer component.
  * Verifies logo image, tagline, and copyright text are rendered.
  */
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock next/image
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -23,7 +22,7 @@ jest.mock("next/image", () => ({
 }));
 
 // Mock next/link
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,

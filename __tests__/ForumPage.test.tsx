@@ -4,11 +4,10 @@
  * - At least 8 thread titles are rendered
  * - Each thread title is a link pointing to /forum/[slug]
  */
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock Next.js modules
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -24,7 +23,7 @@ jest.mock("next/image", () => ({
   },
 }));
 
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,

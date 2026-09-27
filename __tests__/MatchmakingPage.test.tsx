@@ -1,5 +1,6 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import MatchmakingPage from "../src/app/matchmaking/page";
+import MatchmakingPage from "@/app/matchmaking/page";
 import { matchmakingProfiles } from "../lib/matchmaking-data";
 
 describe("MatchmakingPage", () => {

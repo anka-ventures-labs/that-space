@@ -1,11 +1,10 @@
 /**
  * Tests for Landing Page (app/page.tsx) - US-003
  */
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock Next.js modules
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -21,7 +20,7 @@ jest.mock("next/image", () => ({
   },
 }));
 
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,

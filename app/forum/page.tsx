@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { forumThreads, forumCategories } from "../../../lib/forum-data";
+import { forumThreads, forumCategories } from "@/lib/forum-data";
 
 export default function ForumPage() {
   return (

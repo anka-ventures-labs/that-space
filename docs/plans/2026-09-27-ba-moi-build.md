@@ -46,7 +46,12 @@ Order:
 4. W8 for the preview.
 5. W7 when the ASUS is ready.
 
-Each workstream gets an `agent-jobs` `route_decide` call before it starts.
+Execution: Minh asked on 2026-09-27 for Claude to do the engineering directly
+in this session, with no Codex delegation. The router recorded this as the
+`direct` lane, decision `b72236fc`. Workstreams run in the order above in the
+main worktree. The one cross-family review is by OpenCode with Muse Spark
+1.3 (`opencode-go/muse-spark-1.3-contributor`), through agent-jobs (ACO) at
+assembly. A follow-up review happens only if the result requires one.
 
 ## Verification per workstream
 

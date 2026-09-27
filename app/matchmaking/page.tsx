@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { matchmakingProfiles, type MatchmakingProfile } from "../../../lib/matchmaking-data";
+import { matchmakingProfiles, type MatchmakingProfile } from "@/lib/matchmaking-data";
 
 function StarRating({ stars }: { stars: number }) {
   return (

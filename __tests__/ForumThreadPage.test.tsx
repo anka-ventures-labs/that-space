@@ -6,11 +6,10 @@
  * - Breadcrumb / back link pointing to /forum is present
  * - generateStaticParams returns all slugs from forum-data
  */
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock Next.js modules
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -26,7 +25,7 @@ jest.mock("next/image", () => ({
   },
 }));
 
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,
@@ -53,8 +52,8 @@ const firstThread = forumThreads[0];
 
 describe("Forum Thread Detail Page", () => {
   describe("with a valid slug", () => {
-    beforeEach(() => {
-      render(<ThreadPage params={{ slug: firstThread.slug }} />);
+    beforeEach(async () => {
+      render(await ThreadPage({ params: Promise.resolve({ slug: firstThread.slug }) }));
     });
 
     it("renders the thread title as an h1", () => {
@@ -183,9 +182,9 @@ describe("Forum Thread Detail Page", () => {
   });
 
   describe("with a different valid slug", () => {
-    it("renders the correct title for any valid slug", () => {
+    it("renders the correct title for any valid slug", async () => {
       const thread = forumThreads[4]; // vuot-qua-chia-tay
-      const { unmount } = render(<ThreadPage params={{ slug: thread.slug }} />);
+      const { unmount } = render(await ThreadPage({ params: Promise.resolve({ slug: thread.slug }) }));
       const heading = screen.getByRole("heading", { level: 1 });
       expect(heading).toHaveTextContent(thread.title);
       unmount();

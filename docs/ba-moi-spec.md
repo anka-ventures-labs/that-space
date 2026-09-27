@@ -166,6 +166,7 @@ revealed unless both choose to reveal it.
    | 2 | Own gender | Bạn là… | Nữ · Nam · Khác |
    | 3 | Who she wants to meet | Bạn muốn gặp… | Nam · Nữ · Cả hai |
    | 4 | Birth date | Bạn sinh ngày nào? | Must be 18 or older. Gives her age band and tuổi. |
+   | 4b | Birth time (optional) | Bạn có biết giờ sinh không? | A time, or "Không nhớ". Used only for astrology, never shown to anyone. |
    | 5 | Region | Bạn đang sống ở đâu? | City; only the region reaches the pool |
    | 6 | Age range | Bạn muốn gặp người trong khoảng tuổi nào? | Default: own age ±5 |
    | 7 | Marital status | Tình trạng hôn nhân của bạn? | Độc thân · Đã ly hôn · Góa · Đã kết hôn |
@@ -230,8 +231,13 @@ clear the threshold in both directions, as in Moon. The signals are:
 
 - how well each person's open answer fits the other's card
 - shared hobbies
-- tuổi hợp: can chi and ngũ hành from the lunar birth year, computed by code;
-  anyone born before Tết belongs to the previous year
+- astrology, computed by code:
+  - tuổi hợp for everyone: can chi and ngũ hành from the lunar birth year,
+    using Moon's Vietnamese lunar calendar, so anyone born before Tết belongs to
+    the previous year
+  - when both people gave a birth time and the intent is romantic (casual,
+    long-term or marriage), Moon's full Tử Vi and Bát Tự romantic score
+    replaces it
 - plans for children (long-term and marriage only)
 - region
 

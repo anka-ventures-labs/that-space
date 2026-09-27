@@ -2,11 +2,10 @@
  * Tests for Navbar component.
  * Verifies nav links, logo, hamburger button, sticky positioning, and active link logic.
  */
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock next/image
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -23,7 +22,7 @@ jest.mock("next/image", () => ({
 }));
 
 // Mock next/link
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,
@@ -43,8 +42,8 @@ jest.mock("next/link", () => ({
 }));
 
 // Mock usePathname — default to "/" (home, no active nav link)
-const mockUsePathname = jest.fn(() => "/");
-jest.mock("next/navigation", () => ({
+const mockUsePathname = vi.fn(() => "/");
+vi.mock("next/navigation", () => ({
   usePathname: () => mockUsePathname(),
 }));
 

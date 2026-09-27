@@ -1,11 +1,10 @@
 /**
  * Smoke test: verifies the landing page renders with correct branding content.
  */
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 // Mock Next.js modules that require a full Next.js environment
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
     src,
@@ -21,7 +20,7 @@ jest.mock("next/image", () => ({
   },
 }));
 
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default: function MockLink({
     children,

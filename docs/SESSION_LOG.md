@@ -1,5 +1,35 @@
 # Session log
 
+## 2026-09-27: W1 foundation — Next.js 15.5 and Vitest, Moon's layout
+
+### What changed
+
+- `next` went from 14.2.5 to 15.5.26, with `eslint-config-next` 15.5.26.
+- Jest was replaced by Vitest 2.1.9, Moon's version. Page tests in
+  `__tests__/` run under jsdom and unit tests in `tests/unit/` under node,
+  configured in `vitest.config.ts`. `vitest.setup.ts` adds the jest-dom
+  matchers and cleanup between tests.
+- The layout now matches Moon: `src/app` moved to `app/`, `src/components` to
+  `components/`, and `@/*` maps to the repository root. `.moon-src` is excluded
+  from TypeScript.
+- `app/forum/[slug]/page.tsx` takes Next.js 15's asynchronous `params`, and
+  its test awaits the page.
+- Scripts: `test` runs `vitest run`, and a new `typecheck` script was added.
+- The Supabase, AI SDK, iztro and zod dependencies were added and then
+  removed. Minh asked to keep things lean and to reuse mature solutions before
+  writing our own, so dependencies arrive only when code uses them, after
+  research on sign-in, chat and admin.
+
+### Verification
+
+- `npm test`: 10 files, 123 tests passed.
+- `npx tsc --noEmit`: clean.
+- `next lint`: no warnings or errors.
+- `npm run build`: 18 static pages.
+- `npm audit --omit=dev`: one moderate Next.js advisory, fixed only in 16.x,
+  and a high advisory in the PostCSS bundled inside Next.js, which is
+  build-time only. Before the upgrade it reported one critical and two high.
+
 ## 2026-09-27: Supabase project created, build plan, OpenRouter
 
 ### What changed
