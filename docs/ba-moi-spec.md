@@ -47,10 +47,11 @@ revealed unless both choose to reveal it.
   Thảo's January proposal promised her the full source code, and a whole-app
   fork would hand her Moon. This repository moves to Moon's stack (Next.js 15,
   Supabase, Vercel AI SDK).
-- **Model: Claude by default, Gemini as the cheap alternative.** Moon's
-  narratives run on Gemini. Thảo specifically did not want Google holding her
-  members' data, so the model registry defaults to Claude. Moon's Gemini key is
-  the fallback for the beta if Minh prefers it (see Hosting).
+- **Model: through OpenRouter.** Minh will provide a separate OpenRouter key.
+  The model registry calls OpenRouter through the Vercel AI SDK. The model
+  itself is a setting, defaulting to a Claude model because Thảo did not want
+  Google holding her members' data. Until the key exists, Moon's template
+  fallbacks cover every AI text.
 - **Anonymous chat runs on Discourse private messages, through a relay.**
   Each member messages only the Bà Mối bot, in a private message per match.
   Discourse's `post_created` webhook, which also fires for private messages,
@@ -98,13 +99,9 @@ revealed unless both choose to reveal it.
   That gives free HTTPS, with no DNS and no open ports. A real domain can
   replace it later.
 - **The AI model:** Bà Mối's matchmaker conversation and write-ups call a
-  model from the server, so the deployed app needs a paid API key.
-  - Moon's Vercel project has only `GEMINI_API_KEY`. Reusing it costs nothing
-    to set up and is the cheapest option.
-  - Thảo named Google as a concern, which points to Claude, with a new
-    Anthropic key.
-  - The key isn't needed until the AI features go live. Moon's template
-    fallbacks cover everything before that.
+  model from the server through OpenRouter. The key is separate, and Minh will
+  provide it. It isn't needed until the AI features go live; Moon's template
+  fallbacks cover everything before that.
 - **No email in the beta.** Thảo shares invite links over Zalo or Messenger,
   and friends sign in with Google through Bà Mối. Neither Discourse nor Bà Mối
   sends email. Notifications arrive in Discourse and as push notifications from

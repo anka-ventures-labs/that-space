@@ -1,5 +1,38 @@
 # Session log
 
+## 2026-09-27: Supabase project created, build plan, OpenRouter
+
+### What changed
+
+- **New Supabase organization and project.** Created "Thật Space" (org
+  `dtcwiwgptkzsrkowbqfh`, free plan) with the approval Minh gave on
+  2026-09-27. In it, project `that-space` (ref `vafeunxublsuduefolhw`,
+  `ap-southeast-1`, `ACTIVE_HEALTHY`).
+- **Secrets are local only.** The database password was generated locally and
+  never printed. It and the project URL and API keys are in `.env.local`
+  (mode 600, ignored by git).
+- **Build plan.** Added `docs/plans/2026-09-27-ba-moi-build.md`, with the
+  parallel MECE workstreams W1 to W8.
+- **Model.** The model goes through OpenRouter; Minh will provide a separate
+  key. Until then, Moon's template fallbacks keep the full loop working without
+  a model.
+- **Moon reference copy.** Moon's source from `origin/main` (`8f07a25`,
+  1,567 files) is in `.moon-src/`, excluded from git through
+  `.git/info/exclude`, as the porting reference.
+- **Astrology scope for v1.** Tuổi hợp is computed from the lunar year, using
+  Moon's Vietnamese lunar calendar and can-chi tables. Moon's full romantic
+  score needs Tử Vi and Bát Tự charts with a birth time, so it is a later
+  step.
+
+### Verification
+
+- `supabase projects list` shows the new project as `ACTIVE_HEALTHY`.
+- `.env.local` holds the variable names `SUPABASE_PROJECT_REF`,
+  `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_DB_PASSWORD`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`.
+- `git status` shows no secrets.
+
 ## 2026-09-27: Discourse on the ASUS later; Supabase and model-key findings
 
 ### Decisions
