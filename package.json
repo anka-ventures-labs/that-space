@@ -12,6 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "libphonenumber-js": "^1.13.14",
+    "linkify-it": "^6.1.0",
     "next": "15.5.26",
     "react": "^18",
     "react-dom": "^18"

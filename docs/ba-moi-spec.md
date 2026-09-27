@@ -69,8 +69,10 @@ matchmaking logic and thin glue are ours.
    anonymous card derived from it.
 2. **A pool card holds no personal identifiers.**
    - It includes: an age band (18–24, then five-year bands, then 70+), gender
-     and who she wants to meet, intent, hobbies, an astrology element and tuổi,
-     and a short summary.
+     and who she wants to meet, intent, hobbies, her nạp âm element, her day
+     master (for example "Giáp Mộc", as on Moon's card), and a short summary.
+   - It never shows her can chi, zodiac animal or full day pillar: combined
+     with the age band, those would reveal her birth year.
    - A region (miền Bắc, miền Trung or miền Nam) and a name initial appear only
      when at least 5 pool members share them (the rule of 5).
 3. **Every text that describes one member to another passes the leak check**
@@ -184,6 +186,12 @@ The signals are:
   - tuổi hợp for everyone: can chi and ngũ hành nạp âm from the lunar year,
     using Moon's Vietnamese lunar calendar, so anyone born before Tết belongs to
     the previous year
+  - nhật trụ (day pillar) for everyone, from the birth date alone: the day
+    master's relationship (stem combination, sinh or khắc) and the day branch,
+    Bát Tự's spouse palace (lục hợp, tam hợp, xung, hình), scored with Moon's
+    tables. Tuổi and nhật trụ count equally
+  - explanations name the relationship ("tam hợp"), never either person's
+    animal or stem
   - when both people gave a birth time and the intent is romantic, Moon's full
     Tử Vi and Bát Tự romantic score replaces it
 - plans for children (long-term and marriage only)

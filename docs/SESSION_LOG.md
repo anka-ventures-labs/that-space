@@ -1,5 +1,52 @@
 # Session log
 
+## 2026-09-27: W-A matching core (ported from Moon), with the day pillar added
+
+### What changed
+
+Added `lib/matching/`, pure TypeScript with no I/O:
+
+- **`lunar.ts`:** Moon's Vietnamese lunar calendar (Hồ Ngọc Đức, UTC+7) and
+  can chi.
+- **`napam.ts`:** the 30-name nạp âm reference table.
+- **`tables.ts`:** Moon's can-chi relationship tables.
+- **`tuoi.ts`:** tuổi hợp.
+- **`bazi.ts`:** the day pillar, computed as JDN + 49 mod 60. Checked against
+  1949-10-01 (Giáp Tý) and 2000-01-01 (Mậu Ngọ). A birth at 23:xx counts as
+  the next day.
+- **`privacy.ts`:** Moon's card, rule of 5, leak check and chat aliases, plus
+  a third gender and ages computed on the Vietnam calendar day.
+- **`filters.ts`:** the hard filters, in both directions.
+- **`score.ts`:** directional scores, weights and tiers.
+- **`pick.ts`:** Moon's weighted pick and daily-turn rule.
+- **`contact.ts`:** `libphonenumber-js` and `linkify-it` (fuzzy matching
+  enabled, since v6 has it off by default), plus keywords and spelled-out
+  Vietnamese digits.
+
+### Decisions
+
+- Minh asked for day-master and day-branch compatibility. It needs only the
+  birth date, so everyone gets it, weighted equally with tuổi.
+- Moon's full Bát Tự engine (`compute_bazi.js`) needs a birth time and a
+  dependency, `bazi-calculator-by-alvamind`. The published 1.0.2 of that
+  package ships no `dist/`, so the engine couldn't run as a reference here.
+  The full engine stays for A2.
+- Cards show the nạp âm element and the day master only. Explanation labels
+  never name a stem or branch, because that plus the age band would reveal a
+  birth year. A test enforces this.
+
+### Verification
+
+- `npx vitest run`: 16 files, 198 tests. That is the 123 existing tests plus 75
+  new matching tests, covering:
+  - Tết 1985 in Vietnam versus China, and Tết 1990
+  - nạp âm, day pillars, compatibility and label privacy
+  - the leak check and the rule of 5
+  - an exhaustive filter matrix in both directions
+  - the weighted pick with a seeded random source
+  - contact-detail detection
+- `tsc` and `next lint` are clean.
+
 ## 2026-09-27: Plan review (Muse Spark 1.3) folded into the Discourse-native plan
 
 - **The review.** Muse Spark 1.3 (`opencode-go/muse-spark-1.3-contributor`)
