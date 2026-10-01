@@ -37,7 +37,7 @@ module ThatSpace
       @drift = []
       gallery = owned_category!("exhibition")
       retreat = owned_category!("retreat-workshop")
-      host = Group.find_by!(name: "that-space-role-host")
+      host = Group.find_by!(name: "ts-role-host")
       unless host.custom_fields["that_space.community.group_key"] == "role.host"
         raise Error, "Host interest group is not owned by the community manifest"
       end
@@ -69,7 +69,10 @@ module ThatSpace
         path = File.join(@runtime, "tmp/that-space-components", pin.fetch("name"))
         [pin.fetch("name"), import_owned(pin.fetch("name"), path, component: true, apply: apply)]
       end
-      return result unless parent && components.values.all?
+      unless parent && components.values.all?
+        @drift << "theme-dependent settings and attachments cannot be checked until the pinned themes are imported"
+        return result
+      end
 
       configure(parent, { "gallery_path" => gallery.url, "events_path" => "/upcoming-events" }, apply: apply)
       portfolio = components.fetch("discourse-user-portfolio")

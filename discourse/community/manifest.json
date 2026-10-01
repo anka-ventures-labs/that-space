@@ -42,11 +42,11 @@
     "announcements": { "trust_level_0": "readonly", "staff": "full" }
   },
   "groups": [
-    { "key": "role.user", "name": "that-space-role-user", "full_name": "Người trải nghiệm" },
-    { "key": "role.artist", "name": "that-space-role-artist", "full_name": "Artist" },
-    { "key": "role.loveseeker", "name": "that-space-role-loveseeker", "full_name": "Tìm kết nối cảm xúc" },
-    { "key": "role.host", "name": "that-space-role-host", "full_name": "Host" },
-    { "key": "role.observer", "name": "that-space-role-observer", "full_name": "Observer" }
+    { "key": "role.user", "name": "ts-role-user", "full_name": "Người trải nghiệm" },
+    { "key": "role.artist", "name": "ts-role-artist", "full_name": "Artist" },
+    { "key": "role.loveseeker", "name": "ts-role-loveseeker", "full_name": "Tìm kết nối cảm xúc" },
+    { "key": "role.host", "name": "ts-role-host", "full_name": "Host" },
+    { "key": "role.observer", "name": "ts-role-observer", "full_name": "Observer" }
   ],
   "user_fields": [
     { "key": "community_role", "question": "Bạn là ai trong Thật Space?", "type": "dropdown", "options": ["Người trải nghiệm", "Artist", "Tìm kết nối cảm xúc", "Host", "Observer"] },

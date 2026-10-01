@@ -94,6 +94,25 @@ RSpec.describe "Thật Space community bootstrap" do
     end
   end
 
+  it "refuses existing categories, groups and signup questions without taking ownership" do
+    category_definition = that_space_manifest.fetch("categories").first
+    category = Fabricate(:category, slug: category_definition.fetch("slug"))
+    group_definition = that_space_manifest.fetch("groups").first
+    group = Fabricate(:group, name: group_definition.fetch("name"), full_name: "Existing group's purpose")
+    expect { apply_that_space_community! }.to raise_error(ThatSpace::CommunityBootstrap::ConflictError, /group/)
+    expect(group.reload.full_name).to eq("Existing group's purpose")
+    group.destroy!
+
+    question = that_space_manifest.fetch("user_fields").first.fetch("question")
+    field = UserField.create!(name: question, field_type: "text", description: "Existing private field")
+    expect { apply_that_space_community! }.to raise_error(ThatSpace::CommunityBootstrap::ConflictError, /user field/)
+    expect(field.reload.external_type).not_to eq(ThatSpace::CommunityBootstrap::MANIFEST_TYPE)
+    field.destroy!
+
+    expect { apply_that_space_community! }.to raise_error(ThatSpace::CommunityBootstrap::ConflictError, /category/)
+    expect(category.reload.custom_fields["that_space.community.category_key"]).to be_nil
+  end
+
   it "detects drift without mutating and offers a raising check" do
     apply_that_space_community!
     SiteSetting.title = "Unexpected title"

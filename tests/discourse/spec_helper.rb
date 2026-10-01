@@ -47,7 +47,8 @@ module ThatSpaceCommunitySpecSupport
   def that_space_signup_fields
     that_space_manifest.fetch("user_fields").to_h do |definition|
       field = configured_user_field(definition.fetch("key"))
-      [field.id.to_s, definition.fetch("options").first]
+      first_option = definition.fetch("options").first
+      [field.id.to_s, definition.fetch("type") == "multiselect" ? [first_option] : first_option]
     end
   end
 end

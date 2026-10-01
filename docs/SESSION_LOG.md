@@ -2,6 +2,25 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Assembly review `b31ce0d5-03df-4e05-84d3-0fdad462080f` (OpenCode Muse Spark,
+route `b22e9e9e-598e-43b0-bc36-bcef98c248c8`) completed and was read before the
+ship decision. Exact-owner delivery acknowledged; feedback completed. Retained
+result/cursor in `reviews/community-assembly-20261001.md`. No confirmed static
+security/takeover/auto-sanction blocker; verdict permits this build checkpoint
+for hosted acceptance only. Added native required-field validation, explicit
+partial-check drift when themes are missing, takeover-refusal regressions and
+native array-shaped multiselect signup fixtures. Other suggested assertion
+changes require runtime evidence; current upload denial status and event primary
+key are supported by the pinned source, so their precise assertions remain.
+
+Hosted run `36855826009` at `4a271a5` executed 22 native examples. Sixteen failures
+shared a concrete group-name validation error: role names exceeded Discourse's
+20-character limit. Shortened internal names to `ts-role-*`, preserving Q1 keys
+and Vietnamese full names. One moderation fixture used a nonexistent User `bot`
+attribute; replaced it with native `Fabricate(:bot)`. Four other moderation
+examples passed, including review-only flags, idempotence, read-only drift and
+ownership/missing-model refusal. Service checks passed on the same head.
+
 User authorized execution of the community + Bà Mối phase after explicitly
 excluding full Tử Vi/charts/readings/PDFs. Refreshed the clean feature branch
 from origin before editing. Added the owned 13-category/five-interest-group/

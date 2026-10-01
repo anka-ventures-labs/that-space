@@ -95,7 +95,8 @@ fixtures test the Discourse path but do not prove receipt of email. Before live
 invitations, verify the chosen activation/recovery procedure, actual reverse
 proxy upload access, restart, backup/restore and narrow phone behavior. The
 configuration denies anonymous upload downloads through Discourse; direct
-storage/proxy access must also be tested on the chosen host.
+storage/proxy access must also be tested on the chosen host. Staff workflows are
+recorded in [Vietnamese community operations](community-operations.md).
 
 The versioned `discourse/moderation/` configuration uses native `llm_triage` for
 both spam and toxicity classification and sends matches to human review. It

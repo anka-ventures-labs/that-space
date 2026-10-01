@@ -126,7 +126,7 @@ describe ThatSpace::ModerationBootstrap do
     automation = configured_triage_automation
     safe_post = Fabricate(:post, raw: "Mình muốn tìm một workshop vẽ cuối tuần để bình tĩnh hơn.")
     pm_post = Fabricate(:post, topic: Fabricate(:private_message_topic), raw: "Tin nhắn riêng cần được loại trừ")
-    ba_moi = Fabricate(:user, username: "ba-moi-review-bot", bot: true)
+    ba_moi = Fabricate(:bot, username: "ba-moi-review-bot")
     ba_moi_post = Fabricate(:post, user: ba_moi, raw: "Bài viết của Bà Mối phải được bỏ qua")
 
     DiscourseAi::Completions::Llm.with_prepared_responses(

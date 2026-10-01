@@ -417,6 +417,7 @@ module ThatSpace
         )
         automation.save!
         automation.upsert_field!("custom_field_name", "custom_field", expected_field, target: "script")
+        automation.perform_required_fields_validation = true
         automation.update!(enabled: true, last_updated_by_id: Discourse.system_user.id)
       end
     end

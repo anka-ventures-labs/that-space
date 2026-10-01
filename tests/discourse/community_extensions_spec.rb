@@ -28,6 +28,15 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(presentation.theme.get_setting("gallery_path")).to eq(configured_category("exhibition").url)
   end
 
+  it "refuses to take over an unrelated same-named theme" do
+    existing_id = presentation.theme.id
+    PluginStore.remove(ThatSpace::PresentationBootstrap::STORE, "theme")
+    count = Theme.count
+    expect { presentation.apply! }.to raise_error(ThatSpace::PresentationBootstrap::Error, /refusing takeover/)
+    expect(Theme.count).to eq(count)
+    expect(Theme.find_by(name: "Thật Space").id).to eq(existing_id)
+  end
+
   it "allows an approved member to update her bio and feature her own artwork topic" do
     artwork = create_post(user: member, category: configured_category("exhibition"), title: "An artist's first exhibition", raw: "A member-owned artwork with its story and process.")
     sign_in(member)
