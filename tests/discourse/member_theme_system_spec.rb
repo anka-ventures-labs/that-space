@@ -20,6 +20,12 @@ RSpec.describe "Thật Space member theme", type: :system do
 
   after { Theme.clear_cache! }
 
+  def retain_theme_screenshot(name)
+    directory = Rails.root.join("tmp/screenshots")
+    FileUtils.mkdir_p(directory)
+    page.save_screenshot(directory.join("#{name}.png").to_s)
+  end
+
   it "compiles the local theme and renders member navigation on a real Discourse page" do
     sign_in(member)
     visit "/latest"
@@ -32,6 +38,7 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_css(".that-space-member-welcome", visible: true)
     expect(page).to have_link("Xem Triển lãm", href: configured_category("exhibition").url)
     expect(page).to have_link("Xem lịch gặp gỡ", href: "/upcoming-events")
+    retain_theme_screenshot("that-space-desktop")
   end
 
   it "keeps member navigation and content outside the guest session" do
@@ -49,7 +56,8 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_button("Nhắn Bà Mối")
     find(".that-space-member-nav__ba-moi").click
     expect(page).to have_css("#reply-control.open")
-    expect(page).to have_css(".composer-fields .selected-name, .composer-fields .selected-content", text: bot.username)
+    expect(page).to have_css("#reply-control #private-message-users", text: bot.username)
+    retain_theme_screenshot("that-space-ba-moi-composer")
   end
 
   it "renders an artist's portfolio from the gallery category" do
@@ -72,5 +80,6 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(
       page.evaluate_script("getComputedStyle(document.querySelector('.that-space-member-welcome')).display"),
     ).to eq("block")
+    retain_theme_screenshot("that-space-mobile")
   end
 end

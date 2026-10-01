@@ -74,6 +74,15 @@ module ThatSpace
         return result
       end
 
+      logo = parent.theme_fields.find_by(name: "that-space-logo")&.upload
+      if logo
+        %w[logo logo_small mobile_logo].each do |setting|
+          difference("site setting #{setting}", apply: apply) { SiteSetting.set(setting, logo) } unless SiteSetting.public_send(setting) == logo
+        end
+      else
+        @drift << "member theme logo is missing; native header branding cannot be checked"
+      end
+
       configure(parent, { "gallery_path" => gallery.url, "events_path" => "/upcoming-events" }, apply: apply)
       portfolio = components.fetch("discourse-user-portfolio")
       configure(portfolio, { "portfolio_category" => gallery.id, "portfolio_thumbnail_style" => "grid" }, apply: apply)

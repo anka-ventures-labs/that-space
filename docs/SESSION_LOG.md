@@ -2,6 +2,21 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Hosted run `36861220372` at `d2c204d` passed 23 of 24 native requests and four
+of five real Chromium examples. Featured artwork and guest topic-read denial now
+pass. The invitee had only her Q1 interest group: pinned core's
+`spec/support/suite_setup.rb` explicitly skips the production
+`ensure_in_trust_level_group` callback for test performance. Restored that native
+callback only around the invite acceptance examples, restoring the harness's
+default afterward. No production membership behavior changed. The failed browser
+recipient selector was stale; inspected its screenshot (the composer is correctly
+addressed to `ba_moi`) and core's `private-message-users` selector, then fixed the
+assertion. Desktop/member navigation, guest screen, artist portfolio and mobile
+layout passed. Added retained success screenshots and configured core header
+logos from the owned theme upload after visually inspecting the real rendering.
+The phase/build documents now point to the current PR checks and retained review
+as durable evidence rather than stale in-progress review wording.
+
 Hosted run `36859513094` at `c4ac1de` retained the post error: native
 `NewPostManager` reports forbidden category posting. Source inspection also
 confirmed that native featured topics prohibit group-restricted categories.

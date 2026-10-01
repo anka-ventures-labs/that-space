@@ -5,6 +5,15 @@ require_relative "spec_helper"
 RSpec.describe "Thật Space member acceptance", type: :request do
   let!(:admin) { Fabricate(:admin) }
 
+  around do |example|
+    # Core skips this production callback for its fabricated-user test suites.
+    # Invite acceptance must exercise actual automatic membership at creation.
+    User.set_callback(:create, :after, :ensure_in_trust_level_group)
+    example.run
+  ensure
+    User.skip_callback(:create, :after, :ensure_in_trust_level_group)
+  end
+
   before do
     Jobs.run_immediately!
     apply_that_space_community!

@@ -38,6 +38,10 @@ production credentials, deployment, paid AWS host, or self-hosted runner are
 part of this workflow. Review checks on the PR's current head.
 The helper uses RSpec's [fail-if-no-examples configuration](https://rspec.info/features/3-13/rspec-core/configuration/fail-if-no-examples/)
 and is required explicitly so an empty/misconfigured suite cannot pass silently.
+Current acceptance evidence is recorded on
+[PR #1](https://github.com/anka-ventures-labs/that-space/pull/1). Its current-head
+service and Discourse checks, together with the retained
+[assembly review](reviews/community-assembly-20261001.md), are the build gate.
 
 ## Apply owned configuration
 
@@ -90,6 +94,9 @@ same-site paths. Vietnamese navigation, palette and logo are included for
 desktop/mobile. Inter and Playfair Display are self-hosted theme assets with
 Latin/Vietnamese subsets; provenance and SIL licenses are retained in
 `discourse/theme/assets/`. Browser acceptance verifies the imported theme.
+The same owned logo upload configures Discourse's desktop/mobile header.
+Successful desktop/mobile/composer screenshots are retained in the CI artifact
+alongside failure diagnostics.
 
 ## Acceptance and live boundaries
 
