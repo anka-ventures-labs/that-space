@@ -62,9 +62,28 @@ The final production build passed (18 static pages and three API route patterns)
 After error-log redaction, the eight dispatcher regressions passed again; the
 build also typechecked and linted the final source. Assembly review submitted as
 job `faa3fcba-bfa4-42d4-af02-524694be3bb2`, enforced OpenCode route
-`a314ca81-6f80-48ab-90d9-e64db9845289`; its retained result is required before
-the PR decision. No `.github` workflow exists in this repository; current-head checks
-will be inspected on the beta pull request, without inventing a CI lane.
+`a314ca81-6f80-48ab-90d9-e64db9845289`. Its retained result was read and exact-owner
+delivery acknowledged; feedback was completed. Verdict: **ship the local
+checkpoint**, conditional on the build, with no critical/high findings.
+
+The review's medium delayed-reveal alias issue and low concurrent relay-limit
+issue were verified with failing regressions, then fixed: reveal requests and
+confirmations render the current alias at delivery; relay policy/count/receipt
+share the per-sender quota transaction. Persona participant checks now normalize
+case, and closed-during-receipt outcomes report `ignored_closed` rather than
+`replay`. The post-review focused suite passed **4 files / 35 tests**, including
+both acceptance journeys and two new regressions. The production build passed
+again, including its typecheck/lint. No targeted review was required by the
+retained approval; these bounded corrections were locally verified.
+The complete final suite then passed **31 files / 302 tests** (70.89 seconds).
+
+The review correctly treated existing match/relay access after a consent-version
+change as the documented contract; blocking/ending must remain available. Live
+policy for a new-version reveal must be decided before launch. No `.github`
+workflow exists and the Actions runs API returned an empty list. GitHub's private
+repository plan returned 403 for both rulesets and classic branch protection;
+that is the observed scope of unavailable metadata, not evidence of a CI billing
+failure. Current-head checks will be inspected on the beta pull request.
 
 Known limits: remote acceptance followed by a receipt-write crash can duplicate
 a Discourse post; existing Discourse history survives service deletion; contact

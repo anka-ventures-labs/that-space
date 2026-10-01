@@ -96,6 +96,9 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
   - A no-match still uses the box.
   - Search and interest count/write decisions are serialized per member so
     simultaneous calls cannot overspend the daily allowance.
+- **Relay limit:** policy, the per-sender one-minute count and receipt storage
+  share that same transaction lock. Simultaneous webhooks stay within 12 messages
+  per minute; excess posts receive a notice in the sender's thread.
 - **What searches can match:** only what cards show, so a search can't reveal
   what a card hides. Her keywords count as her interests while that search is
   scored.
@@ -107,8 +110,8 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
   covers birth date or time, intent, gender, who she's seeking, marital status
   and age range. Except for the age range, it also un-confirms her card until
   she confirms it again.
-  Already sent signals and existing matches remain available after profile
-  edits; pausing removes discovery visibility and keeps existing conversations.
+Already sent signals and existing matches remain available after profile
+edits; pausing removes discovery visibility and keeps existing conversations.
 
 ## Notices the service posts
 

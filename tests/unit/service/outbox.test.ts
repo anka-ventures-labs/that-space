@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Db } from '@/lib/db/db'
 import { claimDuePosts, enqueuePost, MAX_POST_ATTEMPTS } from '@/lib/db/repo'
 import { send } from '@/lib/service/outbox'
+import { revealAsked, revealed } from '@/lib/service/copy'
 import { HIM, HIS_SUMMARY, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
 
 function failQueue(db: Db): Db {
@@ -127,5 +128,33 @@ describe('durable Discourse delivery', () => {
     const responses = await Promise.all([a, b].map((user) => h.call('match_action', user, { match_id: matchId, action: 'reveal' })))
     expect(responses.map((r) => r.body.result)).toEqual(expect.arrayContaining(['revealed']))
     expect((await h.call('match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('revealed')
+  })
+
+  it('redacts the initial on delayed reveal requests and confirmations', async () => {
+    const { a, b, topicB, matchId } = await matchedPair(h)
+    await h.db.query("update relay_topics set alias_for_other = 'Em ấy L.' where discourse_topic_id = $1", [topicB])
+    h.discourse.clear()
+    h.discourse.failNext(1)
+    await h.call('match_action', a, { match_id: matchId, action: 'reveal' })
+    h.setNow(new Date(h.now.getTime() + 60_000))
+    await h.cron()
+    expect(h.discourse.postsIn(topicB)).toEqual([revealAsked('Em ấy')])
+    h.discourse.failNext(2)
+    await h.call('match_action', b, { match_id: matchId, action: 'reveal' })
+    h.setNow(new Date(h.now.getTime() + 60_000))
+    await h.cron()
+    expect(h.discourse.postsIn(topicB)).toContain(revealed('Em ấy', a.username, `https://forum.test/u/${a.username}`))
+    expect(h.discourse.postsIn(topicB).join('\n')).not.toContain('Em ấy L.')
+  })
+
+  it('counts simultaneous relay webhooks under the per-sender rate limit', async () => {
+    const { a, topicA, topicB } = await matchedPair(h)
+    h.discourse.clear()
+    const responses = await Promise.all(Array.from({ length: 13 }, (_, i) => h.webhook({
+      id: 88100 + i, topic_id: topicA, user_id: a.user_id, raw: `Tin đồng thời ${i}`,
+    })))
+    expect(responses.filter((r) => r.body.outcome === 'relayed')).toHaveLength(12)
+    expect(responses.filter((r) => r.body.outcome === 'rate_limited')).toHaveLength(1)
+    expect(h.discourse.postsIn(topicB)).toHaveLength(12)
   })
 })

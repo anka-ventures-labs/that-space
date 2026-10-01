@@ -12,7 +12,7 @@ import {
 } from '@/lib/db/repo'
 import type { Db } from '@/lib/db/db'
 import { redactAliasForCurrentPool } from './cards'
-import { CONSENT_VERSION, PERSONA_THREAD_TITLE, matchOpened, relayedMessage, relayIntro, relayTitle } from './copy'
+import { CONSENT_VERSION, PERSONA_THREAD_TITLE, matchOpened, relayedMessage, relayIntro, relayTitle, revealAsked, revealed } from './copy'
 import type { ServiceDeps } from './deps'
 
 export type Outbound =
@@ -21,7 +21,7 @@ export type Outbound =
   /** Opens the member's relay thread for a match: a private message from Thư Duyên. */
   | { kind: 'relay_topic'; matchId: string; memberId: string; title: string; raw: string }
   /** A post by Thư Duyên in the member's relay thread, which must already exist. */
-  | { kind: 'relay_post'; matchId: string; memberId: string; raw: string; text?: string; relayMessageId?: number; allowClosed?: boolean }
+  | { kind: 'relay_post'; matchId: string; memberId: string; raw: string; text?: string; notice?: 'reveal_asked' | 'revealed'; relayMessageId?: number; allowClosed?: boolean }
   /** A post into a known topic, for notices that outlive the rows (after a deletion). */
   | { kind: 'topic_post'; as: 'persona' | 'relay'; topicId: number; raw: string }
 
@@ -78,9 +78,17 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
     if (match.state === 'closed') return // no thread was opened, so there is no chat to close
     throw new NotReady('relay topic not opened yet')
   }
-  const raw = item.text === undefined ? item.raw : relayedMessage(
-    redactAliasForCurrentPool(topic.aliasForOther, await poolBuckets(db, CONSENT_VERSION)), item.text,
-  )
+  let raw = item.raw
+  if (item.text !== undefined || item.notice) {
+    const alias = redactAliasForCurrentPool(topic.aliasForOther, await poolBuckets(db, CONSENT_VERSION))
+    if (item.notice === 'reveal_asked') raw = revealAsked(alias)
+    else if (item.notice === 'revealed') {
+      if (match.state !== 'revealed') return
+      const other = await getMember(db, match.memberA === item.memberId ? match.memberB : match.memberA)
+      if (!other?.discourseUsername) return
+      raw = revealed(alias, other.discourseUsername, `${config.discourseUrl}/u/${encodeURIComponent(other.discourseUsername)}`)
+    } else raw = relayedMessage(alias, item.text!)
+  }
   const { postId } = await discourse.createPost({ asUsername: config.relayUsername, topicId: topic.discourseTopicId, raw })
   if (item.relayMessageId !== undefined) await setRelayedPostId(db, item.relayMessageId, postId)
 }

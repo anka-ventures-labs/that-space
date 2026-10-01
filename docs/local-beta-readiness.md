@@ -29,8 +29,12 @@ holding, mutual reveal, blocking, deletion during an outage and retry recovery.
 Focused regression tests also cover concurrent duplicate sends, queue-storage
 failure, post-block retries, the final delivery lease, and daily quota races.
 
-Verified on 2026-10-01: **31 files / 300 tests passed**, typecheck and lint passed,
+Verified on 2026-10-01: **31 files / 302 tests passed**, typecheck and lint passed,
 and the production build passed (18 static pages and three API route patterns).
+The retained cross-family review approved this local checkpoint. After its
+nonblocking findings were corrected, 35 focused tests and the production build
+passed again, including delayed-reveal redaction and simultaneous relay limits.
+The complete suite then passed on the final source with the two new regressions.
 
 The website's public pages remain the original static demo. The beta member
 experience is the Discourse persona; passing service tests does not validate the

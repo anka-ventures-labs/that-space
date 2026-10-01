@@ -71,6 +71,7 @@ describe('tool auth and envelope', () => {
     await h.call('status', user)
     expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBe(user.topic_id)
     expect(personaThread({ username: 'mai', topic_id: 5, private_message: true, participants: 'mai,ba_moi' }, 'ba_moi')).toBe(5)
+    expect(personaThread({ username: 'mai', topic_id: 5, private_message: true, participants: 'Mai,BA_MOI' }, 'ba_moi')).toBe(5)
     expect(personaThread({ username: 'mai', topic_id: 5, private_message: true }, 'ba_moi')).toBeNull()
     for (const participants of ['mai,friend', 'friend,ba_moi', 'mai,mai', 'ba_moi,ba_moi']) {
       await h.call('status', user, {}, { auth: { ...auth, topic_id: 888, private_message: true, participants } })

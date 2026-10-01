@@ -53,8 +53,10 @@ export function bearerMatches(header: string | null, secret: string): boolean {
  */
 export function personaThread(auth: { username: string; topic_id?: number | null; private_message?: boolean | null; participants?: string | null }, personaUsername: string): number | null {
   if (auth.private_message !== true || !auth.topic_id) return null
-  const people = (auth.participants ?? '').split(',').map((p) => p.trim()).filter(Boolean)
-  return people.length === 2 && auth.username !== personaUsername && people.includes(auth.username) && people.includes(personaUsername) ? auth.topic_id : null
+  const people = (auth.participants ?? '').split(',').map((p) => p.trim().toLowerCase()).filter(Boolean)
+  const caller = auth.username.toLowerCase()
+  const bot = personaUsername.toLowerCase()
+  return people.length === 2 && caller !== bot && people.includes(caller) && people.includes(bot) ? auth.topic_id : null
 }
 
 function failure(error: ErrorCode, extra: Record<string, unknown> = {}) {

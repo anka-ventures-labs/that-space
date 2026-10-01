@@ -6,7 +6,7 @@
  */
 import {
   countRelayMessagesSince, getMatchForMember, getMember, getRelayTopicByDiscourseId, insertRelayMessage,
-  listRelayTopicsForMatch, type RelayStatus,
+  listRelayTopicsForMatch, lockMemberQuota, type RelayStatus,
 } from '@/lib/db/repo'
 import { PostWebhookSchema, REGULAR_POST_TYPE, verifyWebhookSignature, type PostWebhook } from '@/lib/discourse/webhook'
 import { HELD_ATTACHMENT, HELD_CONTACT, RATE_LIMITED, TOO_LONG, relayedMessage } from './copy'
@@ -28,40 +28,39 @@ export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): P
   const target = (await listRelayTopicsForMatch(db, match.id)).find((t) => t.memberId !== sender.id)
   if (!target) return 'ignored_no_target'
 
-  let status: RelayStatus
-  let text: string | null = null
-  let notice: string | null = null
-  if (post.raw.length > RELAY_MAX_LENGTH) {
-    status = 'too_long'
-    notice = TOO_LONG
-  } else if ((await countRelayMessagesSince(db, sender.id, new Date(deps.now().getTime() - 60_000))) >= RELAY_PER_MINUTE) {
-    status = 'rate_limited'
-    notice = RATE_LIMITED
-  } else {
-    const decision = decideRelay(post.raw, match.state === 'revealed')
-    if (decision.action === 'drop') return 'dropped_empty'
-    if (decision.action === 'hold') {
-      status = 'held'
-      notice = decision.reason === 'contact' ? HELD_CONTACT : HELD_ATTACHMENT
-    } else {
-      status = 'relayed'
-      text = decision.text
-    }
-  }
-
-  const key = await db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
+    await lockMemberQuota(tx, sender.id)
     const current = await getMatchForMember(tx, match.id, sender.id, true)
-    if (!current || current.state === 'closed') return null
+    if (!current || current.state === 'closed') return { key: null, outcome: 'ignored_closed' }
+    let status: RelayStatus
+    let text: string | null = null
+    let notice: string | null = null
+    if (post.raw.length > RELAY_MAX_LENGTH) {
+      status = 'too_long'
+      notice = TOO_LONG
+    } else if ((await countRelayMessagesSince(tx, sender.id, new Date(deps.now().getTime() - 60_000))) >= RELAY_PER_MINUTE) {
+      status = 'rate_limited'
+      notice = RATE_LIMITED
+    } else {
+      const decision = decideRelay(post.raw, current.state === 'revealed')
+      if (decision.action === 'drop') return { key: null, outcome: 'dropped_empty' }
+      if (decision.action === 'hold') {
+        status = 'held'
+        notice = decision.reason === 'contact' ? HELD_CONTACT : HELD_ATTACHMENT
+      } else {
+        status = 'relayed'
+        text = decision.text
+      }
+    }
     const messageId = await insertRelayMessage(tx, { matchId: match.id, fromMember: sender.id, sourcePostId: post.id, status })
-    if (messageId === null) return null
-    if (text !== null) return queue(tx, `relay:${post.id}`, {
+    if (messageId === null) return { key: null, outcome: 'replay' }
+    const key = text !== null ? await queue(tx, `relay:${post.id}`, {
       kind: 'relay_post', matchId: match.id, memberId: target.memberId, raw: relayedMessage(target.aliasForOther, text), text, relayMessageId: messageId,
-    }, deps.now())
-    return queue(tx, `relay-notice:${post.id}`, { kind: 'relay_post', matchId: match.id, memberId: sender.id, raw: notice! }, deps.now())
+    }, deps.now()) : await queue(tx, `relay-notice:${post.id}`, { kind: 'relay_post', matchId: match.id, memberId: sender.id, raw: notice! }, deps.now())
+    return { key, outcome: status }
   })
-  if (!key) return 'replay'
-  await deliver(deps, key)
-  return status
+  if (result.key) await deliver(deps, result.key)
+  return result.outcome
 }
 
 export async function handleDiscourseWebhook(request: Request, deps: ServiceDeps): Promise<Response> {

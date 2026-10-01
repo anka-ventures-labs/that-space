@@ -96,7 +96,7 @@ export const matchAction = defineTool(MatchActionArgs, async (ctx, args) => {
         if (!topic || !otherMember?.discourseUsername) continue
         const username = otherMember.discourseUsername
         keys.push(await queue(db, `revealed:${match.id}:${me}`, {
-          kind: 'relay_post', matchId: match.id, memberId: me,
+          kind: 'relay_post', matchId: match.id, memberId: me, notice: 'revealed',
           raw: revealed(topic.aliasForOther, username, `${config.discourseUrl}/u/${encodeURIComponent(username)}`),
         }, ctx.now))
       }
@@ -106,7 +106,7 @@ export const matchAction = defineTool(MatchActionArgs, async (ctx, args) => {
       const theirs = await getRelayTopic(db, match.id, otherId)
       if (theirs) {
         keys.push(await queue(db, `reveal-asked:${match.id}:${member.id}`, {
-          kind: 'relay_post', matchId: match.id, memberId: otherId, raw: revealAsked(theirs.aliasForOther),
+          kind: 'relay_post', matchId: match.id, memberId: otherId, notice: 'reveal_asked', raw: revealAsked(theirs.aliasForOther),
         }, ctx.now))
       }
     }
