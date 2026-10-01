@@ -14,6 +14,10 @@ disabled states and native focus behavior. The follow-up current-head check
 verifies this final visual correction. No new acceptance scope or live host was
 introduced.
 
+The contrast correction uses pinned Discourse's primary-button CSS variables,
+preserving its transparent, disabled, hover and keyboard-focus behavior rather
+than replacing button selectors. The original sand/cream accent palette remains.
+
 Hosted run `36861220372` at `d2c204d` passed 23 of 24 native requests and four
 of five real Chromium examples. Featured artwork and guest topic-read denial now
 pass. The invitee had only her Q1 interest group: pinned core's

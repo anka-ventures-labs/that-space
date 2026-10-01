@@ -55,27 +55,18 @@
   --that-space-ink: #33231c;
   --that-space-muted: #705f54;
   --that-space-wash: #eadfce;
+  --d-button-primary-text-color: #fff;
+  --d-button-primary-text-color--hover: #fff;
+  --d-button-primary-bg-color: var(--that-space-brown);
+  --d-button-primary-bg-color--hover: #432a1f;
+  --d-button-primary-icon-color: #fff;
+  --d-button-primary-icon-color--hover: #fff;
 }
 
 body {
   background: var(--that-space-cream);
   color: var(--that-space-ink);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.btn-primary {
-  background: var(--that-space-brown);
-  color: #fff;
-
-  .d-icon {
-    color: #fff;
-  }
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    background: #432a1f;
-    color: #fff;
-  }
 }
 
 h1,
