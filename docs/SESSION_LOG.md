@@ -2,6 +2,21 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Hosted run `36859513094` at `c4ac1de` retained the post error: native
+`NewPostManager` reports forbidden category posting. Source inspection also
+confirmed that native featured topics prohibit group-restricted categories.
+Switched member categories to standard `everyone/full` ACLs inside the required
+login/invite/staff-approval site boundary; announcements remain staff-post only.
+Reconciliation recognizes core's empty ACL representation for unrestricted
+categories, and the manifest refuses disabling those private-site requirements.
+Added actual guest topic-read denial plus native group/Guardian diagnostics before
+the invitee's post. Read-only investigation route
+`24fc1891-6d7d-4ace-8057-92935d8be9d2` completed; prior validator exploration
+`2377e5a8-5f1f-4230-9069-cecc7180b7a0` also completed. No arbitrary posting-rule
+relaxation was made. The CI browser steps now run after a failed request suite
+when frontend/Chromium preparation succeeds, preserving the request failure as a
+failed job while collecting independent browser evidence in the same checkpoint.
+
 Hosted run `36858314551` at `a6bf504` passed 22 of 24 native examples. Signup,
 first-login role mapping, private answers, real logout/upload denial, following,
 events/RSVP and all moderation examples now pass. Corrected the featured-topic

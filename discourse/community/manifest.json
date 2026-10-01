@@ -37,9 +37,9 @@
     { "key": "artist-host-corner", "name": "Góc Artist & Host", "slug": "goc-artist-host", "position": 8 },
     { "key": "announcements", "name": "Thông báo", "slug": "thong-bao", "position": 9 }
   ],
-  "category_permissions": { "trust_level_0": "full" },
+  "category_permissions": { "everyone": "full" },
   "category_permission_overrides": {
-    "announcements": { "trust_level_0": "readonly", "staff": "full" }
+    "announcements": { "everyone": "readonly", "staff": "full" }
   },
   "groups": [
     { "key": "role.user", "name": "ts-role-user", "full_name": "Người trải nghiệm" },

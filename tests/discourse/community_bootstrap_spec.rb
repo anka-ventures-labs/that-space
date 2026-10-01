@@ -58,11 +58,15 @@ RSpec.describe "Thật Space community bootstrap" do
 
     that_space_manifest.fetch("categories").each do |definition|
       category = Category.find_by!(slug: definition.fetch("slug"))
-      expected_category_permissions(definition).each do |group_name, permission_name|
-        group = Group[group_name.to_sym]
-        permission = CategoryGroup.permission_types.fetch(permission_name.to_sym)
-        expect(category.category_groups.find_by!(group: group).permission_type).to eq(permission)
+      expected_permissions = expected_category_permissions(definition).transform_values do |permission_name|
+        CategoryGroup.permission_types.fetch(permission_name.to_sym)
       end
+      if expected_permissions == { "everyone" => CategoryGroup.permission_types[:full] }
+        expect(category.category_groups).to be_empty
+      else
+        expect(category.permissions_params).to eq(expected_permissions)
+      end
+      expect(category.read_restricted).to eq(false)
     end
   end
 

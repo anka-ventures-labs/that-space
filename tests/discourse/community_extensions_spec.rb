@@ -50,6 +50,13 @@ RSpec.describe "Thật Space community extensions", type: :request do
     get "/topics/created-by/#{member.username}.json", params: { category: configured_category("exhibition").id }
     expect(response.status).to eq(200)
     expect(response.parsed_body.dig("topic_list", "topics").map { |topic| topic["id"] }).to include(artwork.topic_id)
+
+    delete "/session/#{member.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
+    get "/t/#{artwork.topic_id}.json"
+    expect(response.status).to eq(403)
+    expect(response.body).not_to include(artwork.raw)
   end
 
   it "follows a member, receives a topic notification, and respects their opt-out" do

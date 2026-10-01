@@ -92,6 +92,9 @@ module ThatSpace
     end
 
     def validate_manifest!
+      unless %w[login_required invite_only must_approve_users].all? { |setting| @manifest.fetch("site_settings").fetch(setting) == true }
+        raise Error, "The community requires private login, invitations and staff approval"
+      end
       raise Error, "Unsupported community manifest schema" unless @manifest["schema_version"] == 1
       raise Error, "Unexpected community manifest id" unless @manifest["manifest_id"] == MANIFEST_ID
 
@@ -332,7 +335,10 @@ module ThatSpace
         expected = category_attributes(definition, parent)
         mismatches = expected.filter_map { |attribute, value| attribute.to_s if category.public_send(attribute) != value }
         expected_permissions = normalized_permissions(category_permissions_for(definition))
-        permissions_match = normalized_permissions(category.permissions_params) == expected_permissions
+        # Core stores everyone/full as an unrestricted category with no ACL rows.
+        stored_permissions = expected_permissions["everyone"] == CategoryGroup.permission_types[:full] ? {} : expected_permissions
+        expected_restricted = !expected_permissions.key?("everyone")
+        permissions_match = normalized_permissions(category.permissions_params) == stored_permissions && category.read_restricted == expected_restricted
         if mismatches.any? || !permissions_match
           details = mismatches + (permissions_match ? [] : ["permissions"])
           difference("category #{definition.fetch("slug")} differs in #{details.join(", ")}", apply: apply) do

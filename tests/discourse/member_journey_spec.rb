@@ -96,6 +96,12 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     approve_and_log_in(member)
 
     category = configured_category("introduction")
+    expect(member.reload.in_any_groups?([Group[:trust_level_0].id])).to eq(true), member.group_users.pluck(:group_id).inspect
+    expect(Guardian.new(member).can_create_topic_on_category?(category)).to eq(true), {
+      silenced: member.silenced?,
+      create_groups: SiteSetting.create_topic_allowed_groups,
+      approve_groups: SiteSetting.approve_unless_allowed_groups,
+    }.inspect
     post "/posts.json",
          params: {
            category: category.id,

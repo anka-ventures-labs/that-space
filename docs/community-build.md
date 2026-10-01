@@ -61,6 +61,13 @@ are excluded from other members' profiles/cards/search. They never populate
 the matchmaking pool without its separate consent flow. Interest groups grant
 neither trust levels nor staff access.
 
+Privacy is enforced at the site boundary by required login, invitations and staff
+approval. Category ACLs use Discourse's standard `everyone` audience inside that
+private site, with staff-only posting in announcements. This permits native
+profile featured topics; core refuses to feature topics in group-restricted
+categories. The reconciler requires those three private-site settings in its
+manifest, and request acceptance denies guest topic reads and uploads.
+
 Q1 membership is assigned by the enabled native first-login Automation script. Editing
 Q1 later requires staff to reconcile interest-group membership: the native script
 adds membership but does not remove a previous selection. Q4/Q8 have separate

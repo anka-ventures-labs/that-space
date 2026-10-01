@@ -85,12 +85,18 @@ jobs:
       - name: Migrate disposable test database
         run: bin/rake db:create db:migrate
       - name: Real community request acceptance
+        id: community_requests
         run: bundle exec rspec --require ./spec/requests/that_space/spec_helper.rb spec/requests/that_space --format documentation
       - name: Compile real Discourse frontend
+        id: frontend
+        if: success() || (failure() && steps.community_requests.outcome == 'failure')
         run: script/assemble_ember_build.rb
       - name: Install Chromium for browser acceptance
+        id: chromium
+        if: ${{ !cancelled() && steps.frontend.outcome == 'success' }}
         run: pnpm playwright-install
       - name: Real member and theme browser acceptance
+        if: ${{ !cancelled() && steps.frontend.outcome == 'success' && steps.chromium.outcome == 'success' }}
         run: bundle exec rspec --require ./spec/system/that_space/spec_helper.rb spec/system/that_space --format documentation
       - name: Retain browser evidence and diagnostics
         if: always()
