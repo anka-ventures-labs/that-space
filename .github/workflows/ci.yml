@@ -85,13 +85,13 @@ jobs:
       - name: Migrate disposable test database
         run: bin/rake db:create db:migrate
       - name: Real community request acceptance
-        run: bundle exec rspec spec/requests/that_space --format documentation --fail-if-no-examples
+        run: bundle exec rspec --require ./spec/requests/that_space/spec_helper.rb spec/requests/that_space --format documentation
       - name: Compile real Discourse frontend
         run: script/assemble_ember_build.rb
       - name: Install Chromium for browser acceptance
         run: pnpm playwright-install
       - name: Real member and theme browser acceptance
-        run: bundle exec rspec spec/system/that_space --format documentation --fail-if-no-examples
+        run: bundle exec rspec --require ./spec/system/that_space/spec_helper.rb spec/system/that_space --format documentation
       - name: Retain browser evidence and diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

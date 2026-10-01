@@ -26,8 +26,8 @@ dependencies using its documented runtime, then execute our specs within that
 checkout with `THAT_SPACE_REPO` set to this repository's absolute path:
 
 ```bash
-RAILS_ENV=test LOAD_PLUGINS=1 THAT_SPACE_REPO=/path/to/that-space bundle exec rspec spec/requests/that_space --fail-if-no-examples
-RAILS_ENV=test LOAD_PLUGINS=1 THAT_SPACE_REPO=/path/to/that-space bundle exec rspec spec/system/that_space --fail-if-no-examples
+RAILS_ENV=test LOAD_PLUGINS=1 THAT_SPACE_REPO=/path/to/that-space bundle exec rspec --require ./spec/requests/that_space/spec_helper.rb spec/requests/that_space
+RAILS_ENV=test LOAD_PLUGINS=1 THAT_SPACE_REPO=/path/to/that-space bundle exec rspec --require ./spec/system/that_space/spec_helper.rb spec/system/that_space
 ```
 
 The GitHub `CI` workflow performs these operations on `ubuntu-latest`, inside
@@ -36,6 +36,8 @@ loads the real plugins, compiles the actual frontend and runs Chromium system
 tests. The separate service job runs tests, typecheck, lint and build. No
 production credentials, deployment, paid AWS host, or self-hosted runner are
 part of this workflow. Review checks on the PR's current head.
+The helper uses RSpec's [fail-if-no-examples configuration](https://rspec.info/features/3-13/rspec-core/configuration/fail-if-no-examples/)
+and is required explicitly so an empty/misconfigured suite cannot pass silently.
 
 ## Apply owned configuration
 
@@ -59,7 +61,7 @@ are excluded from other members' profiles/cards/search. They never populate
 the matchmaking pool without its separate consent flow. Interest groups grant
 neither trust levels nor staff access.
 
-Q1 membership is assigned by the native first-login Automation script. Editing
+Q1 membership is assigned by the enabled native first-login Automation script. Editing
 Q1 later requires staff to reconcile interest-group membership: the native script
 adds membership but does not remove a previous selection. Q4/Q8 have separate
 storage keys; Q15 preserves its four offered answers and leaves the unused Art
@@ -95,8 +97,25 @@ proxy upload access, restart, backup/restore and narrow phone behavior. The
 configuration denies anonymous upload downloads through Discourse; direct
 storage/proxy access must also be tested on the chosen host.
 
-Discourse AI spam/toxicity configuration needs the selected LLM and moderation
-rules. It remains a live acceptance gate alongside the existing Bà Mối agent,
+The versioned `discourse/moderation/` configuration uses native `llm_triage` for
+both spam and toxicity classification and sends matches to human review. It
+excludes private messages, bot posts, tools, images, attachments and onboarding
+answers. It deliberately keeps the native SpamDetector scanner off: the pinned
+scanner can automatically hide posts and silence users, which exceeds this
+beta's review-only behavior. The same required spam/safety detection is performed
+by the triage rule. It does not automatically reply, delete, hide or sanction.
+
+Select an existing, configured Discourse AI LLM with attachment support disabled,
+then apply/check without copying its credentials into this repository:
+
+```bash
+THAT_SPACE_MODERATION_BOOTSTRAP=1 THAT_SPACE_MODERATION_LLM_MODEL_ID=42 bundle exec rails runner /path/to/that-space/discourse/moderation/bootstrap.rb
+THAT_SPACE_MODERATION_BOOTSTRAP=1 THAT_SPACE_MODERATION_LLM_MODEL_ID=42 bundle exec rails runner /path/to/that-space/discourse/moderation/bootstrap.rb -- --check
+```
+
+The model ID above is a placeholder. Hosted tests supply canned model responses
+to prove flag/no-flag and PM/bot exclusion; they do not measure Vietnamese model
+accuracy. Live moderation tuning/acceptance remains a gate alongside the existing Bà Mối agent,
 signed webhook, retry schedule and two-member relay/reveal/block tests. Use
 [the Bà Mối readiness record](local-beta-readiness.md) and
 [the phase plan](plans/2026-10-01-whole-app.md) for those gates. Passing hosted

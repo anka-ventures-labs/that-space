@@ -57,7 +57,8 @@ module ThatSpace
         "discourse_post_event_enabled" => true,
         "discourse_post_event_allowed_on_groups" => [Group[:admins].id, Group[:moderators].id, host.id].join("|"),
         "events_calendar_categories" => retreat.id.to_s,
-        "flag_post_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|")
+        "flag_post_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
+        "ignore_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|")
       }
       settings.each do |key, expected|
         difference("site setting #{key}", apply: apply) { SiteSetting.set(key, expected) } unless SiteSetting.public_send(key) == expected

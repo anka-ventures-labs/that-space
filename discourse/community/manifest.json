@@ -18,6 +18,7 @@
     "invite_only": true,
     "must_approve_users": true,
     "enable_local_logins": true,
+    "discourse_automation_enabled": true,
     "disable_emails": "non-staff",
     "personal_message_enabled_groups": ["admins", "moderators", "trust_level_0"]
   },

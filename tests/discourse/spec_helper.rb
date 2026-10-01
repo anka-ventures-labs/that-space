@@ -53,5 +53,6 @@ module ThatSpaceCommunitySpecSupport
 end
 
 RSpec.configure do |config|
+  config.fail_if_no_examples = true
   config.include ThatSpaceCommunitySpecSupport
 end

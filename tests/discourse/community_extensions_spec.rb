@@ -59,6 +59,30 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(member.reload.following).not_to include(other_member)
   end
 
+  it "serves uploaded artwork to members while denying anonymous downloads" do
+    sign_in(member)
+    image = Rack::Test::UploadedFile.new(file_from_fixtures("smallest.png", "images"))
+    post "/uploads.json", params: { file: image, upload_type: "composer" }
+    expect(response.status).to eq(200)
+    upload = Upload.get_from_url(response.parsed_body.fetch("url"))
+    expect(upload.user_id).to eq(member.id)
+    get upload.short_path
+    expect(response.status).to eq(200)
+    sign_out
+    get upload.short_path
+    expect(response.status).to eq(404)
+  end
+
+  it "lets a new member ignore another member and later restore contact" do
+    sign_in(member)
+    put "/u/#{other_member.username}/notification_level.json", params: { notification_level: "ignore", expiring_at: 30.days.from_now.iso8601 }
+    expect(response.status).to eq(200)
+    expect(IgnoredUser.exists?(user_id: member.id, ignored_user_id: other_member.id)).to eq(true)
+    put "/u/#{other_member.username}/notification_level.json", params: { notification_level: "normal" }
+    expect(response.status).to eq(200)
+    expect(IgnoredUser.exists?(user_id: member.id, ignored_user_id: other_member.id)).to eq(false)
+  end
+
   it "lets a Host create a retreat and a member RSVP without granting staff access" do
     host = Fabricate(:user, refresh_auto_groups: true)
     configured_group("role.host").add(host)

@@ -55,6 +55,24 @@ LLM, real Bà Mối/webhook/retry/two-member acceptance, phone QA and backup/res
 Q1 edits require staff to remove a prior interest membership. No Moon/chart work
 was added; public demo pages retain their labelled fixed-data behavior.
 
+Runtime checkpoint correction: hosted run `36854761582` at `7a8e515` successfully
+initialized the official container, installed dependencies and migrated the test
+database; Service checks passed. Discourse request execution stopped on an
+unsupported RSpec CLI option before running examples. Replaced it with the
+supported `config.fail_if_no_examples` setting and explicit helper loading, rather
+than rerunning unchanged code. Added the GJS `on` imports, removed a derived color
+variable from palette input, and extended request checks for upload protection,
+member ignore/unignore and a moderator's actual flag decision.
+
+Added the required native AI spam/toxicity review configuration with an explicit
+existing model ID, no credentials copied, safe ownership/check mode and model
+response fixtures. Native SpamDetector auto-hides/silences in the pinned source;
+selected native `llm_triage` instead to route both spam and safety detections to
+staff review without automatic sanctions. PMs, bots and private onboarding data
+are excluded. Enabled native Automation explicitly, including real first-login
+interest membership. Moderation decision `4849c0a9-2036-443f-849a-e3b6154e6d86`
+completed after assembly inspection; full plugin execution remains CI evidence.
+
 ## 2026-10-01: user corrected the phase boundary
 
 The user explicitly reaffirmed that full Tử Vi, charts and related features

@@ -69,6 +69,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(response.status).to eq(200)
     expect(response.parsed_body.dig("user", "id")).to eq(member.id)
     expect(session[:current_user_id]).to eq(member.id)
+    expect(configured_group("role.user").reload.users).to include(member)
   end
 
   it "uses the native invite endpoint to require every onboarding field before creating a pending member" do
@@ -140,6 +141,10 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(response.parsed_body.fetch("reviewables").map { |item| item.fetch("id") }).to include(
       reviewable.id,
     )
+    put "/review/#{reviewable.id}/perform/disagree.json", params: { version: reviewable.reload.version }
+    expect(response.status).to eq(200)
+    expect(reviewable.reload).to be_rejected
+    expect(first_post.reload).not_to be_hidden
   end
 
   it "rejects anonymous posting and review-queue access through HTTP" do
