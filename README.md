@@ -21,6 +21,10 @@ Live demo: https://that-space-demo.vercel.app
 - Bà Mối can be verified locally without a server or cloud account. Start with
   [local beta readiness](docs/local-beta-readiness.md); the product contract is
   in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
+- The rest of the app still needs implementation. The
+  [whole-app execution plan](docs/plans/2026-10-01-whole-app.md) covers community
+  onboarding, profiles, artwork, events, Bà Mối integration, full Tử Vi readings
+  and PDFs, and the local-development-to-production sequence.
 
 ## Getting started
 

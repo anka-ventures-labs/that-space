@@ -1,5 +1,54 @@
 # Session log
 
+## 2026-10-01: whole-app scope and execution plan
+
+The user asked whether a plan exists for the rest of the app after the local
+Bà Mối checkpoint. Refreshed `feat/ba-moi` from origin with fetch/prune and
+fast-forward-only pull; the tree was clean. Added
+`plans/2026-10-01-whole-app.md` and linked it from README and the narrower Bà Mối
+plan. No feature code, host provisioning, dependency installation, service
+startup, external configuration or deployment was performed.
+
+The plan separates the unfinished community, real Bà Mối integration and full
+Tử Vi/PDF track. It preserves Discourse as the member/authentication platform,
+starts with a real invite/account/topic/reply slice, names disjoint parallel
+workstreams and their dependency edges, and distinguishes beta acceptance from
+full-app completion. The static Next.js routes are not counted as completed
+member features.
+
+Recovered the original 15-question onboarding template and January forum
+proposal read-only using the Google Drive skill. Exact source links are in the
+plan. Q4/Q8 share an erroneous mapping name; the plan assigns distinct stable
+fields. Q15 maps an Art action without offering Art as an answer; the default
+preserves the four offered answers and records the discrepancy. Private answer
+visibility and interest groups must not expose sensitive preferences or grant
+staff permissions. Historical custom-auth, karma/ranking and email features
+remain explicitly tracked rather than silently treated as delivered by v3.
+
+Planning session `that-space-whole-app-plan-20261001` used one retained
+agent-jobs consultation, job `e559b64d-7ccc-4640-a45b-017263078d94`, enforced
+route `a857a246-4699-49e9-9f69-eb80f79e6786` (OpenCode Muse Spark). The terminal
+result was read, its exact-owner delivery acknowledged, and route feedback
+completed. A bounded native code exploration verified the Tử Vi/profile
+mockup's four inputs and static reading/history/PDF behavior under decision
+`b849aaac-8185-4586-91ad-97287c61b8c5`; feedback completed. No nested review or
+separate worker PR was opened.
+
+Current read-only runtime checks: Docker/Colima binaries exist; the default
+Docker socket is absent; Colima reports not running. Official Discourse guides
+confirm local macOS development and warn about the older x86-only Docker image
+on Apple Silicon. Thus local development is a planned setup step, not a claimed
+running capability. Paid production hosting is unnecessary for the immediate
+manifest/theme preparation.
+
+Verification for this documentation-only checkpoint: checked source against
+the current spec, mockup inventory and recovered requirements; checked local
+Markdown links and Git whitespace. The existing 302-test service checkpoint
+remains the code evidence; no tests were added or repeated for prose changes.
+Next: implement community manifests/theme and prove the local member flow,
+then community extensions and real-account integration; full readings/PDFs
+retain their own calculation, private identity/history and export gates.
+
 ## 2026-10-01: local Bà Mối beta completion before server provisioning
 
 The user chose to build first after comparing ASUS and AWS. Refreshed

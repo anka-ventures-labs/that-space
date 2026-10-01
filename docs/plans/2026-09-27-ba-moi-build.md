@@ -4,6 +4,9 @@
 The original ASUS deployment choice below is historical and unexecuted; AWS can
 be chosen during live integration. Current scope and acceptance evidence:
 [local beta readiness](../local-beta-readiness.md).
+This is the Bà Mối workstream only. See the
+[whole-app execution plan](2026-10-01-whole-app.md) for community and Tử Vi/PDF
+work that remains beyond the locally verified service.
 
 Branch: `feat/ba-moi`. Spec: [docs/ba-moi-spec.md](../ba-moi-spec.md), v3.
 Revised 2026-09-27 after the cross-family plan review (see Review outcome at
