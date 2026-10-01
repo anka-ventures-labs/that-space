@@ -6,6 +6,12 @@ and follows the flow and rules of Moon's Nhân Duyên (`moon-ai-vn/moon2-app`,
 `lib/nhan-duyen`). Minh built Moon entirely, so we reuse its code as well as
 its design.
 
+**Phase boundary reaffirmed 2026-10-01:** deliver the complete Discourse
+community and Bà Mối. Full Tử Vi charts/readings, reading history and PDFs are
+out of scope. Keep the current tuổi/day-pillar compatibility; full-chart
+romantic scoring remains a future Moon-reuse step, not a completion gate for
+this phase. See the [current execution plan](plans/2026-10-01-whole-app.md).
+
 ## The product in one paragraph
 
 Thật Space is a private community for Vietnamese women, running on Discourse.
@@ -193,8 +199,9 @@ The signals are:
     tables. Tuổi and nhật trụ count equally
   - explanations name the relationship ("tam hợp"), never either person's
     animal or stem
-  - when both people gave a birth time and the intent is romantic, Moon's full
-    Tử Vi and Bát Tự romantic score replaces it
+  - future Moon integration, outside this phase: when both people gave a birth
+    time and the intent is romantic, Moon's full Tử Vi and Bát Tự romantic score
+    can replace it
 - plans for children (long-term and marriage only)
 - region
 
@@ -256,7 +263,7 @@ her scores recomputed.
 - Photos in matchmaking
 - Images in the relay (text only)
 - Syncing edits and deletes in the relay
-- Full Tử Vi readings
+- Full Tử Vi charts/readings, reading history, PDFs and full-chart scoring
 - Payments
 - Outgoing email (recruitment is by invite link)
 - Hosting in Vietnam (planned: the AWS Hanoi Local Zone)

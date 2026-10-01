@@ -1,6 +1,38 @@
 # Session log
 
+## 2026-10-01: user corrected the phase boundary
+
+The user explicitly reaffirmed that full Tử Vi, charts and related features
+remain out of scope this phase, and that Thật Space should not rebuild Moon.
+The earlier whole-app plan mistakenly included a reading/history/PDF track.
+Removed that track and its worker/dependency/acceptance gates, renumbered
+production as Phase 4, and aligned README, the Bà Mối spec and its plan. The current
+phase is the complete Discourse community plus Bà Mối, with existing
+tuổi/day-pillar compatibility retained. The astrology discussion category
+does not imply chart generation. Future astrology work should begin with
+Moon reuse rather than a parallel implementation.
+
+Before this correction, read-only capability checks confirmed access to
+`moon-ai-vn/moon2-app` and its local source. A standalone Tử Vi engine and
+regression test files exist; they were inspected, not executed, ported or
+changed. The availability check followed enforced direct route
+`b80e87f4-304b-4583-bf17-bb76d3fa8ab3` in the existing whole-app planning
+session; terminal feedback completed. No new cross-family review or native
+worker was launched. Those findings do not expand the user's current scope.
+
+Refreshed the clean feature branch with fetch/prune and fast-forward-only
+pull before editing. This correction changes documentation only. Validation:
+local Markdown links and Git whitespace; no code tests needed or repeated.
+No hosting, deployment, external settings or feature code changed.
+Next: implement community manifests/theme and prove the invite/account/topic/
+reply path, then community extensions and live Bà Mối acceptance. Hosting and
+credentials are later integration inputs; a full-chart engine is not a gate.
+
 ## 2026-10-01: whole-app scope and execution plan
+
+**Scope correction:** the later entry above supersedes this entry's Tử Vi/PDF
+implementation and completion assumptions. This section records the historical
+planning checkpoint, not the current phase boundary.
 
 The user asked whether a plan exists for the rest of the app after the local
 Bà Mối checkpoint. Refreshed `feat/ba-moi` from origin with fetch/prune and

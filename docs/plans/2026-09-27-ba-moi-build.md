@@ -5,8 +5,9 @@ The original ASUS deployment choice below is historical and unexecuted; AWS can
 be chosen during live integration. Current scope and acceptance evidence:
 [local beta readiness](../local-beta-readiness.md).
 This is the Bà Mối workstream only. See the
-[whole-app execution plan](2026-10-01-whole-app.md) for community and Tử Vi/PDF
-work that remains beyond the locally verified service.
+[whole-app execution plan](2026-10-01-whole-app.md) for community work that
+remains beyond the locally verified service. Full Tử Vi/chart/reading/PDF
+features remain out of scope for this phase.
 
 Branch: `feat/ba-moi`. Spec: [docs/ba-moi-spec.md](../ba-moi-spec.md), v3.
 Revised 2026-09-27 after the cross-family plan review (see Review outcome at
@@ -195,8 +196,9 @@ for future tables. Checked live: the REST API with the publishable key returns
 
 Order: A, then B, then C now. D when the ASUS is free (1–2 days). E needs D
 and the OpenRouter key. Then F. The full Tử Vi and Bát Tự romantic score for an
-optional birth time (A2) comes after the loop works end to end: the birth time
-is collected and stored now, and used later.
+optional birth time (A2) is future Moon reuse, outside the current phase as
+reaffirmed on 2026-10-01: the birth time is collected and stored now, and used
+later. A2 does not gate current community/Bà Mối completion.
 
 ## Failure semantics
 

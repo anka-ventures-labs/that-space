@@ -23,8 +23,9 @@ Live demo: https://that-space-demo.vercel.app
   in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
 - The rest of the app still needs implementation. The
   [whole-app execution plan](docs/plans/2026-10-01-whole-app.md) covers community
-  onboarding, profiles, artwork, events, Bà Mối integration, full Tử Vi readings
-  and PDFs, and the local-development-to-production sequence.
+  onboarding, profiles, artwork, events, Bà Mối integration and the
+  local-development-to-production sequence. Full Tử Vi charts/readings/PDFs
+  remain out of scope for this phase; future astrology work should reuse Moon.
 
 ## Getting started
 
