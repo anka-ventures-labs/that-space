@@ -2,6 +2,14 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Hosted run `36858314551` at `a6bf504` passed 22 of 24 native examples. Signup,
+first-login role mapping, private answers, real logout/upload denial, following,
+events/RSVP and all moderation examples now pass. Corrected the featured-topic
+fixture to use Discourse's dedicated `PUT /u/:username/feature-topic.json`
+endpoint. The newly invited member's topic returns 422; added its response body
+to the failed assertion for concrete validation diagnosis rather than changing
+posting policy without evidence. Request acceptance still gates browser tests.
+
 Hosted run `36856879291` at `627e0cf` executed 24 native examples: 15 passed,
 including all five review-only AI moderation examples; nine failed. Normalized
 manifest permission strings to Discourse enum integers at both category writes,
@@ -14,6 +22,13 @@ This is a fixture correction, not a relaxed privacy boundary. Native worker
 route `d743cdfd-255e-47e5-a814-bf136b88a534` completed for the anonymous fixtures;
 coordinator assembled and verified syntax/whitespace. Browser acceptance remains
 next after request acceptance passes.
+
+Closed the theme's font-loading gap: the initial CSS named Inter and Playfair
+Display but provided no font sources. Added the unchanged Latin, Latin Extended
+and Vietnamese WOFF2 subsets from the existing Next.js Google-font build as
+local theme assets, with the matching unicode ranges, official SIL licenses and
+SHA-256 provenance. Static checks verify asset references and WOFF2 headers;
+the native browser acceptance will compile the final theme.
 
 Assembly review `b31ce0d5-03df-4e05-84d3-0fdad462080f` (OpenCode Muse Spark,
 route `b22e9e9e-598e-43b0-bc36-bcef98c248c8`) completed and was read before the

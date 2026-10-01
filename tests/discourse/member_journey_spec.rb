@@ -103,7 +103,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
            raw: "A real acceptance post written by a synthetic member.",
          }
 
-    expect(response.status).to eq(200)
+    expect(response.status).to eq(200), response.body
     first_post = Post.find(response.parsed_body.fetch("id"))
     expect(first_post.topic.category).to eq(category)
 

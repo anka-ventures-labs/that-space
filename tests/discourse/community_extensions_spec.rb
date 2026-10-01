@@ -40,10 +40,12 @@ RSpec.describe "Thật Space community extensions", type: :request do
   it "allows an approved member to update her bio and feature her own artwork topic" do
     artwork = create_post(user: member, category: configured_category("exhibition"), title: "An artist's first exhibition", raw: "A member-owned artwork with its story and process.")
     sign_in(member)
-    put "/u/#{member.username}.json", params: { bio_raw: "Mình yêu nghệ thuật và những kết nối tử tế.", featured_topic_id: artwork.topic_id }
+    put "/u/#{member.username}.json", params: { bio_raw: "Mình yêu nghệ thuật và những kết nối tử tế." }
     expect(response.status).to eq(200)
     expect(member.user_profile.reload.bio_raw).to include("Mình yêu nghệ thuật")
-    expect(member.user_profile.featured_topic_id).to eq(artwork.topic_id)
+    put "/u/#{member.username}/feature-topic.json", params: { topic_id: artwork.topic_id }
+    expect(response.status).to eq(200)
+    expect(member.user_profile.reload.featured_topic_id).to eq(artwork.topic_id)
 
     get "/topics/created-by/#{member.username}.json", params: { category: configured_category("exhibition").id }
     expect(response.status).to eq(200)

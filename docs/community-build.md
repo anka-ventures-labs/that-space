@@ -79,7 +79,10 @@ The theme links forum, gallery, events and the member's profile. Set its
 `ba_moi_username` to the actual installed AI account after running the existing
 Bà Mối installer/probe. Until then its private-message CTA is omitted. It uses
 Discourse's composer and private-message permissions. Gallery/event links are
-same-site paths. Vietnamese navigation, palette and logo work on desktop/mobile.
+same-site paths. Vietnamese navigation, palette and logo are included for
+desktop/mobile. Inter and Playfair Display are self-hosted theme assets with
+Latin/Vietnamese subsets; provenance and SIL licenses are retained in
+`discourse/theme/assets/`. Browser acceptance verifies the imported theme.
 
 ## Acceptance and live boundaries
 

@@ -7,7 +7,13 @@
   "license_url": null,
   "about_url": null,
   "assets": {
-    "that-space-logo": "assets/logo.jpg"
+    "that-space-logo": "assets/logo.jpg",
+    "inter-latin": "assets/inter-latin.woff2",
+    "inter-vietnamese": "assets/inter-vietnamese.woff2",
+    "inter-latin-ext": "assets/inter-latin-ext.woff2",
+    "playfair-latin": "assets/playfair-latin.woff2",
+    "playfair-vietnamese": "assets/playfair-vietnamese.woff2",
+    "playfair-latin-ext": "assets/playfair-latin-ext.woff2"
   },
   "color_schemes": {
     "Thật Space": {
