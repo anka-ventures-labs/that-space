@@ -2,6 +2,19 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Hosted run `36856879291` at `627e0cf` executed 24 native examples: 15 passed,
+including all five review-only AI moderation examples; nine failed. Normalized
+manifest permission strings to Discourse enum integers at both category writes,
+fixing member posting and repeated application drift. Kept array-shaped signup
+requests and compared answer values as arrays because Discourse stores a single
+multiselect choice as a scalar. Replaced the native test helper's unmatched
+`DELETE /session` route with the actual username logout endpoint; logout now
+asserts cleared session/cookies before checking anonymous upload/event denial.
+This is a fixture correction, not a relaxed privacy boundary. Native worker
+route `d743cdfd-255e-47e5-a814-bf136b88a534` completed for the anonymous fixtures;
+coordinator assembled and verified syntax/whitespace. Browser acceptance remains
+next after request acceptance passes.
+
 Assembly review `b31ce0d5-03df-4e05-84d3-0fdad462080f` (OpenCode Muse Spark,
 route `b22e9e9e-598e-43b0-bc36-bcef98c248c8`) completed and was read before the
 ship decision. Exact-owner delivery acknowledged; feedback completed. Retained
@@ -65,7 +78,7 @@ could not open its loopback Postgres socket (`listen EPERM`), so it was rerun wi
 the same test command and appropriate loopback permission. Hosted runtime results
 will be recorded after completion; the checkpoint is pushed to execute the real
 container because the local runtime capacity check rules out this test locally.
-One assembly cross-family code review remains before the ship decision. This is
+The assembly cross-family code review above has completed. This is
 a durable build checkpoint, not a production readiness claim.
 
 Remaining live gates: chosen persistent host, email or verified staff-assisted

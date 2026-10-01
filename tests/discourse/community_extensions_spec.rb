@@ -77,7 +77,10 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(upload.user_id).to eq(member.id)
     get upload.short_path
     expect(response.status).to eq(200)
-    sign_out
+    delete "/session/#{member.username}.json"
+    expect(response.status).to eq(302)
+    expect(session[:current_user_id]).to be_nil
+    expect(response.cookies["_t"]).to be_blank
     get upload.short_path
     expect(response.status).to eq(404)
   end
@@ -114,7 +117,10 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(event.invitees.find_by!(user_id: member.id).status).to eq(DiscourseEvents::Events::Invitee.statuses[:going])
     get "/discourse-post-event/events/#{event.id}.json"
     expect(response.status).to eq(200)
-    sign_out
+    delete "/session/#{member.username}.json"
+    expect(response.status).to eq(302)
+    expect(session[:current_user_id]).to be_nil
+    expect(response.cookies["_t"]).to be_blank
     get "/discourse-post-event/events/#{event.id}.json"
     expect(response.status).not_to eq(200)
   end

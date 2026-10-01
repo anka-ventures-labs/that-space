@@ -321,7 +321,7 @@ module ThatSpace
             category = Category.new
             apply_category_attributes(category, definition, parent)
             category.user = Discourse.system_user
-            category.set_permissions(category_permissions_for(definition))
+            category.set_permissions(normalized_permissions(category_permissions_for(definition)))
             category.save!
             category.upsert_custom_fields(owner_key("category_key") => key)
           end
@@ -337,7 +337,7 @@ module ThatSpace
           details = mismatches + (permissions_match ? [] : ["permissions"])
           difference("category #{definition.fetch("slug")} differs in #{details.join(", ")}", apply: apply) do
             apply_category_attributes(category, definition, parent)
-            category.set_permissions(category_permissions_for(definition)) unless permissions_match
+            category.set_permissions(expected_permissions) unless permissions_match
             category.save!
           end
         end

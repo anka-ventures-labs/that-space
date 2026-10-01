@@ -47,7 +47,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(member).to be_active
     expect(member).not_to be_approved
     expect(member).not_to be_moderator
-    expect(member.user_fields).to include(that_space_signup_fields)
+    that_space_signup_fields.each do |field_id, submitted_answer|
+      expect(Array(member.user_fields.fetch(field_id))).to eq(Array(submitted_answer))
+    end
     expect(invite.reload).to be_redeemed
     expect(login_code.reload.consumed_at).to be_present
     expect(session[:current_user_id]).to be_nil
@@ -62,7 +64,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(member.reload).to be_approved
     expect(member).not_to be_moderator
 
-    sign_out
+    delete "/session/#{admin.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
     login_code = EmailLoginCode.generate!(email: member.email)
     post "/session/login-code/verify.json", params: { email: member.email, code: login_code.code }
 
@@ -103,7 +107,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     first_post = Post.find(response.parsed_body.fetch("id"))
     expect(first_post.topic.category).to eq(category)
 
-    sign_out
+    delete "/session/#{member.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
     replier = Fabricate(:user, refresh_auto_groups: true)
     sign_in(replier)
     expect {
@@ -132,7 +138,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     reviewable = ReviewableFlaggedPost.find_by!(target: first_post)
     expect(reviewable).to be_pending
 
-    sign_out
+    delete "/session/#{replier.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
     moderator = Fabricate(:moderator, refresh_auto_groups: true)
     sign_in(moderator)
     get "/review.json", params: { ids: [reviewable.id] }
@@ -163,7 +171,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     private_field = configured_user_field("relationship_status")
     other_member = Fabricate(:user, refresh_auto_groups: true)
 
-    sign_out
+    delete "/session/#{member.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
     sign_in(other_member)
     get "/u/#{member.username}.json"
 
@@ -172,7 +182,9 @@ RSpec.describe "Thật Space member acceptance", type: :request do
       private_field.id.to_s,
     )
 
-    sign_out
+    delete "/session/#{other_member.username}.json", xhr: true
+    expect(response.status).to eq(200)
+    expect(session[:current_user_id]).to be_nil
     sign_in(member)
     get "/u/#{member.username}.json"
 
