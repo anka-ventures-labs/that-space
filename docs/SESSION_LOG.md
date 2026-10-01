@@ -2,6 +2,18 @@
 
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
+Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,
+24 native Discourse requests and five Chromium examples**, plus typecheck, lint
+and production build. Both PR checks were verified against that exact head.
+The real invite-to-moderator-decision path now passes with the production
+membership callback restored in its test scope. Inspected retained desktop and
+mobile screenshots; the brand/header/fonts, navigation, portfolio and composer
+render correctly. Visual inspection exposed white native primary-button text on
+pale sand, so changed those actions to the dark brown brand fill while preserving
+disabled states and native focus behavior. The follow-up current-head check
+verifies this final visual correction. No new acceptance scope or live host was
+introduced.
+
 Hosted run `36861220372` at `d2c204d` passed 23 of 24 native requests and four
 of five real Chromium examples. Featured artwork and guest topic-read denial now
 pass. The invitee had only her Q1 interest group: pinned core's
