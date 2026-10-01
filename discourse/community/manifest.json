@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "manifest_id": "that-space-community",
+  "revision": "2026-10-01-v1",
+  "provenance": {
+    "onboarding_source": "Google Drive template 1YlrxlqGv_VJOG3IvkUt8Sf1LihA6HDTn",
+    "recovered_on": "2026-10-01",
+    "notes": [
+      "Q4 and Q8 had the duplicate source identifier preference.sense; their stable keys below are deliberately distinct.",
+      "Q15 only contains the four source choices. Art is intentionally not inferred."
+    ]
+  },
+  "site_settings": {
+    "title": "Thật Space",
+    "default_locale": "vi",
+    "allow_user_locale": true,
+    "login_required": true,
+    "invite_only": true,
+    "must_approve_users": true,
+    "enable_local_logins": true,
+    "disable_emails": "non-staff",
+    "personal_message_enabled_groups": ["admins", "moderators", "trust_level_0"]
+  },
+  "categories": [
+    { "key": "introduction", "name": "Giới thiệu", "slug": "gioi-thieu", "position": 1 },
+    { "key": "healing-growth", "name": "Chữa lành & Trưởng thành", "slug": "chua-lanh-truong-thanh", "position": 2 },
+    { "key": "art-creation", "name": "Nghệ thuật & Sáng tạo", "slug": "nghe-thuat-sang-tao", "position": 3 },
+    { "key": "drawing", "name": "Vẽ", "slug": "ve", "parent": "art-creation", "position": 1 },
+    { "key": "writing", "name": "Viết", "slug": "viet", "parent": "art-creation", "position": 2 },
+    { "key": "music-movement", "name": "Âm nhạc & Chuyển động", "slug": "am-nhac-chuyen-dong", "parent": "art-creation", "position": 3 },
+    { "key": "flower-arranging", "name": "Cắm hoa", "slug": "cam-hoa", "parent": "art-creation", "position": 4 },
+    { "key": "spirituality-tu-vi", "name": "Tâm linh & Tử Vi", "slug": "tam-linh-tu-vi", "position": 4 },
+    { "key": "relationships", "name": "Các mối quan hệ", "slug": "cac-moi-quan-he", "position": 5 },
+    { "key": "retreat-workshop", "name": "Retreat & Workshop", "slug": "retreat-workshop", "position": 6 },
+    { "key": "exhibition", "name": "Triển lãm", "slug": "trien-lam", "position": 7 },
+    { "key": "artist-host-corner", "name": "Góc Artist & Host", "slug": "goc-artist-host", "position": 8 },
+    { "key": "announcements", "name": "Thông báo", "slug": "thong-bao", "position": 9 }
+  ],
+  "category_permissions": { "trust_level_0": "full" },
+  "category_permission_overrides": {
+    "announcements": { "trust_level_0": "readonly", "staff": "full" }
+  },
+  "groups": [
+    { "key": "role.user", "name": "that-space-role-user", "full_name": "Người trải nghiệm" },
+    { "key": "role.artist", "name": "that-space-role-artist", "full_name": "Artist" },
+    { "key": "role.loveseeker", "name": "that-space-role-loveseeker", "full_name": "Tìm kết nối cảm xúc" },
+    { "key": "role.host", "name": "that-space-role-host", "full_name": "Host" },
+    { "key": "role.observer", "name": "that-space-role-observer", "full_name": "Observer" }
+  ],
+  "user_fields": [
+    { "key": "community_role", "question": "Bạn là ai trong Thật Space?", "type": "dropdown", "options": ["Người trải nghiệm", "Artist", "Tìm kết nối cảm xúc", "Host", "Observer"] },
+    { "key": "zodiac_sign", "question": "Cung hoàng đạo của bạn?", "type": "dropdown", "options": ["Bạch Dương", "Kim Ngưu", "Song Tử", "Cự Giải", "Sư Tử", "Xử Nữ", "Thiên Bình", "Bọ Cạp", "Nhân Mã", "Ma Kết", "Bảo Bình", "Song Ngư"] },
+    { "key": "life_path", "question": "Số chủ đạo (Thần số học)?", "type": "dropdown", "options": ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "22/4"] },
+    { "key": "relationship_status", "question": "Bạn đang trong mối quan hệ nào?", "type": "dropdown", "options": ["Độc thân", "Relationship", "Kết hôn", "Ly hôn"] },
+    { "key": "emotional_expression", "question": "Khi cảm xúc dâng lên, bạn thường làm gì?", "type": "multiselect", "options": ["Vẽ", "Viết", "Nghe nhạc hoặc nhảy", "Cắm hoa", "Im lặng"] },
+    { "key": "weekend_preference", "question": "Cuối tuần lý tưởng của bạn?", "type": "dropdown", "options": ["Ở nhà", "Retreat nhỏ", "Đi dạo chụp ảnh", "Workshop", "Café & viết"] },
+    { "key": "current_energy", "question": "Năng lượng tuần này của bạn?", "type": "dropdown", "options": ["Nhẹ nhàng", "Tươi mới", "Sâu sắc", "Sexy nhẹ", "Tĩnh lặng"] },
+    { "key": "art_sense", "question": "Trong nghệ thuật, bạn bị thu hút bởi điều gì nhất?", "type": "dropdown", "options": ["Màu sắc", "Chuyển động", "Ngôn từ", "Hương thơm", "Âm thanh"] },
+    { "key": "art_channel", "question": "Bạn muốn chảy cảm xúc qua đâu?", "type": "dropdown", "options": ["Bàn tay", "Cơ thể", "Giọng nói", "Chữ viết", "Tĩnh lặng"] },
+    { "key": "art_goals", "question": "Nghệ thuật giúp bạn điều gì?", "type": "multiselect", "options": ["Bình tĩnh", "Thấy mình đẹp hơn", "Hiểu mình hơn", "Có lối thoát", "Kết nối người khác"] },
+    { "key": "art_element", "question": "Nguyên tố nghệ thuật của bạn là gì?", "type": "dropdown", "options": ["Đất", "Nước", "Gió", "Lửa", "Ánh sáng"] },
+    { "key": "art_mode", "question": "Bạn muốn trải nghiệm nghệ thuật theo cách nào?", "type": "dropdown", "options": ["Một mình", "Nhóm nhỏ", "Retreat", "Lớp định kỳ", "Mỗi tháng"] },
+    { "key": "connection_level", "question": "Bạn muốn kết nối ở mức độ nào?", "type": "dropdown", "options": ["Nhẹ", "Sâu", "Thân mật có biên"] },
+    { "key": "community_goals", "question": "Bạn mong muốn tìm thấy điều gì ở Thật Space?", "type": "multiselect", "options": ["Healing", "Kết nối", "Cảm xúc", "Sáng tạo", "Học hỏi", "Tìm đầu ra cho sản phẩm", "Triển lãm cá nhân"] },
+    { "key": "journey", "question": "Bạn muốn đồng hành cùng Thật Space theo hướng nào?", "type": "dropdown", "options": ["Retreat", "Matching", "Học", "Cộng đồng"] }
+  ],
+  "user_field_defaults": {
+    "editable": true,
+    "requirement": "on_signup",
+    "show_on_signup": true,
+    "show_on_profile": false,
+    "show_on_user_card": false,
+    "searchable": false
+  },
+  "automation": {
+    "name": "Thật Space: Q1 role group at first login",
+    "script": "add_user_to_group_through_custom_field",
+    "trigger": "user_first_logged_in",
+    "field_key": "community_role",
+    "mapping": {
+      "Người trải nghiệm": "role.user",
+      "Artist": "role.artist",
+      "Tìm kết nối cảm xúc": "role.loveseeker",
+      "Host": "role.host",
+      "Observer": "role.observer"
+    }
+  },
+  "known_limits": [
+    "The native Automation script adds a member to the selected Q1 group at first login. It does not remove a prior role group when an editable answer changes; staff must reconcile changed roles until an official reversible script is available.",
+    "No onboarding answer is sent to Bà Mối or its matchmaking pool by this configuration. That requires the separate consent and card-confirmation flow."
+  ]
+}

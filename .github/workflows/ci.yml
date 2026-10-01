@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  service:
+    name: Service checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+
+  community:
+    name: Discourse community acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    container:
+      image: discourse/discourse_test@sha256:428694a2c15215003b325804c3e0b9627388f36bfe243f2fa2dcd4b37c293587
+    defaults:
+      run:
+        shell: bash
+        working-directory: discourse-core
+    env:
+      RAILS_ENV: test
+      PGUSER: discourse
+      PGPASSWORD: discourse
+      LOAD_PLUGINS: "1"
+      EMBER_ENV: development
+      CHEAP_SOURCE_MAPS: "1"
+      NODE_OPTIONS: --max-old-space-size=4096
+      CAPYBARA_DEFAULT_MAX_WAIT_TIME: "20"
+      PLAYWRIGHT_BROWSERS_PATH: /home/discourse/.cache/ms-playwright
+      DBUS_SESSION_BUS_ADDRESS: unix:path=/dev/null
+      THAT_SPACE_REPO: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: discourse/discourse
+          ref: c237680d280a34b1025f79bf37b865c5349313a3
+          path: discourse-core
+          persist-credentials: false
+      - name: Prepare pinned extensions and our acceptance specs
+        run: |
+          git config --global --add safe.directory "$PWD"
+          python3 ../scripts/discourse/prepare-runtime.py --discourse-path "$PWD"
+      - name: Start disposable test databases
+        run: |
+          redis-server /etc/redis/redis.conf --daemonize yes --logfile ""
+          chown -R postgres /var/run/postgresql
+          sudo -E -u postgres script/start_test_db.rb
+          sudo -u postgres psql -c "CREATE ROLE discourse LOGIN SUPERUSER PASSWORD 'discourse';"
+      - name: Install pinned dependencies
+        run: |
+          ln -s /var/www/discourse/vendor/bundle vendor/bundle
+          bundle config --local path vendor/bundle
+          bundle config --local deployment true
+          bundle config --local without development
+          bundle install --jobs 2
+          for cached in /var/www/discourse/plugins/*/gems; do
+            plugin_name=$(basename "$(dirname "$cached")")
+            if [ -d "plugins/$plugin_name" ] && [ ! -e "plugins/$plugin_name/gems" ]; then
+              ln -s "$cached" "plugins/$plugin_name/gems"
+            fi
+          done
+          pnpm install --frozen-lockfile
+      - name: Migrate disposable test database
+        run: bin/rake db:create db:migrate
+      - name: Real community request acceptance
+        run: bundle exec rspec spec/requests/that_space --format documentation --fail-if-no-examples
+      - name: Compile real Discourse frontend
+        run: script/assemble_ember_build.rb
+      - name: Install Chromium for browser acceptance
+        run: pnpm playwright-install
+      - name: Real member and theme browser acceptance
+        run: bundle exec rspec spec/system/that_space --format documentation --fail-if-no-examples
+      - name: Retain browser evidence and diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: community-acceptance-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            discourse-core/tmp/capybara
+            discourse-core/tmp/screenshots
+            discourse-core/log/test.log

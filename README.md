@@ -2,10 +2,10 @@
 
 A private community for Vietnamese women: a forum, Tử Vi (Vietnamese astrology)
 readings, and spiritual matchmaking. This repository contains the static Next.js
-**frontend demo** and the **Bà Mối beta backend**: matching, private Postgres data,
-Discourse AI tools, and an anonymous chat relay. Discourse provides the beta's
-member interface and authentication. The backend is locally verified; the live
-Discourse integration is still pending.
+**frontend demo**, **Discourse community build**, and **Bà Mối beta backend**:
+onboarding, member presentation, matching, private Postgres data, Discourse AI
+tools, and an anonymous chat relay. Discourse provides the member interface and
+authentication. Live installation and model/relay acceptance remain pending.
 
 Live demo: https://that-space-demo.vercel.app
 
@@ -21,7 +21,9 @@ Live demo: https://that-space-demo.vercel.app
 - Bà Mối can be verified locally without a server or cloud account. Start with
   [local beta readiness](docs/local-beta-readiness.md); the product contract is
   in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
-- The rest of the app still needs implementation. The
+- The community build is versioned under `discourse/`, with pinned extensions
+  and real Discourse request/browser tests. See [community build](docs/community-build.md)
+  for reproduction, application, privacy boundaries and remaining live gates. The
   [whole-app execution plan](docs/plans/2026-10-01-whole-app.md) covers community
   onboarding, profiles, artwork, events, Bà Mối integration and the
   local-development-to-production sequence. Full Tử Vi charts/readings/PDFs
@@ -70,6 +72,8 @@ lib/discourse/    Discourse API client and webhook signature check
 app/api/ba-moi/   Route handlers: /v1/<tool>, /v1/webhooks/discourse, /v1/cron/retry-posts
 supabase/         Supabase CLI config and SQL migrations
 scripts/          One-off scripts (seed-samples.ts, run with tsx)
+discourse/        Community/onboarding, branded theme, extension pins and Bà Mối agent/tools
+tests/discourse/  Native Discourse request and browser acceptance
 __tests__/        Vitest + Testing Library page tests (jsdom)
 tests/unit/       Vitest unit tests (node); tests/unit/db runs on PGlite
 tests/integration/ Local beta acceptance journeys through the real dispatcher

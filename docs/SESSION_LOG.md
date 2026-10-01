@@ -1,5 +1,60 @@
 # Session log
 
+## 2026-10-01: assembled community build for real Discourse acceptance
+
+User authorized execution of the community + Bà Mối phase after explicitly
+excluding full Tử Vi/charts/readings/PDFs. Refreshed the clean feature branch
+from origin before editing. Added the owned 13-category/five-interest-group/
+15-field signup manifest, Rails-native idempotent application/drift checking,
+first-login Q1 mapping, and branded desktop/mobile member theme. Answers remain
+private; interest roles grant no staff/trust privileges; announcements allow
+staff posting and member reading.
+
+Pinned Discourse and the official test container, Follow, portfolio and thumbnail
+extensions. Added presentation application for gallery/profile portfolios, bios/
+featured topics, member following/notifications, Host events/RSVP, member-only
+navigation and the existing Bà Mối private-message composer. Added native request
+and Chromium acceptance for the actual Discourse APIs, not the Next.js mockup.
+`docs/community-build.md` records application, ownership, operations, source
+ambiguities and remaining live checks.
+
+Both available Macs lack sufficient free disk for a full disposable Discourse
+container (5.4 GB and 1.4 GB observed); Docker/Colima is not running. Used a pinned
+source checkout for compatibility inspection and a standard GitHub-hosted test
+container for planned runtime acceptance. No dependencies, host services, Docker
+daemon, AWS resources, production instance or Vercel deployment were created.
+The prepared checkout fetched and verified every extension pin successfully.
+CI uses `ubuntu-latest` and no local-fleet routing.
+
+Parallel MECE workstreams: community configuration, member theme, native member
+acceptance, and coordinator-owned runtime/presentation/assembly. Independent
+outputs were assembled here; runtime/API dependencies stayed ordered. Native
+workers used routed codex-worker Terra profiles; no worker launched CI/reviews/
+PRs. Retained current decisions: configuration runtime fixes
+`aeda8c07-db24-474f-8a56-cc5668a39657`, member boundary tests
+`7ae364b2-538c-4c09-9739-4e79ba32bd49`; both completed. Extension acceptance
+decision `766a084c-06e3-48f5-9a98-aeb7467d48fd` returned direct due to native
+capacity and is implemented by the coordinator. Earlier completed foundation
+decisions: `e83eaa03-ac16-40c5-9079-84853829ed34`,
+`a53da6a6-e65b-4846-ac84-1f4c61534bf5`,
+`2821abf0-b839-4013-be89-0c5cb57c708e`.
+
+Checkpoint verification: Ruby syntax/static manifest checks and pinned preparation
+passed; all 31 service test files / 302 tests, typecheck, lint and production
+build passed (18 static pages plus three API routes). The first sandboxed service test invocation
+could not open its loopback Postgres socket (`listen EPERM`), so it was rerun with
+the same test command and appropriate loopback permission. Hosted runtime results
+will be recorded after completion; the checkpoint is pushed to execute the real
+container because the local runtime capacity check rules out this test locally.
+One assembly cross-family code review remains before the ship decision. This is
+a durable build checkpoint, not a production readiness claim.
+
+Remaining live gates: chosen persistent host, email or verified staff-assisted
+activation/recovery, proxy/storage upload protection, AI spam/toxicity rules and
+LLM, real Bà Mối/webhook/retry/two-member acceptance, phone QA and backup/restore.
+Q1 edits require staff to remove a prior interest membership. No Moon/chart work
+was added; public demo pages retain their labelled fixed-data behavior.
+
 ## 2026-10-01: user corrected the phase boundary
 
 The user explicitly reaffirmed that full Tử Vi, charts and related features
