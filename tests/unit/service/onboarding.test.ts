@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { getCard, getMemberByDiscourseId, getProfile } from '@/lib/db/repo'
+import { getCard, getMemberByDiscourseId, getProfile, recordConsent } from '@/lib/db/repo'
+import { redactCardForCurrentPool } from '@/lib/service/cards'
 import { CONSENT_TEXT, CONSENT_VERSION } from '@/lib/service/copy'
 import { PROFILE, createHarness, onboard, testUser, type Harness } from '../../helpers/service'
 
@@ -36,6 +37,34 @@ describe('consent', () => {
     expect((await h.call('status', user)).body.paused).toBe(true)
     await h.call('consent', user, { action: 'resume' })
     expect((await h.call('status', user)).body.paused).toBe(false)
+  })
+
+  it('requires the current consent version before a member can use the pool again', async () => {
+    const user = testUser('van')
+    await h.call('consent', user, { action: 'opt_in', adult_confirmed: true })
+    const member = await memberOf(user)
+    await recordConsent(h.db, member.id, 'beta-old-version', h.now)
+
+    const stale = await h.call('status', user)
+    expect(stale.body).toMatchObject({ opted_in: false, consent: { version: CONSENT_VERSION, text: CONSENT_TEXT } })
+    expect((await h.call('profile_update', user, { intent: 'friendship' })).body.error).toBe('consent_required')
+    expect((await h.call('card_preview', user)).body.error).toBe('consent_required')
+    expect((await h.call('box_open', user)).body.error).toBe('consent_required')
+  })
+})
+
+describe('rule-of-5 presentation', () => {
+  const card = {
+    ageBand: '30-34', region: 'miền Bắc' as const, initial: 'L.', gender: 'female' as const, seeking: 'male' as const,
+    intent: 'long_term' as const, hobbies: ['đọc sách'], element: 'Mộc' as const, dayMaster: 'Giáp Mộc', summary: 'Thích đọc sách.',
+  }
+
+  it('redacts identifiers from an old card when a bucket drops below five', () => {
+    const low = { regions: new Map([['miền Bắc', 4]]), initials: new Map([['L', 4]]) }
+    expect(redactCardForCurrentPool(card, low)).toMatchObject({ region: null, initial: null })
+
+    const sufficient = { regions: new Map([['miền Bắc', 5]]), initials: new Map([['L', 5]]) }
+    expect(redactCardForCurrentPool(card, sufficient)).toMatchObject({ region: 'miền Bắc', initial: 'L.' })
   })
 })
 

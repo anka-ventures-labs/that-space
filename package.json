@@ -9,6 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:beta": "vitest run tests/integration/local-beta.test.ts",
     "test:watch": "vitest",
     "seed:samples": "tsx --env-file=.env.local scripts/seed-samples.ts",
     "discourse:install": "tsx --env-file=.env.local scripts/install-discourse-ai.ts",

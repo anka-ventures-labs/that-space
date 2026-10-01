@@ -1,5 +1,78 @@
 # Session log
 
+## 2026-10-01: local Bà Mối beta completion before server provisioning
+
+The user chose to build first after comparing ASUS and AWS. Refreshed
+`feat/ba-moi` from its authoritative `anka-ventures-labs/that-space` origin;
+the initial working tree was clean. No deployment, provisioning, external
+installer run or live database migration was performed. The ASUS read-only
+check still found Atum/Taylor traffic and running tunnel/SSH services, so the
+host remains occupied. Historical ASUS deployment notes are not execution
+authorization for this checkpoint.
+
+### Parallel MECE workstreams and assembly
+
+- Member/pool scope: current consent enforcement and current rule-of-5
+  redaction, preserving labelled samples and existing signals/matches.
+- Discourse scope: injectable installer, structural drift check against full
+  admin edit records, route-wrapper auth tests and malformed probe responses.
+- Coordinating scope: shared SQL access, transactional outbound intent,
+  lifecycle/retry fixes, quota concurrency, documentation, integration and Git.
+- A second bounded test scope added two local acceptance journeys after the
+  shared harness and contract were available. Workers did not commit, push,
+  run CI, request reviews or mutate external services.
+
+Planning used `$agent-jobs`, job `103bf72f-e3db-4d15-9ada-ff483029d380`
+(OpenCode Muse Spark; enforced route
+`539f621d-4643-40b9-a8f5-c1392d5b3bcf`). Its retained advice was read and delivery
+acknowledged. It could not inspect source directly; recommendations were
+verified against source before implementation. Native worker decisions:
+`800cac32-faa6-48de-acd7-99585d1141de`,
+`7fd95b2a-195f-4371-913a-16f46c754d65`,
+`f3368144-0246-49b1-9e31-05fedac1fc6c`; all completed and fed back.
+Stable routing session: `that-space-local-beta-20261001`.
+
+### Behavior and recovery
+
+- Domain changes and outgoing notifications now commit together. Relay
+  receipt storage failure rolls back so a redelivery can work. Keyed delivery
+  leases prevent simultaneous/repeated calls from duplicating successful sends.
+- Closed matches suppress queued chat/opening/reveal messages; generic closure
+  notices remain deliverable. Deleted-member private queue payloads are purged;
+  successful delivery retains the key and clears the payload.
+- Final crashed leases stop at ten attempts. Search/interest quotas serialize
+  count/write decisions per member. Repeat reveal returns the revealed state.
+- Stored card identifiers and new chat aliases follow current anonymity counts.
+  Persona topic IDs require a private message containing exactly the caller and
+  the configured bot. Operational errors log classes instead of private bodies.
+- Installer checks scripts, parameters, metadata, secret bindings and agent
+  wiring/settings, failing on missing unverifiable fields. Secret plaintext
+  cannot be read back. Tool export excludes bindings; verified edit records
+  expose them. Source links and local/live boundaries are recorded in
+  `local-beta-readiness.md` and the service API.
+
+### Verification checkpoint
+
+The clean baseline passed 281 tests, typecheck, lint and production build.
+Four added regression tests first reproduced duplicate sends, post-block retry
+delivery, an unrecoverable webhook receipt, and an eleventh delivery attempt;
+all passed after fixes. The assembled suite passed **31 files / 300 tests**,
+including two complete local acceptance journeys. Typecheck and lint passed.
+The final production build passed (18 static pages and three API route patterns).
+After error-log redaction, the eight dispatcher regressions passed again; the
+build also typechecked and linted the final source. Assembly review submitted as
+job `faa3fcba-bfa4-42d4-af02-524694be3bb2`, enforced OpenCode route
+`a314ca81-6f80-48ab-90d9-e64db9845289`; its retained result is required before
+the PR decision. No `.github` workflow exists in this repository; current-head checks
+will be inspected on the beta pull request, without inventing a CI lane.
+
+Known limits: remote acceptance followed by a receipt-write crash can duplicate
+a Discourse post; existing Discourse history survives service deletion; contact
+heuristics can be bypassed across messages. The fake boundary cannot prove
+Discourse UI, model wording, mobile acceptance, moderator visibility, backup or
+live cron. Next: choose and provision a host only for the live checklist in
+`local-beta-readiness.md`.
+
 ## 2026-09-27: W-D and W-E prepared ahead of the ASUS, and per-bot API keys
 
 ### Why now

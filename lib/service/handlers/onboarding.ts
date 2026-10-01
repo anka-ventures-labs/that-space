@@ -10,8 +10,9 @@ import { vnDate } from '@/lib/matching/privacy'
 import type { MemberProfile } from '@/lib/matching/types'
 import { SUMMARY_MAX_LENGTH, buildCard, summaryViolations, templateSummary } from '../cards'
 import { CONSENT_TEXT, CONSENT_VERSION, MATCH_ENDED } from '../copy'
+import { hasCurrentConsent } from '../consent'
 import { INTEREST_DAILY_LIMIT, SEARCH_DAILY_LIMIT, nextVnDayStart, vnDayStart } from '../limits'
-import { send } from '../outbox'
+import { deliverAll, queue } from '../outbox'
 import { ProfileUpdateArgs, applyProfileUpdate, missingFields, toMemberProfile } from '../profile'
 import { defineTool, fail, type ToolContext } from '../tool'
 
@@ -30,9 +31,9 @@ export const status = defineTool(NoArgs, async ({ deps: { db }, member, now }) =
   const draft = profile ?? EMPTY_PROFILE
   return {
     ok: true,
-    opted_in: member.consentVersion === CONSENT_VERSION,
+    opted_in: hasCurrentConsent(member),
     /** Present until she has agreed to this version; the persona shows it word for word. */
-    consent: member.consentVersion === CONSENT_VERSION ? null : { version: CONSENT_VERSION, text: CONSENT_TEXT },
+    consent: hasCurrentConsent(member) ? null : { version: CONSENT_VERSION, text: CONSENT_TEXT },
     paused: member.status === 'paused',
     missing: missingFields(draft),
     married_friendship_only: draft.marital === 'married' && draft.intent !== null && draft.intent !== 'friendship',
@@ -65,7 +66,7 @@ export const consent = defineTool(ConsentArgs, async (ctx, args) => {
       await setMemberStatus(db, member.id, 'paused')
       return { ok: true, paused: true }
     case 'resume':
-      if (!member.consentVersion) return fail('consent_required')
+      if (!hasCurrentConsent(member)) return fail('consent_required')
       await setMemberStatus(db, member.id, 'active')
       return { ok: true, paused: false }
     case 'delete':
@@ -76,23 +77,28 @@ export const consent = defineTool(ConsentArgs, async (ctx, args) => {
 
 /** Deletes her rows (every table cascades), then tells each open match's other side the chat has ended. */
 async function deleteEverything({ deps, member }: ToolContext) {
-  const notices: Array<{ matchId: string; topicId: number }> = []
-  for (const match of await listMatchesForMember(deps.db, member.id)) {
-    if (match.state === 'closed') continue
-    for (const topic of await listRelayTopicsForMatch(deps.db, match.id)) {
-      if (topic.memberId !== member.id && topic.discourseTopicId) notices.push({ matchId: match.id, topicId: topic.discourseTopicId })
+  const keys = await deps.db.transaction(async (db) => {
+    const notices: Array<{ matchId: string; topicId: number }> = []
+    for (const match of await listMatchesForMember(db, member.id)) {
+      if (match.state === 'closed') continue
+      for (const topic of await listRelayTopicsForMatch(db, match.id)) {
+        if (topic.memberId !== member.id && topic.discourseTopicId) notices.push({ matchId: match.id, topicId: topic.discourseTopicId })
+      }
     }
-  }
-  await deleteMember(deps.db, member.id)
-  for (const { matchId, topicId } of notices) {
-    await send(deps, `closed:${matchId}:deleted`, { kind: 'topic_post', as: 'relay', topicId, raw: MATCH_ENDED })
-  }
+    await deleteMember(db, member.id)
+    const keys: string[] = []
+    for (const { matchId, topicId } of notices) {
+      keys.push(await queue(db, `closed:${matchId}:deleted`, { kind: 'topic_post', as: 'relay', topicId, raw: MATCH_ENDED }, deps.now()))
+    }
+    return keys
+  })
+  await deliverAll(deps, keys)
   deps.log({ event: 'member_deleted', memberId: member.id })
   return { ok: true as const, deleted: true }
 }
 
 export const profileUpdate = defineTool(ProfileUpdateArgs, async ({ deps: { db }, member, now }, args) => {
-  if (!member.consentVersion) return fail('consent_required')
+  if (!hasCurrentConsent(member)) return fail('consent_required')
   const current = await getProfile(db, member.id)
   const applied = applyProfileUpdate(current ?? EMPTY_PROFILE, args, now)
   if (!applied.ok) return fail(applied.error)
@@ -103,7 +109,7 @@ export const profileUpdate = defineTool(ProfileUpdateArgs, async ({ deps: { db }
   const card = await getCard(db, member.id)
   const complete = toMemberProfile(member.id, applied.profile)
   if (card?.confirmedAt && complete) {
-    const fresh = await buildCard(db, member, { ...complete, ...derived }, card.summaryText, now)
+    const fresh = await buildCard(db, member, { ...complete, ...derived }, card.summaryText, now, CONSENT_VERSION)
     await saveCard(db, member.id, fresh, card.summaryText, card.confirmedAt)
   }
   return {
@@ -122,13 +128,13 @@ async function completeProfile({ deps: { db }, member }: ToolContext): Promise<{
 
 export const cardPreview = defineTool(NoArgs, async (ctx) => {
   const { deps: { db }, member, now } = ctx
-  if (!member.consentVersion) return fail('consent_required')
+  if (!hasCurrentConsent(member)) return fail('consent_required')
   const loaded = await completeProfile(ctx)
   if (!('profile' in loaded)) return fail('profile_incomplete', { missing: loaded.missing })
   const stored = await getCard(db, member.id)
   return {
     ok: true,
-    card: await buildCard(db, member, loaded.profile, null, now),
+    card: await buildCard(db, member, loaded.profile, null, now, CONSENT_VERSION),
     template_summary: templateSummary(loaded.profile),
     current_summary: stored?.summaryText ?? null,
     confirmed: !!stored?.discoverable,
@@ -140,12 +146,12 @@ const CardConfirmArgs = z.object({ summary_text: z.string().trim().min(10).max(S
 
 export const cardConfirm = defineTool(CardConfirmArgs, async (ctx, args) => {
   const { deps: { db }, member, now } = ctx
-  if (!member.consentVersion) return fail('consent_required')
+  if (!hasCurrentConsent(member)) return fail('consent_required')
   const loaded = await completeProfile(ctx)
   if (!('profile' in loaded)) return fail('profile_incomplete', { missing: loaded.missing })
   const violations = summaryViolations(args.summary_text, member, loaded.profile)
   if (violations.length > 0) return fail('summary_leaks', { violations })
-  const card = await buildCard(db, member, loaded.profile, args.summary_text, now)
+  const card = await buildCard(db, member, loaded.profile, args.summary_text, now, CONSENT_VERSION)
   await saveCard(db, member.id, card, args.summary_text, now)
   return { ok: true, card, in_pool: member.status === 'active' }
 })

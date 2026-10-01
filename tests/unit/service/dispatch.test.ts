@@ -70,8 +70,12 @@ describe('tool auth and envelope', () => {
     expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBeNull()
     await h.call('status', user)
     expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBe(user.topic_id)
-    expect(personaThread({ topic_id: 5, private_message: true, participants: 'mai,ba_moi' })).toBe(5)
-    expect(personaThread({ topic_id: 5, private_message: true })).toBeNull()
+    expect(personaThread({ username: 'mai', topic_id: 5, private_message: true, participants: 'mai,ba_moi' }, 'ba_moi')).toBe(5)
+    expect(personaThread({ username: 'mai', topic_id: 5, private_message: true }, 'ba_moi')).toBeNull()
+    for (const participants of ['mai,friend', 'friend,ba_moi', 'mai,mai', 'ba_moi,ba_moi']) {
+      await h.call('status', user, {}, { auth: { ...auth, topic_id: 888, private_message: true, participants } })
+      expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBe(user.topic_id)
+    }
   })
 
   it('fails closed with a generic message when the database is down', async () => {
@@ -83,6 +87,7 @@ describe('tool auth and envelope', () => {
     const body = await response.json()
     expect(body).toMatchObject({ ok: false, error: 'internal' })
     expect(JSON.stringify(body)).not.toContain('secret host')
+    expect(JSON.stringify(h.logs)).not.toContain('secret host')
   })
 
   it('logs one line per call with ids and outcome only', async () => {

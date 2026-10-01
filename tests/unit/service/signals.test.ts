@@ -110,6 +110,29 @@ describe('interest, signal and match', () => {
     expect(h.discourse.calls).toEqual([])
   })
 
+  it('redacts a stored signal card when its region or initial no longer has five members', async () => {
+    const a = testUser('lan')
+    const b = testUser('nam')
+    await onboard(h, a)
+    await onboard(h, b, HIM, HIS_SUMMARY)
+    const box = await h.call('box_open', a)
+    await h.call('interest', a, { discovery_id: box.body.introduction.discovery_id })
+
+    const toId = await idOf(b)
+    const [interest] = await h.db.query<{ id: string; recipientPayload: { card: Record<string, unknown>; fit: Record<string, unknown> } }>(
+      `select id, recipient_payload as "recipientPayload" from interests where to_id = $1`, [toId],
+    )
+    const payload = {
+      ...interest.recipientPayload,
+      card: { ...interest.recipientPayload.card, region: 'miền Bắc', initial: 'L.' },
+      fit: { ...interest.recipientPayload.fit, same_region: true },
+    }
+    await h.db.query(`update interests set recipient_payload = $2::jsonb where id = $1`, [interest.id, payload])
+
+    const [signal] = (await h.call('signals', b)).body.signals
+    expect(signal).toMatchObject({ card: { region: null, initial: null }, fit: { same_region: null } })
+  })
+
   it('only acts on her own discoveries, and not after the other side has left', async () => {
     const a = testUser('lan')
     const b = testUser('nam')

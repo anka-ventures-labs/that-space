@@ -5,7 +5,7 @@ import path from 'node:path'
 // __tests__ (jsdom). The `@/*` alias mirrors tsconfig.json, as in Moon.
 export default defineConfig({
   test: {
-    include: ['tests/unit/**/*.test.ts', '__tests__/**/*.test.tsx'],
+    include: ['tests/unit/**/*.test.ts', 'tests/integration/**/*.test.ts', '__tests__/**/*.test.tsx'],
     environment: 'node',
     environmentMatchGlobs: [['__tests__/**', 'jsdom']],
     setupFiles: ['./vitest.setup.ts'],

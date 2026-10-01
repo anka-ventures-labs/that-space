@@ -1,5 +1,10 @@
 # Bà Mối build plan (Discourse-native)
 
+**2026-10-01 checkpoint:** finish and verify locally before provisioning a host.
+The original ASUS deployment choice below is historical and unexecuted; AWS can
+be chosen during live integration. Current scope and acceptance evidence:
+[local beta readiness](../local-beta-readiness.md).
+
 Branch: `feat/ba-moi`. Spec: [docs/ba-moi-spec.md](../ba-moi-spec.md), v3.
 Revised 2026-09-27 after the cross-family plan review (see Review outcome at
 the end). W1, the foundation, is done: Next.js 15.5.26 and Vitest, commit
@@ -60,9 +65,11 @@ with `zod`.
   - one relay message per source post
 
   So if the model calls a tool twice, nothing is duplicated.
-- **Database first, Discourse second:** side effects on Discourse (notification
-  posts, relay topics) happen after the database commit. A failed post goes to
-  `pending_posts` and never fails the tool call.
+- **Database first, Discourse second:** domain changes and keyed notification
+  intent commit together before Discourse calls. A failed remote send stays in
+  `pending_posts`; a failure to persist intent rolls back the action. Leases
+  prevent concurrent sends. A crash between remote acceptance and recording
+  success can still duplicate a post; see the API's durable-delivery contract.
 
 | Endpoint | Does |
 |---|---|

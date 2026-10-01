@@ -51,10 +51,10 @@ export function bearerMatches(header: string | null, secret: string): boolean {
  * Her own thread with Bà Mối: a private message with just her and the bot.
  * A thread she shares with anyone else never receives her notifications.
  */
-export function personaThread(auth: { topic_id?: number | null; private_message?: boolean | null; participants?: string | null }): number | null {
+export function personaThread(auth: { username: string; topic_id?: number | null; private_message?: boolean | null; participants?: string | null }, personaUsername: string): number | null {
   if (auth.private_message !== true || !auth.topic_id) return null
   const people = (auth.participants ?? '').split(',').map((p) => p.trim()).filter(Boolean)
-  return people.length === 2 ? auth.topic_id : null
+  return people.length === 2 && auth.username !== personaUsername && people.includes(auth.username) && people.includes(personaUsername) ? auth.topic_id : null
 }
 
 function failure(error: ErrorCode, extra: Record<string, unknown> = {}) {
@@ -94,13 +94,13 @@ export async function handleToolRequest(name: string, request: Request, deps: Se
       discourseUserId: auth.user_id,
       username: auth.username,
       displayName: auth.name || auth.username,
-      personaTopicId: personaThread(auth),
+      personaTopicId: personaThread(auth, deps.config.personaUsername),
     })
     memberId = member.id
     const result = await tool.run({ deps, member, now: deps.now(), requestId }, args.data as never)
     return respond(200, result)
   } catch (error) {
-    deps.log({ event: 'tool_error', requestId, tool: name, memberId, error: (error as Error).message.slice(0, 300) })
+    deps.log({ event: 'tool_error', requestId, tool: name, memberId, error: error instanceof Error ? error.name : 'Error' })
     return respond(500, failure('internal'))
   }
 }

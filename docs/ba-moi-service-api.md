@@ -10,7 +10,7 @@ sentence the member reads in conversation. The service returns facts, plus
 
 ```json
 {
-  "auth": { "user_id": 101, "username": "lan", "name": "Lan", "topic_id": 4001, "private_message": true },
+  "auth": { "user_id": 101, "username": "lan", "name": "Lan", "topic_id": 4001, "private_message": true, "participants": "lan,ba_moi" },
   "args": { }
 }
 ```
@@ -21,7 +21,8 @@ sentence the member reads in conversation. The service returns facts, plus
 - The member is resolved from `auth.user_id` alone.
 - Unknown keys in `args`, such as a model-invented `user_id`, are stripped.
 - `topic_id` is remembered as her thread with Bà Mối only when
-  `private_message` is true. Notifications go to that thread. If she has none,
+  `private_message` is true and the two participants are exactly her username
+  and the configured Bà Mối bot. Notifications go to that thread. If she has none,
   Bà Mối opens a new private message titled "Bà Mối có tin cho bạn".
 
 **Status codes:**
@@ -81,11 +82,20 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
 
 ## Rules the service enforces
 
+- **Current consent:** profile/card work, discovery, interests and signal
+  responses require the current consent version. Real candidates with obsolete
+  consent are excluded from discovery and anonymity counts. Labelled samples
+  remain available without human consent.
+- **Current anonymity counts:** stored cards and new chat aliases lose region
+  or initial when its discoverable bucket falls below five. Read-time redaction
+  never adds a previously hidden field. A hidden region also clears `same_region`.
 - **Daily limits** reset at midnight in Vietnam (UTC+7):
   - one box
   - 6 search results
   - 5 new interests
   - A no-match still uses the box.
+  - Search and interest count/write decisions are serialized per member so
+    simultaneous calls cannot overspend the daily allowance.
 - **What searches can match:** only what cards show, so a search can't reveal
   what a card hides. Her keywords count as her interests while that search is
   scored.
@@ -97,6 +107,8 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
   covers birth date or time, intent, gender, who she's seeking, marital status
   and age range. Except for the age range, it also un-confirms her card until
   she confirms it again.
+  Already sent signals and existing matches remain available after profile
+  edits; pausing removes discovery visibility and keeps existing conversations.
 
 ## Notices the service posts
 
@@ -124,3 +136,23 @@ The wording lives in `lib/service/copy.ts`.
   `Authorization: Bearer $CRON_SECRET`. Supabase pg_cron calls it every 5
   minutes through pg_net. It retries queued Discourse posts, and a post is dead
   after 10 attempts. The job is set up in W-F, once the service URL exists.
+
+## Durable delivery
+
+Interest/response, match actions, deletion notices and relay receipts commit
+together with their keyed outbound intent. Discourse calls happen after that
+transaction. Failure to store intent rolls back the action and returns 500;
+Discourse outages preserve the successful action and leave delivery queued.
+Retry leases prevent simultaneous sends for the same key and use exponential
+backoff (one minute to one hour), with a ten-attempt cap even if a worker crashes.
+
+Queued chat, reveal and match-opening messages are discarded when the match is
+closed; generic closing notices can still arrive. Deletion purges queued private
+payloads associated with the member or their matches, and successful deliveries
+clear the payload while retaining the key. Already stored Discourse posts remain,
+as disclosed by the consent text.
+
+Discourse offers no remote idempotency guarantee here. A crash after Discourse
+accepts a post but before its delivery receipt is recorded can duplicate that
+post. This remaining uncertainty must be exercised during live acceptance; the
+service does not promise exactly-once delivery across that boundary.

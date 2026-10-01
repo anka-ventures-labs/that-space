@@ -37,11 +37,17 @@ export function partyFromPool(row: PoolCandidate): Party | null {
   return toParty({ memberId: row.memberId, profile: row, card: row.card, available: true, isSample: row.isSample })
 }
 
-export function partyFromMember(member: Member, profile: StoredProfile | null, card: StoredCard | null): Party | null {
+export function partyFromMember(
+  member: Member,
+  profile: StoredProfile | null,
+  card: StoredCard | null,
+  currentConsentVersion?: string,
+): Party | null {
   if (!profile || !card) return null
   return toParty({
     memberId: member.id, profile, card: card.card, isSample: member.isSample,
-    available: card.discoverable && member.status === 'active' && member.consentVersion !== null,
+    available: card.discoverable && member.status === 'active'
+      && (currentConsentVersion === undefined || member.isSample || member.consentVersion === currentConsentVersion),
   })
 }
 

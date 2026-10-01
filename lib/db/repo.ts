@@ -21,6 +21,11 @@ async function lockPair(tx: Db, a: string, b: string): Promise<void> {
   await tx.query(`select pg_advisory_xact_lock(hashtext($1))`, [`pair:${pairKey(a, b)}`])
 }
 
+/** Serializes a member's read-count-write daily quota decisions. */
+export async function lockMemberQuota(tx: Db, memberId: string): Promise<void> {
+  await tx.query(`select pg_advisory_xact_lock(hashtext($1))`, [`quota:${memberId}`])
+}
+
 // ── Members ────────────────────────────────────────────────────────────────
 
 export type MemberStatus = 'active' | 'paused'
@@ -107,6 +112,13 @@ export async function deleteSampleMembers(db: Db): Promise<number> {
 
 /** Deletes all of the member's matchmaking data; every other table cascades. */
 export async function deleteMember(db: Db, memberId: string): Promise<void> {
+  // Outbound payloads are JSON without FKs. Purge messages to/from this member
+  // before the cascades remove the match IDs needed to find them.
+  await db.query(
+    `delete from pending_posts where payload->>'memberId' = $1::text
+       or payload->>'matchId' in (select id::text from matches where member_a = $1::uuid or member_b = $1::uuid)`,
+    [memberId],
+  )
   await db.query(`delete from members where id = $1`, [memberId])
 }
 
@@ -239,11 +251,13 @@ export interface PoolBuckets {
 }
 
 /** Counts behind the rule of 5, over the discoverable pool. */
-export async function poolBuckets(db: Db): Promise<PoolBuckets> {
+export async function poolBuckets(db: Db, currentConsentVersion?: string): Promise<PoolBuckets> {
   const rows = await db.query<{ region: string | null; displayName: string | null }>(
     `select p.region, m.display_name as "displayName"
      from pool_cards c join members m on m.id = c.member_id join member_profiles p on p.member_id = c.member_id
-     where c.discoverable and m.status = 'active'`,
+     where c.discoverable and m.status = 'active'
+       ${currentConsentVersion ? 'and (m.consent_version = $1 or m.is_sample)' : ''}`,
+    currentConsentVersion ? [currentConsentVersion] : [],
   )
   const regions = new Map<string, number>()
   const initials = new Map<string, number>()
@@ -261,16 +275,17 @@ export interface PoolCandidate extends StoredProfile {
 }
 
 /** Every discoverable, active member except the viewer. The beta pool is small enough to score in memory. */
-export async function listPool(db: Db, viewerId: string, limit = 1000): Promise<PoolCandidate[]> {
+export async function listPool(db: Db, viewerId: string, limit = 1000, currentConsentVersion?: string): Promise<PoolCandidate[]> {
   return db.query<PoolCandidate>(
     `select p.*, c.card, m.is_sample as "isSample"
      from (select ${PROFILE_COLS} from member_profiles) p
      join pool_cards c on c.member_id = p."memberId"
      join members m on m.id = p."memberId"
      where c.discoverable and m.status = 'active' and m.id <> $1
+       ${currentConsentVersion ? 'and (m.consent_version = $3 or m.is_sample)' : ''}
      order by m.created_at
      limit $2`,
-    [viewerId, limit],
+    currentConsentVersion ? [viewerId, limit, currentConsentVersion] : [viewerId, limit],
   )
 }
 
@@ -527,9 +542,9 @@ export async function respondToSignal(db: Db, input: {
   })
 }
 
-export async function getMatchForMember(db: Db, matchId: string, memberId: string): Promise<Match | null> {
+export async function getMatchForMember(db: Db, matchId: string, memberId: string, lock = false): Promise<Match | null> {
   const [row] = await db.query<Match>(
-    `select ${MATCH_COLS} from matches where id = $1 and (member_a = $2 or member_b = $2)`, [matchId, memberId])
+    `select ${MATCH_COLS} from matches where id = $1 and (member_a = $2 or member_b = $2) ${lock ? 'for update' : ''}`, [matchId, memberId])
   return row ?? null
 }
 
@@ -648,11 +663,11 @@ export interface PendingPost {
 
 export const MAX_POST_ATTEMPTS = 10
 
-export async function enqueuePost(db: Db, idempotencyKey: string, kind: string, payload: Record<string, unknown>): Promise<void> {
+export async function enqueuePost(db: Db, idempotencyKey: string, kind: string, payload: Record<string, unknown>, now = new Date()): Promise<void> {
   await db.query(
-    `insert into pending_posts (idempotency_key, kind, payload) values ($1, $2, $3::jsonb)
+    `insert into pending_posts (idempotency_key, kind, payload, next_at) values ($1, $2, $3::jsonb, $4::timestamptz)
      on conflict (idempotency_key) do nothing`,
-    [idempotencyKey, kind, payload],
+    [idempotencyKey, kind, payload, iso(now)],
   )
 }
 
@@ -661,21 +676,27 @@ export async function enqueuePost(db: Db, idempotencyKey: string, kind: string, 
  * backoff (1, 2, 4 ... minutes, capped at an hour), so a worker that dies
  * mid-send can't retry a post forever or send it twice at once.
  */
-export async function claimDuePosts(db: Db, now: Date, limit = 20): Promise<PendingPost[]> {
+export async function claimDuePosts(db: Db, now: Date, limit = 20, key?: string): Promise<PendingPost[]> {
+  await db.query(
+    `update pending_posts set status = 'dead', updated_at = now()
+     where status = 'pending' and attempts >= $2 and next_at <= $1::timestamptz`,
+    [iso(now), MAX_POST_ATTEMPTS],
+  )
   return db.query<PendingPost>(
     `update pending_posts set
        attempts = attempts + 1,
        next_at = $1::timestamptz + least(interval '1 minute' * power(2, attempts), interval '1 hour'),
        updated_at = now()
-     where id in (select id from pending_posts where status = 'pending' and next_at <= $1::timestamptz
+     where id in (select id from pending_posts where status = 'pending' and attempts < $3 and next_at <= $1::timestamptz
+                  ${key ? 'and idempotency_key = $4' : ''}
                   order by next_at limit $2 for update skip locked)
      returning id, idempotency_key as "idempotencyKey", kind, payload, attempts`,
-    [iso(now), limit],
+    key ? [iso(now), limit, MAX_POST_ATTEMPTS, key] : [iso(now), limit, MAX_POST_ATTEMPTS],
   )
 }
 
 export async function markPostSent(db: Db, id: string): Promise<void> {
-  await db.query(`update pending_posts set status = 'sent', last_error = null, updated_at = now() where id = $1`, [id])
+  await db.query(`update pending_posts set status = 'sent', payload = '{}'::jsonb, last_error = null, updated_at = now() where id = $1`, [id])
 }
 
 /** Records the failure; the post is dead once it has used MAX_POST_ATTEMPTS. */
@@ -687,5 +708,5 @@ export async function markPostFailed(db: Db, id: string, error: string): Promise
      where id = $1 returning status`,
     [id, error, MAX_POST_ATTEMPTS],
   )
-  return row.status
+  return row?.status ?? 'dead' // deletion can purge a claimed post while delivery is in flight
 }

@@ -1,9 +1,11 @@
 # Thật Space
 
 A private community for Vietnamese women: a forum, Tử Vi (Vietnamese astrology)
-readings, and spiritual matchmaking. This repository holds the **frontend demo**,
-a static Next.js site with hardcoded content. There is no backend, authentication,
-or database.
+readings, and spiritual matchmaking. This repository contains the static Next.js
+**frontend demo** and the **Bà Mối beta backend**: matching, private Postgres data,
+Discourse AI tools, and an anonymous chat relay. Discourse provides the beta's
+member interface and authentication. The backend is locally verified; the live
+Discourse integration is still pending.
 
 Live demo: https://that-space-demo.vercel.app
 
@@ -16,7 +18,9 @@ Live demo: https://that-space-demo.vercel.app
   matchmaking compatibility modal are interactive.
 - Testimonial and member names are fictional. Replace them with real, consented
   content before any public launch.
-- Next: Bà Mối, an AI matchmaker. See [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
+- Bà Mối can be verified locally without a server or cloud account. Start with
+  [local beta readiness](docs/local-beta-readiness.md); the product contract is
+  in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
 
 ## Getting started
 
@@ -30,7 +34,8 @@ npm run dev        # http://localhost:3000
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Vitest: page tests, matching core, data layer and service (272 tests) |
+| `npm test` | Vitest: pages, matching core, migrated data layer, service and local acceptance |
+| `npm run test:beta` | Two complete member journeys using disposable Postgres and fake Discourse; no external services or secrets |
 | `npm run typecheck` | Typecheck |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
 | `npm run build` | Production build (18 static pages) |
@@ -62,6 +67,7 @@ supabase/         Supabase CLI config and SQL migrations
 scripts/          One-off scripts (seed-samples.ts, run with tsx)
 __tests__/        Vitest + Testing Library page tests (jsdom)
 tests/unit/       Vitest unit tests (node); tests/unit/db runs on PGlite
+tests/integration/ Local beta acceptance journeys through the real dispatcher
 tests/helpers/    Test database: PGlite + migrations, reached through postgres.js
 public/logo.jpg   Brand logo, served at /logo.jpg
 ```

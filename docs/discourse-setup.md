@@ -1,5 +1,12 @@
 # Discourse on the ASUS: setup runbook (W-D)
 
+**2026-10-01 update:** build and local acceptance come first. This host-specific
+runbook remains unexecuted. The current ASUS still serves Atum/Taylor-related
+traffic; it is not available for reuse. AWS is an alternative for the later live
+integration stage. See [local beta readiness](local-beta-readiness.md) for the
+current boundary and remaining live checks. Do not execute these host changes as
+part of local verification.
+
 **Status: prepared on 2026-09-27, not yet run.** It waits for Minh to confirm
 that Atum has moved off the ASUS. A read-only check that day found:
 - Ubuntu, 3.2 GB of RAM (1.6 GB available) and 370 GB of free disk.

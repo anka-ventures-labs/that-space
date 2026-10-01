@@ -9,6 +9,7 @@
  * Read-only: it creates nothing. Exits 1 if any check fails.
  */
 import { z } from 'zod'
+import { jsonObject } from '@/lib/discourse/probe'
 
 const env = z.object({
   DISCOURSE_URL: z.url(),
@@ -44,8 +45,12 @@ async function main() {
 
   for (const [username, key] of [[env.BA_MOI_PERSONA_USERNAME, env.DISCOURSE_PERSONA_API_KEY], [env.BA_MOI_RELAY_USERNAME, env.DISCOURSE_RELAY_API_KEY]]) {
     const self = await get(`${forum}/session/current.json`, { 'Api-Key': key, 'Api-Username': username })
-    const actual = self.status === 200 ? (JSON.parse(self.text).current_user?.username as string | undefined) : undefined
-    report(actual === username, `${username}'s key acts as ${username}`, actual ? `as ${actual}` : `HTTP ${self.status}`)
+    const selfJson = self.status === 200 ? jsonObject(self.text) : null
+    const currentUser = selfJson?.current_user
+    const actual = currentUser && typeof currentUser === 'object' && !Array.isArray(currentUser)
+      ? (currentUser as Record<string, unknown>).username as string | undefined
+      : undefined
+    report(actual === username, `${username}'s key acts as ${username}`, actual ? `as ${actual}` : self.status === 200 ? 'invalid JSON' : `HTTP ${self.status}`)
     const other = await get(`${forum}/session/current.json`, { 'Api-Key': key, 'Api-Username': 'system' })
     report(other.status !== 200, `${username}'s key can't act as anyone else`, `as system: HTTP ${other.status}`)
   }
@@ -53,9 +58,10 @@ async function main() {
   const webhookUrl = env.BA_MOI_SERVICE_URL ? `${env.BA_MOI_SERVICE_URL.replace(/\/+$/, '')}/webhooks/discourse` : null
   if (env.DISCOURSE_ADMIN_API_KEY && webhookUrl) {
     const hooks = await get(`${forum}/admin/api/web_hooks.json`, { 'Api-Key': env.DISCOURSE_ADMIN_API_KEY, 'Api-Username': env.DISCOURSE_ADMIN_USERNAME })
-    const list = hooks.status === 200 ? (JSON.parse(hooks.text).web_hooks ?? []) as Array<{ payload_url: string; active: boolean }> : []
+    const hooksJson = hooks.status === 200 ? jsonObject(hooks.text) : null
+    const list = Array.isArray(hooksJson?.web_hooks) ? hooksJson.web_hooks as Array<{ payload_url: string; active: boolean }> : []
     const hook = list.find((h) => h.payload_url === webhookUrl)
-    report(!!hook?.active, 'relay webhook active and pointing at the service', hook ? webhookUrl : `HTTP ${hooks.status}, not found`)
+    report(!!hook?.active, 'relay webhook active and pointing at the service', hook ? webhookUrl : hooks.status === 200 && !hooksJson ? 'invalid JSON' : `HTTP ${hooks.status}, not found`)
   } else {
     console.log('- webhook check skipped (needs DISCOURSE_ADMIN_API_KEY and BA_MOI_SERVICE_URL)')
   }

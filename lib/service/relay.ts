@@ -11,7 +11,7 @@ import {
 import { PostWebhookSchema, REGULAR_POST_TYPE, verifyWebhookSignature, type PostWebhook } from '@/lib/discourse/webhook'
 import { HELD_ATTACHMENT, HELD_CONTACT, RATE_LIMITED, TOO_LONG, relayedMessage } from './copy'
 import type { ServiceDeps } from './deps'
-import { send } from './outbox'
+import { deliver, queue } from './outbox'
 import { RELAY_MAX_LENGTH, RELAY_PER_MINUTE, decideRelay } from './relay-policy'
 
 export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): Promise<string> {
@@ -49,15 +49,18 @@ export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): P
     }
   }
 
-  const messageId = await insertRelayMessage(db, { matchId: match.id, fromMember: sender.id, sourcePostId: post.id, status })
-  if (messageId === null) return 'replay'
-  if (text !== null) {
-    await send(deps, `relay:${post.id}`, {
-      kind: 'relay_post', matchId: match.id, memberId: target.memberId, raw: relayedMessage(target.aliasForOther, text), relayMessageId: messageId,
-    })
-  } else {
-    await send(deps, `relay-notice:${post.id}`, { kind: 'relay_post', matchId: match.id, memberId: sender.id, raw: notice! })
-  }
+  const key = await db.transaction(async (tx) => {
+    const current = await getMatchForMember(tx, match.id, sender.id, true)
+    if (!current || current.state === 'closed') return null
+    const messageId = await insertRelayMessage(tx, { matchId: match.id, fromMember: sender.id, sourcePostId: post.id, status })
+    if (messageId === null) return null
+    if (text !== null) return queue(tx, `relay:${post.id}`, {
+      kind: 'relay_post', matchId: match.id, memberId: target.memberId, raw: relayedMessage(target.aliasForOther, text), text, relayMessageId: messageId,
+    }, deps.now())
+    return queue(tx, `relay-notice:${post.id}`, { kind: 'relay_post', matchId: match.id, memberId: sender.id, raw: notice! }, deps.now())
+  })
+  if (!key) return 'replay'
+  await deliver(deps, key)
   return status
 }
 
@@ -83,7 +86,7 @@ export async function handleDiscourseWebhook(request: Request, deps: ServiceDeps
   try {
     return respond(200, await relayPost(deps, parsed.post))
   } catch (error) {
-    deps.log({ event: 'webhook_error', error: (error as Error).message.slice(0, 300) })
+    deps.log({ event: 'webhook_error', error: error instanceof Error ? error.name : 'Error' })
     return respond(500, 'error') // Discourse records the failed delivery; a redelivery is absorbed by source_post_id
   }
 }
