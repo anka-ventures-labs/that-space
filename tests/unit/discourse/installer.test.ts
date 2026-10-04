@@ -53,6 +53,24 @@ describe('the Discourse AI installer contract', () => {
     expect(calls.every((call) => call.method === 'GET')).toBe(true)
   })
 
+  it('accepts native parameter key order and omitted custom-tool options', async () => {
+    const { api } = installedApi({
+      mutateTool: (tool) => {
+        tool.parameters = (tool.parameters as Array<Record<string, unknown>>).map((parameter) => {
+          const { enum: values, ...rest } = parameter
+          return values === undefined ? rest : { enum: values, ...rest }
+        })
+      },
+      mutateAgent: (agent) => {
+        // `permit_tools` stores an omitted options value as false on the
+        // pinned native controller, rather than the null sent in older forms.
+        agent.tools = (agent.tools as Array<[string, unknown, boolean]>).map(([name, _options, forced]) => [name, false, forced])
+      },
+    })
+    const result = await installDiscourseAi({ ...input, api, check: true })
+    expect(result.drift).toEqual([])
+  })
+
   it('detects a broken tool binding and agent configuration that script checksums miss', async () => {
     const { api } = installedApi({
       mutateTool: (tool) => {
@@ -62,7 +80,7 @@ describe('the Discourse AI installer contract', () => {
         }
       },
       mutateAgent: (agent) => {
-        agent.tools = [['custom-999', null, false]]
+        agent.tools = [['custom-999', false, false]]
         agent.allow_chat_direct_messages = true
         agent.user_id = null
       },
@@ -74,6 +92,27 @@ describe('the Discourse AI installer contract', () => {
       'agent Bà Mối tools differs from the repo',
       'agent Bà Mối allow_chat_direct_messages differs from the repo',
       'agent Bà Mối has no bot user',
+    ]))
+  })
+
+  it('still detects changed enum values and custom-tool options', async () => {
+    const { api } = installedApi({
+      mutateTool: (tool) => {
+        if (tool.tool_name === 'ba_moi_consent') {
+          const parameters = (tool.parameters as Array<Record<string, unknown>>).map((parameter) => ({ ...parameter }))
+          parameters[0] = { ...parameters[0], enum: ['pause', 'opt_in', 'resume', 'delete'] }
+          tool.parameters = parameters
+        }
+      },
+      mutateAgent: (agent) => {
+        const tools = agent.tools as Array<[string, boolean, boolean]>
+        tools[0] = [tools[0][0], true, false]
+      },
+    })
+    const result = await installDiscourseAi({ ...input, api, check: true })
+    expect(result.drift).toEqual(expect.arrayContaining([
+      'tool ba_moi_consent parameters differs from the repo',
+      'agent Bà Mối tools differs from the repo',
     ]))
   })
 
@@ -106,7 +145,7 @@ describe('the Discourse AI installer contract', () => {
     expect(result.changes).toHaveLength(definitions.length + 3)
     const agentCall = calls.find((call) => call.path.endsWith('/ai-agents.json') && call.method === 'POST')!
     expect(agentCall.body).toMatchObject({
-      ai_agent: { name: AGENT_NAME, tools: definitions.map((_, index) => [`custom-${index + 10}`, null, false]) },
+      ai_agent: { name: AGENT_NAME, tools: definitions.map((_, index) => [`custom-${index + 10}`, false, false]) },
     })
     expect(calls.some((call) => call.path.endsWith('/create-user.json'))).toBe(true)
   })

@@ -48,8 +48,26 @@ function rows(body: Record<string, unknown>, root: string): Row[] {
   return Array.isArray(value) ? value as Row[] : []
 }
 
+/**
+ * The native serializers preserve JSON object insertion order. The admin
+ * controller permits parameter hashes as ordinary ActionController params, so
+ * an installed `{ enum, name, ... }` is semantically the same schema as the
+ * repo's `{ name, ..., enum }`. Arrays deliberately retain their order:
+ * parameter order, enum order, bindings, and custom-tool tuples remain part
+ * of the contract.
+ */
+function normalized(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(normalized)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => [key, normalized(item)]))
+  }
+  return value
+}
+
 function equal(left: unknown, right: unknown): boolean {
-  return JSON.stringify(left) === JSON.stringify(right)
+  return JSON.stringify(normalized(left)) === JSON.stringify(normalized(right))
 }
 
 function compareField(

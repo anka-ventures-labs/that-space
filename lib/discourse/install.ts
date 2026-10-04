@@ -65,8 +65,9 @@ export function agentPayload(input: { systemPrompt: string; toolIds: number[]; l
       description: 'Bà Mối, người mai mối ẩn danh của Thật Space',
       enabled: true,
       system_prompt: input.systemPrompt,
-      // Custom tools are referenced as "custom-<id>": [name, options, forced].
-      tools: input.toolIds.map((id) => [`custom-${id}`, null, false]),
+      // The native admin controller stores an omitted custom-tool options
+      // value as false: [name, options, forced]. Match its serialized form.
+      tools: input.toolIds.map((id) => [`custom-${id}`, false, false]),
       // Only in private messages: her thread with Bà Mối is private by design.
       allow_personal_messages: true,
       allow_topic_mentions: false,

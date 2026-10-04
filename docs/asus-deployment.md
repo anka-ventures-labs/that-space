@@ -23,7 +23,8 @@ are the launch procedure for this deployment.
 
 ## Before the first build
 
-Perform these checks on the ASUS after the wipe completes. They are read-only
+The ASUS is available after Atum Matrix removal; no OS wipe or reboot is a
+prerequisite. Perform these checks before a first build. They are read-only
 except where explicitly marked as setup:
 
 ```bash
@@ -165,6 +166,25 @@ sets the no-email beta mode (`disable_emails: non-staff`) and Vietnamese locale.
 Therefore a guest cannot see the community during first startup, before these
 reconcilers run.
 
+Enable `discourse_ai_enabled` before running the repository AI installer. The
+pinned plugin hides its admin API routes while this setting is false, producing
+404 responses even though the bundled plugin is installed. When using the native
+site-setting API, PUT `/admin/site_settings/discourse_ai_enabled.json` with
+`{"discourse_ai_enabled":true}` and read the setting back; a body containing
+only `value` does not change it. Keep `ai_bot_enabled` false until an actual
+provider credential and model are configured and tested.
+
+Run `npm run discourse:install`, then `npm run discourse:install -- --check`
+from the trusted operator checkout. The native agent's generated username and
+negative user ID must be read back rather than guessed. Its serialized custom
+tool tuples use `["custom-N",false,false]`; object key order in parameter schemas
+is insignificant, while array order and values remain part of the drift check.
+Issue separate single-user native API keys for that exact persona and the normal
+relay user. Capture plaintext keys once to ignored, mode-600 secret storage and
+configure only these scoped keys in the service. The all-users installation key
+and administrator password do not belong in Vercel. Prove that each runtime key
+can act as its own user and receives 403 when trying to act as `system`.
+
 After an actual Discourse AI LLM is configured with its credentials outside the
 repository, apply the review-only moderation configuration using that existing
 model's numeric ID:
@@ -197,6 +217,34 @@ recovery, upload access through the Funnel, restart recovery, backup/restore,
 phone layout, Vietnamese moderation behavior, and the real Bà Mối relay. The
 repository's GitHub acceptance checks validate the pinned build; they do not
 replace these live checks.
+
+### Observed Oct4 live checkpoint
+
+The durable `that-space-bootstrap-20261004` unit completed successfully. Its
+image is `local_discourse/that-space` with ID
+`sha256:e0e89b087eec0bb5847deba8a0d9ae28a549132071328b538afb9ba23ad14e97`.
+The container has been started; do not start another bootstrap or recreate
+operator keys when resuming this checkpoint. Community and presentation apply
+and check both report zero drift: 13 owned categories, 15 user fields and five
+owned groups. The canonical base URL and all three private access flags were
+verified from Rails before enabling Funnel 8443. External health returns 200;
+guest `/latest.json` returns 403. Funnel 443 remains on Taylor's 8787, and MinIO
+remains active. Daily backups include uploads, retain seven archives and run at
+20:30 UTC.
+
+Administrator `minh` (ID 1), relay `thu_duyen` (ID 2) and native persona
+`Ba_Moi_bot` (ID -1201, agent ID 1) exist. The 12 Bà Mối tools and their native
+encrypted secret binding are installed; installer check reports no drift.
+Persona and relay keys pass own-user access and reject impersonation. All ten
+service runtime variable names are present in this project's Vercel preview and
+production environments. No provider key or default LLM is configured yet, and
+member AI conversations remain disabled.
+
+An initial pre-community backup was copied off-host to ignored
+`.backups/discourse/pre-community-20261004-v20261001073226.tar.gz` (2,887,594
+bytes, mode 600). This archive predates the community and bot setup; a final
+backup and isolated full restore remain required. The current checkpoint does
+not claim live model, relay, upload, recovery, restart or phone acceptance.
 
 To roll back only this release, first preserve an off-host backup and the
 current source commit. Restore the previously recorded
