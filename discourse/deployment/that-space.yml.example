@@ -1,0 +1,88 @@
+## Dedicated launcher configuration for the private Thật Space beta.
+##
+## Install as /var/discourse/containers/that-space.yml after replacing the
+## administrator email. It intentionally shares no container, volume, or public
+## port with the existing Taylor services.
+##
+## Public origin: https://ubuntu-asus.tail349cbf.ts.net:8443
+## Funnel 8443 terminates TLS and forwards only to 127.0.0.1:8080.
+
+templates:
+  - "templates/postgres.template.yml"
+  - "templates/redis.template.yml"
+  - "templates/web.template.yml"
+  - "templates/web.ratelimited.template.yml"
+
+base_image: "discourse/base@sha256:5028d077b061225507e7093fda1ff5bdc64d483b5c0397776f9a52c50008cd9b"
+
+expose:
+  - "127.0.0.1:8080:80"
+
+# Leave CPU and memory for Taylor on the shared host. The limits also apply
+# during bootstrap; swap absorbs build peaks without consuming all host RAM.
+docker_args: "--memory=2g --memory-swap=4g --cpus=2"
+
+params:
+  # A full commit SHA makes the application source deterministic. The launcher
+  # revision and base image digest are recorded by the operator before build.
+  version: c237680d280a34b1025f79bf37b865c5349313a3
+  db_default_text_search_config: "pg_catalog.simple"
+  db_shared_buffers: "256MB"
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+
+  # Sized for the ASUS's 3.2 GiB RAM plus swap. Keep one supervised Sidekiq
+  # process for regular jobs; do not add speculative plugin workers.
+  UNICORN_WORKERS: 2
+  UNICORN_SIDEKIQS: 1
+
+  # Replace before the first build. This is an admin address, never an API key.
+  DISCOURSE_DEVELOPER_EMAILS: "REPLACE_WITH_ADMIN_EMAIL"
+  DISCOURSE_SKIP_EMAIL_SETUP: "1"
+
+  # The hostname deliberately excludes the externally visible port. Discourse
+  # maps these normal DISCOURSE_* production values to its configuration, so
+  # its canonical URL is https://ubuntu-asus.tail349cbf.ts.net:8443.
+  DISCOURSE_HOSTNAME: "ubuntu-asus.tail349cbf.ts.net"
+  DISCOURSE_PORT: "8443"
+  DISCOURSE_FORCE_HTTPS: "true"
+
+  # Apply the private beta boundary before the first request. The owned
+  # community manifest reconciles these same values after startup.
+  DISCOURSE_LOGIN_REQUIRED: "true"
+  DISCOURSE_INVITE_ONLY: "true"
+  DISCOURSE_MUST_APPROVE_USERS: "true"
+  DISCOURSE_DISABLE_EMAILS: "non-staff"
+  DISCOURSE_DEFAULT_LOCALE: "vi"
+
+volumes:
+  - volume:
+      host: /var/discourse/shared/that-space
+      guest: /shared
+  - volume:
+      host: /var/discourse/shared/that-space/log/var-log
+      guest: /var/log
+
+hooks:
+  # The current upstream base image does not promise Python. The pinned runtime
+  # preparer is Python, so add only that small build dependency when needed.
+  before_code:
+    - exec:
+        cmd:
+          - |-
+            if ! command -v python3 >/dev/null 2>&1; then
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3
+              rm -rf /var/lib/apt/lists/*
+            fi
+  # The web template's `code` hook runs immediately after its pinned Discourse
+  # checkout. This hook therefore pins Follow and stages the two local theme
+  # components before dependency installation and asset compilation.
+  after_code:
+    - exec:
+        cd: $home
+        cmd:
+          - sudo -H -E -u discourse python3 /shared/source/scripts/discourse/prepare-runtime.py --discourse-path /var/www/discourse

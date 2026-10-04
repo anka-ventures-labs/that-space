@@ -8,7 +8,7 @@ import { createDb, type Db } from '@/lib/db/db'
 const MIGRATIONS_DIR = path.resolve(__dirname, '../../supabase/migrations')
 
 /**
- * A fresh in-memory Postgres (PGlite) with every migration applied, reached
+ * A fresh in-memory Postgres (PGlite) with every application migration applied, reached
  * through postgres.js over a local socket with the production client options,
  * so tests exercise the same driver, encoding and parsing as production.
  */
@@ -21,6 +21,10 @@ export async function createTestDb(): Promise<{ db: Db; close: () => Promise<voi
     alter default privileges in schema public grant all on sequences to anon, authenticated;
   `)
   for (const file of readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql')).sort()) {
+    // PGlite has no background workers or outbound HTTP. Supabase's retry
+    // extensions are operator infrastructure, verified by the live installer.
+    // Core tables and their privilege migrations still run without alteration.
+    if (file.endsWith('_ba_moi_retry_extensions.sql')) continue
     await pg.exec(readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8'))
   }
   const server = new PGLiteSocketServer({ db: pg, port: 0, host: '127.0.0.1' })
