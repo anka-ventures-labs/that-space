@@ -5,9 +5,12 @@ readings, and spiritual matchmaking. This repository contains the static Next.js
 **frontend demo**, **Discourse community build**, and **Bà Mối beta backend**:
 onboarding, member presentation, matching, private Postgres data, Discourse AI
 tools, and an anonymous chat relay. Discourse provides the member interface and
-authentication. Live installation and model/relay acceptance remain pending.
+authentication. The private community and service are installed; actual AI
+conversation, review-only AI moderation and phone acceptance remain pending.
 
 Live demo: https://that-space-demo.vercel.app
+
+Private community: https://ubuntu-asus.tail349cbf.ts.net:8443
 
 ## Status
 
@@ -28,6 +31,10 @@ Live demo: https://that-space-demo.vercel.app
   onboarding, profiles, artwork, events, Bà Mối integration and the
   local-development-to-production sequence. Full Tử Vi charts/readings/PDFs
   remain out of scope for this phase; future astrology work should reuse Moon.
+- The current [ASUS deployment checkpoint](docs/asus-deployment.md#observed-oct5-live-checkpoint)
+  records synthetic member acceptance, private-upload checks, scheduled retry
+  recovery and the isolated native restore. No real members have been invited;
+  the native AI bot stays disabled until its dedicated model works.
 
 ## Getting started
 
@@ -131,6 +138,15 @@ Deploy according to the studio's Vercel policy in
 `anka-ventures-labs/anka-dev-infra` (`docs/vercel-build-cost-control.md`). Build a
 preview first, smoke-test its URL, and promote to production only after a human
 approves. Do not connect Git auto-deploy.
+
+On 2026-10-05 the user approved staging a production-target local prebuilt with
+`--skip-domain`, testing it, then manually promoting it because the current CLI
+would rebuild a promoted preview remotely. Deployment
+`dpl_ENbPZPxbsomoaYwAq9jYvWpvAPPr`, built from `1787b83`, now serves the canonical
+alias in `sin1`. The clean archive's mapped-file audit found no native binaries
+or operator environment references. See [the session log](docs/SESSION_LOG.md)
+for that authorization and evidence; never upload this operator checkout's
+`.vercel/output`.
 
 To link a checkout to the existing project without creating a new one:
 

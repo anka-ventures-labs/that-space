@@ -82,3 +82,15 @@ Do not disable or remove unrelated scheduled work.
 
 This does not change the generated negative Discourse AI bot ID or either bot
 username. Those remain a separate installation acceptance step.
+
+### Observed Oct5 acceptance
+
+The dedicated project passed apply/check/reapply with one owned five-minute
+job and one named Vault secret. Actual pg_cron runs produced pg_net HTTP 200
+receipts without timeouts. During the serialized native restore drill, the
+live forum was intentionally stopped and a synthetic first-reveal notification
+remained pending with `DiscourseError`. After restart the scheduled retry sent
+it on attempt five; its recipient read the notice in the private native thread.
+The HTTP receipt reported one claimed, one sent, zero retrying and zero dead.
+No queue timestamps, payloads or delivery statuses were manually altered to
+produce this result. Full recovery evidence is in [SESSION_LOG.md](SESSION_LOG.md).

@@ -248,7 +248,7 @@ phone layout, Vietnamese moderation behavior, and the real Bà Mối relay. The
 repository's GitHub acceptance checks validate the pinned build; they do not
 replace these live checks.
 
-### Observed Oct4 live checkpoint
+### Observed Oct5 live checkpoint
 
 The durable `that-space-bootstrap-20261004` unit completed successfully. Its
 image is `local_discourse/that-space` with ID
@@ -272,15 +272,68 @@ member AI conversations remain disabled.
 
 An initial pre-community backup was copied off-host to ignored
 `.backups/discourse/pre-community-20261004-v20261001073226.tar.gz` (2,887,594
-bytes, mode 600). This archive predates the community and bot setup; a final
-backup and isolated full restore remain required. The current checkpoint does
-not claim live model, relay, upload, recovery, restart or phone acceptance.
+bytes, mode 600). Keep it unchanged. The later
+`community-checkpoint-20261005-v20261001073226.tar.gz` includes uploads and was
+copied off-host with matching SHA-256
+`c8256a7280633cc9badaddeb4176d2f8b4f63340268cf12c11b36d00d60d2c14`
+(4,769,089 bytes). The isolated native restore passed: all twelve recorded
+table counts match, no original upload is missing, `rake uploads:missing_files`
+exits zero without output, and a restored image returns HTTP 200. The disposable
+container was removed; the live container restarted with its ID preserved.
+Health, private access flags, community/presentation drift, both bot key scopes
+and optimized-upload member/guest/forged-cookie access passed after restart.
+Retained nonsecret evidence is in
+[`verification/discourse-restore-20261005.json`](verification/discourse-restore-20261005.json).
+
+The native archive does not include the launcher or shared Nginx operations
+files. Their separate private off-host bundle is
+`.backups/discourse/operations-1787b83-20261005.tar.gz`; Git retains source and
+private operator storage retains credentials. ASUS source `ae50556` is retained
+as `source-ae50556`; the current source was extracted into an empty tree from
+`1787b83`, without rebuilding the image or recreating keys.
+
+The canonical Vercel service now runs exact source `1787b83` in `sin1`, with a
+60-second tool function. The user approved staging the locally audited
+production artifact with `--prebuilt --prod --skip-domain`, testing it, then
+manually promoting it. No remote compilation ran. Native signed event201
+webhooks deliver member text and ignore bot events. The owned five-minute
+retry job passed apply/check/reapply and actual scheduled HTTP receipts. A
+reveal notification queued during the intentional forum outage was delivered
+automatically after restart and read by its recipient.
+
+The controlled production service journey also passed mutual reveal, native
+contact delivery after reveal, bot-loop refusal, blocking and refusal to relay
+a later post. Both closure notices arrived. Explicit service deletion removed
+the tested member's rows and matching outbound payloads from all eleven tables,
+while disclosed native message history remained. The remaining synthetic
+profile is paused; 30 labelled sample cards remain and no synthetic profile is
+discoverable. See
+[`verification/live-service-20261005.json`](verification/live-service-20261005.json).
+These controlled calls verify the service and native transport, not actual
+LLM conversation or phone rendering.
+
+Two synthetic normal members have verified activation/approval, password and
+session recovery, private onboarding fields, artwork/portfolio, following,
+Host event/RSVP, human review and private relay isolation. Original, short and
+actual optimized member uploads deny guests and forged cookies. Actual model
+conversation, review-only AI moderation and rendered phone acceptance remain
+required before invitations; no provider credential is configured and browser
+tab binding is timing out.
 
 ### Isolated native restore initialization
 
-The current image's run scripts initialize PostgreSQL 18 from an empty dedicated
-shared root. `CREATE_DB_ON_BOOT=1` creates its database/role/extensions, and
+The assembled image has already consumed and removed `/root/install_postgres`
+during its first build. Its PostgreSQL run script cannot initialize an empty
+shared root until that initializer is restored. Extract the exact
+`/root/install_postgres` file contents from the recorded launcher's
+`templates/postgres.template.yml` and install it only in the disposable target
+before starting its PostgreSQL service. Do not copy live PostgreSQL data or
+initialize the live volume. The initializer creates PostgreSQL 18 data and its
+shared socket directory; the run script removes the installer after success.
+`CREATE_DB_ON_BOOT=1` then creates the database/role/extensions, and
 `MIGRATE_ON_BOOT=1` migrates and seeds the system user needed by the Restorer.
+The Oct5 drill found and corrected this consumed-installer behavior; merely
+setting the two boot flags produced a missing-socket failure.
 No second bootstrap, image build or separate `db:create` is needed. On this
 small host, stop only the live `that-space` container before starting the
 disposable target so Taylor retains capacity. Use a different container name
@@ -292,6 +345,9 @@ Prove that the target's system user exists and its PostgreSQL/Redis services are
 ready. Execute Rails as OS user `discourse`, set `allow_restore` only in the
 target, then use `BackupRestore::Restorer` with the archive basename,
 `Discourse.system_user.id`, `BackupRestore::Factory` and `disable_emails:true`.
+The Oct5 readback reported `disable_emails=non-staff` because the image's
+environment overrides the setting; network-none, rather than that argument,
+was the proven outbound/email boundary.
 Retain success evidence, compare native table counts and run
 `rake uploads:missing_files`. Test target loopback health from inside its
 network namespace. Keep network isolation throughout so restored hooks and

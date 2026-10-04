@@ -1,0 +1,32 @@
+{
+  "source": "1787b835ca130d5e79d04fe64f4fe0f325f0390f",
+  "target": "production",
+  "auditedFiles": 760,
+  "mappedFiles": 628,
+  "nativeFiles": 0,
+  "environmentReferences": 0,
+  "toolMaxDuration": 60,
+  "regions": [
+    "sin1"
+  ],
+  "functions": [
+    {
+      "path": "functions/api/ba-moi/v1/cron/retry-posts.func",
+      "runtime": "nodejs24.x",
+      "architecture": "arm64",
+      "maxDuration": 60
+    },
+    {
+      "path": "functions/api/ba-moi/v1/webhooks/discourse.func",
+      "runtime": "nodejs24.x",
+      "architecture": "arm64",
+      "maxDuration": 15
+    },
+    {
+      "path": "functions/forum/[slug].func",
+      "runtime": "nodejs24.x",
+      "architecture": "arm64",
+      "maxDuration": null
+    }
+  ]
+}

@@ -1,25 +1,23 @@
-# Discourse on the ASUS: setup runbook (W-D)
+# Discourse on the ASUS: historical setup notes (W-D)
 
-**2026-10-01 update:** build and local acceptance come first. This host-specific
-runbook remains unexecuted. The current ASUS still serves Atum/Taylor-related
-traffic; it is not available for reuse. AWS is an alternative for the later live
-integration stage. See [local beta readiness](local-beta-readiness.md) for the
-current boundary and remaining live checks. Do not execute these host changes as
-part of local verification.
+**Superseded on 2026-10-05:** use the current
+[ASUS deployment runbook](asus-deployment.md) and pinned
+[`that-space.yml.example`](../discourse/deployment/that-space.yml.example).
+The private forum is installed on loopback 8080 and separate Funnel 8443 after
+Atum Matrix removal. Preserve Taylor MinIO and Funnel 443 to 8787. Do not execute
+the historical unpinned build, generic `app` launcher, swap or default Funnel
+commands below against the running host. AWS remains excluded.
 
-**Status: prepared on 2026-09-27, not yet run.** It waits for Minh to confirm
-that Atum has moved off the ASUS. A read-only check that day found:
+These notes were prepared on 2026-09-27 and were not used for the current
+installation. A read-only check that day found:
 - Ubuntu, 3.2 GB of RAM (1.6 GB available) and 370 GB of free disk.
 - Docker not installed.
 - `minhnkn` has sudo.
 - Atum's services (`atum-chat-backup-sshd`, `atum-chat-tunnel`) still running.
 
-Installing Docker changes the host's networking, so nothing here runs while
-Atum is on the box.
-
 Facts checked against Discourse's source (`discourse/discourse`, main on
-2026-09-25) are marked *(source)*. Everything else is verified on the box as it
-runs, and this file gets corrected where reality differs.
+2026-09-25) are marked *(source)*. Current pins, host facts and recovery evidence
+are recorded in the deployment runbook and session log.
 
 ## 1. Host
 

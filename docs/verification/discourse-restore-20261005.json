@@ -1,0 +1,50 @@
+{
+  "restored": true,
+  "counts_equal": true,
+  "counts": {
+    "users": 7,
+    "categories": 17,
+    "groups": 17,
+    "user_fields": 15,
+    "topics": 28,
+    "posts": 41,
+    "uploads": 21,
+    "themes": 5,
+    "theme_fields": 297,
+    "web_hooks": 1,
+    "ai_agents": 44,
+    "ai_tools": 12
+  },
+  "original_uploads_missing": 0,
+  "base_url": "https://ubuntu-asus.tail349cbf.ts.net:8443",
+  "login_required": true,
+  "invite_only": true,
+  "must_approve_users": true,
+  "emails_disabled": "non-staff",
+  "network": "none",
+  "publishedPorts": 0,
+  "nativeRestoreExit": 0,
+  "missingFilesTaskExit": 0,
+  "missingFilesOutputLines": 0,
+  "restoredImageHttpStatus": 200,
+  "restoredImageBytes": 67,
+  "targetHealthHttpStatus": 200,
+  "disposableContainerRemoved": true,
+  "liveContainerIdPreserved": "e7181459a2a65e0911eea71bb3b08eb6e37edb09d9f16ba97e7e1523708fd37d",
+  "postRestartBotScopesVerified": true,
+  "postRestartOptimizedAccess": {
+    "member": 200,
+    "guest": 403,
+    "forgedCookie": 403
+  },
+  "postRestartExternalHealth": 200,
+  "postRestartCommunityDrift": [],
+  "postRestartPresentationDrift": [],
+  "postRestartPrivateFlagsVerified": true,
+  "postRestartAiBotEnabled": false,
+  "taylorMinioActive": true,
+  "funnelMappings": {
+    "443": "127.0.0.1:8787",
+    "8443": "127.0.0.1:8080"
+  }
+}
