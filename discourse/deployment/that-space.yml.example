@@ -86,3 +86,14 @@ hooks:
         cd: $home
         cmd:
           - sudo -H -E -u discourse python3 /shared/source/scripts/discourse/prepare-runtime.py --discourse-path /var/www/discourse
+    # Nginx's server outlet is regenerated from the container image on rebuild.
+    # Keep the owned source on the shared volume and install it after checkout;
+    # public-assets is intentionally a separate persistent directory populated
+    # only by exact owned-theme routes.
+    - exec:
+        cmd:
+          - |-
+            mkdir -p /etc/nginx/conf.d/outlets/server
+            mkdir -p /shared/operations/nginx/public-assets
+            install -m 0644 /shared/source/discourse/deployment/private-uploads.conf \
+              /etc/nginx/conf.d/outlets/server/that-space-private-uploads.conf

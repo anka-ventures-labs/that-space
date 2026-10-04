@@ -203,6 +203,36 @@ journey. It remains gated on a deployed service URL and real credentials.
 
 ## Durability, checks, and constrained rollback
 
+### Local upload authorization
+
+The stock Nginx configuration serves original and optimized images directly.
+`prevent_anons_from_downloading_files` alone protects Rails short URLs but does
+not protect those static URLs. The launcher installs the owned
+[`private-uploads.conf`](../discourse/deployment/private-uploads.conf) server
+outlet to require a native authenticated session before serving `/uploads/`.
+Its internal subrequest uses `/session/current.json`; the pinned guest 404 is
+translated to 403 for Nginx `auth_request`. It checks the session rather than
+accepting the mere presence of a cookie. Upload responses use private/no-store
+cache headers, and SVG downloads retain attachment disposition. Short URLs keep
+the native Rails response path with sendfile acceleration disabled.
+
+The only public exceptions are exact URLs for the owned theme's logo and six
+fonts. Read the seven asset fields' `url` values from the owned theme's native
+admin API after import, validate that each is an original upload on this origin,
+and write exact `location = /uploads/...` blocks to
+`/shared/operations/nginx/public-assets/owned-theme.conf`. Each block uses
+`root $public`, `auth_request off`, and `try_files $uri =404`; do not allow whole
+directories or extensions. This separate shared file survives rebuilds. A
+member upload with the same bytes as the public logo is that public asset after
+Discourse deduplication; use a distinct image for privacy acceptance.
+
+For an existing running container, install the repository outlet into
+`/etc/nginx/conf.d/outlets/server/that-space-private-uploads.conf`, then run
+`nginx -t` before `nginx -s reload`. Test original, short and optimized upload
+URLs as a signed-in member, a guest and a forged-cookie guest; verify exact
+branding URLs still work on the login page. This is scoped to Thật Space's
+container and does not modify the host proxy or Taylor's listener.
+
 The only application data path is `/var/discourse/shared/that-space`: it holds
 PostgreSQL data, Redis persistence, uploads, logs, backups and the archived
 source. Discourse backups are under
@@ -245,6 +275,30 @@ An initial pre-community backup was copied off-host to ignored
 bytes, mode 600). This archive predates the community and bot setup; a final
 backup and isolated full restore remain required. The current checkpoint does
 not claim live model, relay, upload, recovery, restart or phone acceptance.
+
+### Isolated native restore initialization
+
+The current image's run scripts initialize PostgreSQL 18 from an empty dedicated
+shared root. `CREATE_DB_ON_BOOT=1` creates its database/role/extensions, and
+`MIGRATE_ON_BOOT=1` migrates and seeds the system user needed by the Restorer.
+No second bootstrap, image build or separate `db:create` is needed. On this
+small host, stop only the live `that-space` container before starting the
+disposable target so Taylor retains capacity. Use a different container name
+and empty shared root, `--network none`, no published ports, restart disabled
+and the same memory/CPU limits. Stage the selected native archive under the
+target's own `/shared/backups/default/` before restore.
+
+Prove that the target's system user exists and its PostgreSQL/Redis services are
+ready. Execute Rails as OS user `discourse`, set `allow_restore` only in the
+target, then use `BackupRestore::Restorer` with the archive basename,
+`Discourse.system_user.id`, `BackupRestore::Factory` and `disable_emails:true`.
+Retain success evidence, compare native table counts and run
+`rake uploads:missing_files`. Test target loopback health from inside its
+network namespace. Keep network isolation throughout so restored hooks and
+provider credentials cannot call out. Remove only the disposable target after
+the drill; restart only the live forum and verify health, canonical URL,
+private flags and upload authorization again. Do not restore into the live
+shared root or delete it.
 
 To roll back only this release, first preserve an off-host backup and the
 current source commit. Restore the previously recorded
