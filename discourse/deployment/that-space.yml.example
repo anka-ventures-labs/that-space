@@ -83,7 +83,9 @@ env:
   DISCOURSE_ENABLE_LOCAL_LOGINS: "false"
   DISCOURSE_AUTH_SKIP_CREATE_CONFIRM: "false"
   DISCOURSE_ENABLE_SMTP: "false"
-  DISCOURSE_DISABLE_EMAILS: "all"
+  # Valid enum choices are "no", "yes" and "non-staff". "yes" disables outgoing
+  # mail entirely, which is what a Google-only deployment with no mailer needs.
+  DISCOURSE_DISABLE_EMAILS: "yes"
   DISCOURSE_DEFAULT_LOCALE: "vi"
 
 volumes:

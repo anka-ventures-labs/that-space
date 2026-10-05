@@ -135,7 +135,9 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
   - `default_locale` is `vi`
   - `allow_user_locale` is on
 - **Email:** no mailer is configured, so `enable_smtp` is off and
-  `disable_emails` is `all`. Members are notified in-app instead. Do not add an
+  `disable_emails` is `yes`. Its only valid choices are `no`, `yes` and
+  `non-staff`; `all` is rejected at boot with `Discourse::InvalidParameters`.
+  Members are notified in-app instead. Do not add an
   SMTP host without also sending a real test email; a half-configured mailer
   looks healthy and silently drops every message.
 - **Access recovery:** with no password path, a member who loses their Google

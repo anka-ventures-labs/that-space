@@ -67,7 +67,8 @@ site, superseding the email-activation and custom-domain assumptions below.
   `atumplatform.com`; that account's key is not available to this repository.
   No launch-critical credential exists in Infisical for it.
 - **Consequence:** with no mailer, `enable_smtp=false` and
-  `disable_emails=all`. Members are notified in-app. Bà Mối relay notices,
+  `disable_emails=yes`. Its valid choices are `no`, `yes` and `non-staff`; `all`
+  fails validation at boot. Members are notified in-app. Bà Mối relay notices,
   match reveals and closure messages ride on personal messages, so members who
   never open the bell may miss them; adding transactional email is the highest
   value follow-up.

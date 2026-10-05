@@ -102,7 +102,7 @@ module ThatSpace
         "enable_local_logins" => false,
         "auth_skip_create_confirm" => false,
         "enable_smtp" => false,
-        "disable_emails" => "all"
+        "disable_emails" => "yes"
       }
       unless admission_contract.all? { |setting, expected| @manifest.fetch("site_settings").fetch(setting) == expected }
         raise Error, "The community requires Google-only self-service signup with login-gated member content"

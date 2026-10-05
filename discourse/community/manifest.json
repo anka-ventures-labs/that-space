@@ -24,7 +24,7 @@
     "auth_skip_create_confirm": false,
     "discourse_automation_enabled": true,
     "enable_smtp": false,
-    "disable_emails": "all",
+    "disable_emails": "yes",
     "personal_message_enabled_groups": ["admins", "moderators", "trust_level_0"]
   },
   "categories": [

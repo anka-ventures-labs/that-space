@@ -162,7 +162,7 @@ THAT_SPACE_PRESENTATION_BOOTSTRAP=1 bundle exec rails runner /shared/source/disc
 ```
 
 The manifest keeps `login_required` on and sets the no-email mode
-(`enable_smtp: false`, `disable_emails: all`) with the Vietnamese locale.
+(`enable_smtp: false`, `disable_emails: yes`) with the Vietnamese locale.
 Therefore a guest cannot see the community during first startup, before these
 reconcilers run.
 
