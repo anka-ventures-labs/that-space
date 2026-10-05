@@ -27,11 +27,6 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     SiteSetting.google_oauth2_client_secret = "acceptance-secret"
     SiteSetting.enable_google_oauth2_logins = true
 
-    # `session` resolves through the current request, which does not exist until
-    # a call has been made. Prime it the same way Discourse's own server_session
-    # helper does before touching `session`.
-    get "/session/hp.json"
-
     authentication = Auth::Result.new
     authentication.email = "google-member@example.com"
     authentication.username = "google_member"
@@ -39,7 +34,13 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     authentication.email_valid = true
     authentication.authenticator_name = "google_oauth2"
     authentication.extra_data = { provider: "google_oauth2", uid: "acceptance-google-uid" }.with_indifferent_access
-    session[:authentication] = authentication.session_data
+
+    # UsersController#create hands `server_session` to UserAuthenticator, and
+    # that reads :authentication from the Redis-backed ServerSession rather than
+    # the Rack session. Prime the server session with a call, then seed the
+    # handoff there. Seeding `session[...]` instead leaves has_authenticator?
+    # false, and with local logins disabled that is a 403 at account creation.
+    server_session[:authentication] = authentication.session_data
   end
 
   # Google is the only admission path, so a completed OAuth handoff is what
@@ -54,10 +55,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
            user_fields: that_space_signup_fields,
          }
 
-    expect(response.status).to eq(200)
+    expect(response.status).to eq(200), response.body
     expect(response.parsed_body).to include("success" => true, "active" => true)
 
-    member = User.find_by_email!("google-member@example.com")
+    member = User.find_by_email("google-member@example.com")
+    expect(member).not_to be_nil
     expect(member).to be_active
     expect(member).to be_email_confirmed
     expect(session[:current_user_id]).to eq(member.id)
@@ -103,7 +105,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
            user_fields: that_space_signup_fields.except(that_space_signup_fields.keys.first),
          }
 
-    expect(response.status).to eq(200)
+    expect(response.status).to eq(200), response.body
     expect(response.parsed_body).to include("success" => false)
     expect(User.find_by_email("google-member@example.com")).to be_nil
 
@@ -115,9 +117,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
            user_fields: that_space_signup_fields,
          }
 
-    member = User.find_by_email!("google-member@example.com")
-    expect(response.status).to eq(200)
+    expect(response.status).to eq(200), response.body
     expect(response.parsed_body).to include("success" => true, "active" => true)
+
+    member = User.find_by_email("google-member@example.com")
+    expect(member).not_to be_nil
     expect(member).to be_active
     expect(member).to be_email_confirmed
     expect(session[:current_user_id]).to eq(member.id)

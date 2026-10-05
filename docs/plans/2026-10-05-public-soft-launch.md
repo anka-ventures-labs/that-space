@@ -96,13 +96,22 @@ the argument for keeping it a required check.
    reconciliation, aborting the boot and failing all 19 member/community
    examples before any member flow ran. The correct value for a deployment with
    no mailer is `yes`.
-2. **`session` is unavailable before the first request.** In a Rails request spec
-   `session` resolves through the current request, so seeding
-   `session[:authentication]` for a Google handoff raised
-   `NoMethodError: undefined method 'session' for nil`. Fixed by priming with
-   the same `get "/session/hp.json"` Discourse's own `server_session` helper
-   uses. The password-signup 403 example needed no priming and passed, which
-   isolated the fault to the OAuth helper rather than the admission contract.
+2. **The OAuth handoff must be seeded in the server session, not the Rack
+   session.** `UsersController#create` passes `server_session` to
+   `UserAuthenticator`, which reads `:authentication` from the Redis-backed
+   `ServerSession`. Seeding the Rack `session` leaves `has_authenticator?` false,
+   and with local logins disabled that is a **403 at account creation** — the
+   account is never made, so there is nothing to log in as. Fixed by seeding via
+   Discourse's own `server_session` helper.
+
+   This took two CI rounds to find, and the first attempt was wrong in an
+   instructive way: priming `get "/session/hp.json"` fixed the nil `session`
+   error but left the 403, because it created the server session while seeding
+   the wrong store. Reading the call chain to the end was what settled it.
+
+3. **`User.find_by_email!` does not exist.** Only `find_by_email(email,
+   primary: false)` is defined, and it returns nil rather than raising. The
+   specs now assert the result explicitly.
 - **The redirect URI must include the port**, with no trailing slash:
 
   ```text
