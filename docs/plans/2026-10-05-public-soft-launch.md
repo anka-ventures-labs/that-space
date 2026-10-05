@@ -4,8 +4,8 @@ The user explicitly requested self-service public admission and branded OAuth
 on Oct5, superseding the invitation/staff-activation admission model. Keep
 existing forum posts, uploads, signup answers and Bà Mối private behind login.
 Open registration without requiring an invitation or staff approval; require
-verified identity/email and all 15 onboarding answers. Local email/password
-remains available alongside Google sign-in.
+verified identity/email and all 15 onboarding answers. Google is the only
+admission path; see the superseded decisions below.
 
 ## Parallel MECE workstreams
 
@@ -83,6 +83,26 @@ site, superseding the email-activation and custom-domain assumptions below.
   avoid the unverified-app warning that a `vercel.app` host would otherwise show.
 - **Access recovery is a known gap:** a member who loses their Google account has
   no self-service recovery and needs staff help.
+
+## Two failures the real Discourse suite caught
+
+Both were invisible to typecheck, lint, the 289 local Vitest tests and the
+production build. Only the real Discourse suite exercises these values, which is
+the argument for keeping it a required check.
+
+1. **`disable_emails: "all"` does not exist.** The setting is an enum whose only
+   choices are `no`, `yes` and `non-staff` in the pinned SHA `c237680`. The bad
+   value raised `Discourse::InvalidParameters` from `SiteSetting#set` during
+   reconciliation, aborting the boot and failing all 19 member/community
+   examples before any member flow ran. The correct value for a deployment with
+   no mailer is `yes`.
+2. **`session` is unavailable before the first request.** In a Rails request spec
+   `session` resolves through the current request, so seeding
+   `session[:authentication]` for a Google handoff raised
+   `NoMethodError: undefined method 'session' for nil`. Fixed by priming with
+   the same `get "/session/hp.json"` Discourse's own `server_session` helper
+   uses. The password-signup 403 example needed no priming and passed, which
+   isolated the fault to the OAuth helper rather than the admission contract.
 - **The redirect URI must include the port**, with no trailing slash:
 
   ```text

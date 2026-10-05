@@ -27,6 +27,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     SiteSetting.google_oauth2_client_secret = "acceptance-secret"
     SiteSetting.enable_google_oauth2_logins = true
 
+    # `session` resolves through the current request, which does not exist until
+    # a call has been made. Prime it the same way Discourse's own server_session
+    # helper does before touching `session`.
+    get "/session/hp.json"
+
     authentication = Auth::Result.new
     authentication.email = "google-member@example.com"
     authentication.username = "google_member"
