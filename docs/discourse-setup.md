@@ -143,6 +143,11 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
    discourse:install`. That creates the AI secret `ba_moi_tool_secret`, the 12
    `ba_moi_*` tools, the "Bà Mối" agent and its bot user.
    - It is idempotent, and `--check` reports drift from the repo by checksum.
+   - Configure a dedicated native provider secret/model, then set
+     `BA_MOI_LLM_ID` and `BA_MOI_ALLOWED_GROUP_IDS` to the instance's model and
+     intended groups for both apply and check. Empty groups leave the persona
+     unavailable to ordinary members. Enable native AI for those same groups
+     and set the owned theme's `ba_moi_username` from the generated bot readback.
    - It needs an all-users admin key (`DISCOURSE_ADMIN_API_KEY`). Use it only
      from a trusted machine, never put it in Vercel, and revoke it after.
 3. **API keys for the service:** two single-user keys, one for Bà Mối's bot user

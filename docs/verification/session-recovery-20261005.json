@@ -1,0 +1,335 @@
+{
+  "capturedAt": "2026-10-05T05:03:16.198207+00:00",
+  "scope": "Community/Bà Mối recovery and native acceptance; synthetic accounts only; no source change or new deployment",
+  "source": "1787b835ca130d5e79d04fe64f4fe0f325f0390f",
+  "documentationBaseHead": "5fc2d643fbde169335bc13c7eac3e88f5f7133d4",
+  "forumUrl": "https://ubuntu-asus.tail349cbf.ts.net:8443",
+  "recovery": {
+    "originalThreadId": "01a0f286-232d-7220-b250-fcc465094fcc",
+    "originalThreadTitle": "Understand the repository",
+    "appHistoryReadError": "SQLite database disk image is malformed (code 11)",
+    "historyDatabaseModified": false,
+    "archivedTranscriptBytes": 30103891,
+    "validRecords": 6115,
+    "malformedRecords": 0,
+    "sha256": "741cf9ec4b3c3b27b90350f0d0e8de59574cc16760c828992245ee8b3e596352",
+    "lastRecoveredProjectToolAt": "2026-10-04T18:13:22.515Z",
+    "resumedFrom": "Dedicated provider key, native AI/moderation and phone acceptance",
+    "existingPullRequest": 1
+  },
+  "provider": {
+    "credentialSource": "Infisical / That Space / prod / OPENROUTER_API_KEY",
+    "dedicatedCredentialVerified": true,
+    "credentialCopiedToGitOrVercel": false,
+    "nativeSecretAlias": "that_space_openrouter",
+    "secretId": 2,
+    "modelId": 1,
+    "provider": "open_router",
+    "model": "anthropic/claude-sonnet-5",
+    "nativeStreamingAndNonStreamingValidation": true,
+    "maxPromptTokens": 64000,
+    "maxOutputTokens": 4096,
+    "visionEnabled": false,
+    "allowedAttachmentTypes": [],
+    "personaId": 1,
+    "personaUserId": -1201,
+    "personaUsername": "Ba_Moi_bot",
+    "personaAllowedGroupIds": [
+      10
+    ],
+    "globalAllowedGroups": "10",
+    "aiBotEnabled": true,
+    "themeId": 1,
+    "themeBaMoiUsername": "Ba_Moi_bot",
+    "finalInstallerDrift": []
+  },
+  "nativeAiAcceptance": {
+    "method": "Ordinary synthetic member PMs answered by native Discourse AI; read-only backend assertions; actual member phone UI pause",
+    "actors": [
+      {
+        "username": "ts_qa_lan",
+        "id": 3,
+        "topicId": 33,
+        "trustLevel": 1,
+        "staff": false
+      },
+      {
+        "username": "ts_qa_nam",
+        "id": 4,
+        "topicId": 23,
+        "trustLevel": 1,
+        "staff": false
+      }
+    ],
+    "fixtureTrustAdjustment": "Only these two API-created accounts promoted to TL1, matching default_invitee_trust_level=1; site quotas unchanged",
+    "auditSince": "2026-10-05T03:47:00Z",
+    "audit": [
+      {
+        "userId": 3,
+        "topicId": 33,
+        "requests": 36,
+        "successful": 36
+      },
+      {
+        "userId": 4,
+        "topicId": 23,
+        "requests": 20,
+        "successful": 20
+      }
+    ],
+    "auditSuccessDefinition": "HTTP 2xx, or native null response_status with positive response_tokens",
+    "observedTools": [
+      "ba_moi_box_open",
+      "ba_moi_card_confirm",
+      "ba_moi_card_preview",
+      "ba_moi_consent",
+      "ba_moi_interest",
+      "ba_moi_match_action",
+      "ba_moi_matches",
+      "ba_moi_profile_update",
+      "ba_moi_search",
+      "ba_moi_signal_respond",
+      "ba_moi_signals",
+      "ba_moi_status"
+    ],
+    "verified": [
+      "four numbered disclosures preserved",
+      "adult confirmation and explicit consent",
+      "one interview field per turn; explicit bundled answers accepted",
+      "card preview and approval",
+      "empty search does not invent candidate",
+      "interest without discovery does not invent identifier",
+      "anonymous search and interest",
+      "signal acceptance creates match",
+      "pause/resume",
+      "reveal requires confirmation",
+      "one-sided reveal withholds identity",
+      "mutual approvals reach revealed",
+      "block requires confirmation and closes match",
+      "delete requires confirmation and removes service rows"
+    ],
+    "match": {
+      "id": "db8ad502-d7a0-495b-a823-1b37d5d3bf33",
+      "relayTopics": {
+        "ts_qa_lan": 43,
+        "ts_qa_nam": 41
+      },
+      "participants": "Each owner and thu_duyen only",
+      "ownMemberHttp": 200,
+      "otherMemberHttp": 404,
+      "initialIntents": 4,
+      "initialDeliveryAttempts": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "scheduledRecoveryVerified": true,
+      "manualQueueEdits": false,
+      "mutualRevealState": "revealed",
+      "namRevealNoticeDelivered": true,
+      "bothRevealNoticesDeliveredInThisRun": true,
+      "positiveBothRevealEvidence": "Native posts 111 and 115; post115 precedes confirmed block post116 by 52.828 seconds",
+      "bothClosureIntentsCompleted": true,
+      "revealNotices": [
+        {
+          "postId": 111,
+          "topicId": 41,
+          "createdAt": "2026-10-05T04:36:56.180Z",
+          "otherMemberProfileLink": true
+        },
+        {
+          "postId": 115,
+          "topicId": 43,
+          "createdAt": "2026-10-05T04:40:01.839Z",
+          "otherMemberProfileLink": true
+        }
+      ],
+      "confirmedBlockPost": {
+        "id": 116,
+        "createdAt": "2026-10-05T04:40:54.667Z"
+      },
+      "closureNotices": [
+        {
+          "postId": 118,
+          "topicId": 41,
+          "createdAt": "2026-10-05T04:40:59.890Z"
+        },
+        {
+          "postId": 124,
+          "topicId": 43,
+          "createdAt": "2026-10-05T04:45:02.840Z"
+        }
+      ],
+      "bothClosureNoticesReadBack": true
+    },
+    "deletionResidualCounts": {
+      "members": 0,
+      "profiles": 0,
+      "cards": 0,
+      "discoveries": 0,
+      "daily_openings": 0,
+      "interests": 0,
+      "matches": 0,
+      "relay_topics": 0,
+      "relay_messages": 0,
+      "blocks": 0,
+      "pending_payloads": 0
+    },
+    "poolAfterCleanup": {
+      "lanMembers": 0,
+      "namStatus": "paused",
+      "sampleMembers": 30,
+      "discoverableSynthetic": 0,
+      "pendingDeliveries": 0
+    },
+    "nativeSyntheticMessageHistoryRetained": true
+  },
+  "moderation": {
+    "mode": "Native review-only automation for regular topics; private messages and bot posts excluded",
+    "modelId": 1,
+    "classifierAgentId": 2,
+    "classifierHasUser": false,
+    "classifierTools": [],
+    "applySucceeded": true,
+    "checkExit": 0,
+    "benignPost": {
+      "id": 59,
+      "topic": 34,
+      "reviewCreated": false
+    },
+    "abusePost": {
+      "id": 62,
+      "topic": 36,
+      "reviewableId": 4,
+      "status": "pending",
+      "hidden": false,
+      "deleted": false,
+      "authorSilenced": false,
+      "authorSuspended": false,
+      "automatedReply": false
+    },
+    "privatePost": {
+      "id": 66,
+      "topic": 39,
+      "reviewCreated": false
+    },
+    "botPost": {
+      "id": 67,
+      "topic": 40,
+      "reviewCreated": false
+    },
+    "memberReviewHttp": 403,
+    "ownedPublicFixtureTopicsSoftDeleted": [
+      34,
+      36,
+      40
+    ]
+  },
+  "renderedAcceptance": {
+    "driver": "Owned gstack Chromium with ordinary member session",
+    "phoneViewport": {
+      "width": 375,
+      "height": 812
+    },
+    "pages": [
+      {
+        "path": "/login",
+        "scrollWidth": 375
+      },
+      {
+        "path": "/latest",
+        "scrollWidth": 375
+      },
+      {
+        "path": "/u/ts_qa_lan/preferences/profile",
+        "scrollWidth": 375,
+        "userFields": 15
+      },
+      {
+        "path": "/c/trien-lam",
+        "scrollWidth": 375,
+        "loadedImages": 8
+      },
+      {
+        "path": "/u/ts_qa_nam/activity/portfolio",
+        "scrollWidth": 375,
+        "loadedImages": 4
+      },
+      {
+        "path": "/t/28",
+        "scrollWidth": 375,
+        "eventAndRsvpControls": true
+      }
+    ],
+    "baMoiHeaderAndWelcomeCtasVisible": true,
+    "ctaOpensNativeComposer": true,
+    "soleRecipient": "Ba_Moi_bot",
+    "nativePmNoHorizontalOverflow": true,
+    "actualPhonePausePostId": 82,
+    "phonePauseBackendAcknowledged": true,
+    "eventAdditionalWidths": [
+      768,
+      1440
+    ],
+    "eventHorizontalOverflow": false,
+    "finalLatestConsoleErrors": [],
+    "languageLimit": "Brand/navigation, onboarding and AI are Vietnamese; some upstream editor/event strings remain English"
+  },
+  "runtime": {
+    "liveContainerId": "e7181459a2a65e0911eea71bb3b08eb6e37edb09d9f16ba97e7e1523708fd37d",
+    "containerRecreated": false,
+    "operatorRestartDuringRecovery": false,
+    "dockerRestartCount": 0,
+    "oomKilled": false,
+    "coldIncident": "CSS503 and signed-in502; Pitchfork timeout in PostgreSQL exec, monitor exited, native supervisor recovered",
+    "hostStorageRotational": true,
+    "peakIoPressureSomeAvg10": 93.56,
+    "peakIoPressureFullAvg10": 85.99,
+    "workersRecoveredAt": "2026-10-05T03:45:09Z",
+    "warmFunctionalRequestsSucceeded": true,
+    "permanentColdIoFixClaimed": false,
+    "taylorMinioActive": true,
+    "funnelMappings": {
+      "443": "127.0.0.1:8787",
+      "8443": "127.0.0.1:8080"
+    },
+    "beforeInvitationAction": "Check signed-in pages and native posting after cold starts; status endpoint alone missed the stalled worker"
+  },
+  "priorRestoreEvidence": "discourse-restore-20261005.json",
+  "requiredChecksAtDocumentationBaseHead": {
+    "head": "5fc2d643fbde169335bc13c7eac3e88f5f7133d4",
+    "run": 37223252017,
+    "Service checks": "SUCCESS",
+    "Discourse community acceptance": "SUCCESS"
+  },
+  "completedIntegrationGates": {
+    "dedicatedCredential": true,
+    "nativeModelConversation": true,
+    "reviewOnlyAiModeration": true,
+    "renderedPhone": true
+  },
+  "realMembersInvited": false,
+  "pullRequestMerged": false,
+  "recoveryBackup": {
+    "filename": "th-t-space-2026-10-05-045818-v20261001073226.tar.gz",
+    "bytes": 5323203,
+    "sha256": "21069e653bd565b6705db6cb9764fa7df6317f6d06fe4003e160dbe92d5f330f",
+    "remoteSha256Matches": true,
+    "mode": "0o600",
+    "outerGzipVerified": true,
+    "databaseGzipVerified": true,
+    "uploadFiles": 16,
+    "restorePerformedOnThisArchive": false,
+    "priorRestoreEvidence": "discourse-restore-20261005.json",
+    "apiWithUploadsParameter": "string true; JSON boolean true produces a database-only archive in the pinned native controller"
+  },
+  "finalNativeReadback": {
+    "ownRelayTopicsHttp": 200,
+    "bothProfileLinksPresent": true,
+    "bothClosureNoticesPresent": true,
+    "guestLatestHttp": 403,
+    "healthHttp": 200,
+    "healthBody": "ok"
+  }
+}

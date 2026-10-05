@@ -248,7 +248,7 @@ phone layout, Vietnamese moderation behavior, and the real Bà Mối relay. The
 repository's GitHub acceptance checks validate the pinned build; they do not
 replace these live checks.
 
-### Observed Oct5 live checkpoint
+### Observed Oct5 initial live checkpoint
 
 The durable `that-space-bootstrap-20261004` unit completed successfully. Its
 image is `local_discourse/that-space` with ID
@@ -263,12 +263,13 @@ remains active. Daily backups include uploads, retain seven archives and run at
 20:30 UTC.
 
 Administrator `minh` (ID 1), relay `thu_duyen` (ID 2) and native persona
-`Ba_Moi_bot` (ID -1201, agent ID 1) exist. The 12 Bà Mối tools and their native
-encrypted secret binding are installed; installer check reports no drift.
+`Ba_Moi_bot` (ID -1201, agent ID 1) exist. The 12 Bà Mối tools and their
+native secret binding are installed; installer check reports no drift.
 Persona and relay keys pass own-user access and reject impersonation. All ten
 service runtime variable names are present in this project's Vercel preview and
-production environments. No provider key or default LLM is configured yet, and
-member AI conversations remain disabled.
+production environments. At this initial checkpoint, no provider key or default
+LLM was configured and member AI conversations were disabled. Resumed
+acceptance below supersedes that state.
 
 An initial pre-community backup was copied off-host to ignored
 `.backups/discourse/pre-community-20261004-v20261001073226.tar.gz` (2,887,594
@@ -315,10 +316,73 @@ LLM conversation or phone rendering.
 Two synthetic normal members have verified activation/approval, password and
 session recovery, private onboarding fields, artwork/portfolio, following,
 Host event/RSVP, human review and private relay isolation. Original, short and
-actual optimized member uploads deny guests and forged cookies. Actual model
-conversation, review-only AI moderation and rendered phone acceptance remain
-required before invitations; no provider credential is configured and browser
-tab binding is timing out.
+actual optimized member uploads deny guests and forged cookies. At that
+checkpoint, actual model conversation, review-only AI moderation and
+rendered phone acceptance were still outstanding. Those checks were completed
+in the resumed session below.
+
+### Resumed native AI acceptance, Oct5
+
+The original chat's SQLite history is damaged, but its complete archived JSONL
+was recovered without modifying the app database. ASUS/source were intact;
+no bootstrap, container recreation or new deployment ran. Nonsecret evidence:
+[`verification/session-recovery-20261005.json`](verification/session-recovery-20261005.json).
+
+The dedicated provider credential is in Infisical **That Space / prod /
+OPENROUTER_API_KEY**. Native secret `that_space_openrouter` (2) binds model
+`anthropic/claude-sonnet-5` (1, open_router). Native streaming/non-streaming
+validation passed. `ai_bot_enabled=true`; persona/global allowed group is
+registered members (10); theme `ba_moi_username=Ba_Moi_bot`. Keep
+`BA_MOI_LLM_ID=1` and `BA_MOI_ALLOWED_GROUP_IDS=10` in this installation's
+private operator configuration for both apply and check. Empty allowed groups
+do not grant ordinary member access. Read IDs from a new instance instead of
+assuming them. Final installer check reports no drift. No provider value is
+in Git or Vercel; native secret binding does not imply encryption at rest.
+
+Actual non-staff conversations exercised all 12 tools, with 56 successful
+native provider audit records. Consent, interview/card approval, empty-result
+handling, interest/acceptance, private relay rooms, pause/resume and confirmation
+before reveal/block/deletion passed. Native cooldowns queued two initial
+match deliveries; the existing scheduler sent both on attempt two. Each relay
+room denies the other member. Both approvals reached `revealed` and both
+native profile links arrived (posts 111/115); Lan's queued notice was sent by
+the scheduler at 04:40:01 UTC, before block confirmation at 04:40:54. Both
+closure notices were read back (118/124). Native post timestamps, rather than
+queue metadata alone, verify these deliveries. Confirmed model-driven deletion
+leaves all eleven residual service-data/payload counts zero; the other fixture is paused, no
+synthetic profile is discoverable and 30 labelled samples remain. Disclosed
+native PM history remains.
+
+Moderation apply/check passed with model 1. Vietnamese scam/abuse entered
+pending staff review without hiding, deletion, silencing, suspension or an
+automated reply. Benign, private and bot fixtures did not create reviews.
+Only three owned public fixture topics were soft-deleted afterward.
+
+Rendered 375×812 checks passed login, latest, 15 profile fields, gallery,
+portfolio, event/RSVP and native Bà Mối CTA/composer without horizontal overflow.
+A real phone UI pause message was acknowledged. Event layout also passed at
+768/1440 pixels. Some upstream editor/event strings remain English. Only the
+two API-created fixtures were promoted to TL1, matching the invited-member
+default; neither is staff and no site quota was relaxed.
+
+Cold rotational-disk I/O caused worker timeouts and temporary 502/503 responses.
+The native supervisor recovered without manual restart or speculative tuning.
+Warm signed-in pages, posting and AI succeeded, with no Docker restart or
+observed OOM. Before invitations/after cold starts, check a signed-in page and
+native posting as well as `/srv/status`; health alone missed the stalled worker.
+This records recovery, not a permanent storage-performance fix. Taylor MinIO
+and Funnel 443 remain intact.
+
+A new post-acceptance database/upload checkpoint was copied off-host to ignored
+mode-600 storage: `th-t-space-2026-10-05-045818-v20261001073226.tar.gz`,
+5,323,203 bytes, SHA-256
+`21069e653bd565b6705db6cb9764fa7df6317f6d06fe4003e160dbe92d5f330f`.
+Remote/local hashes match; outer archive and database gzip checks passed,
+with 16 upload files present. The earlier archive retains the actual restore
+drill proof; this fresh archive has not undergone another restore. For this
+pinned native API, send `with_uploads: "true"` as a string: JSON boolean `true`
+produces a database-only `.sql.gz`. A returned success starts a background
+process; wait for the completed archive and inspect its contents.
 
 ### Isolated native restore initialization
 

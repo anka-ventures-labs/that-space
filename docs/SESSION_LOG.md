@@ -1195,7 +1195,7 @@ The durable ASUS bootstrap completed with exit zero, including its slow but prog
 
 Created an initial native backup with uploads and copied its 2,887,594-byte archive off-host into ignored `.backups/discourse/` before applying product configuration. Community/presentation apply and check passed with 13 owned categories, 15 user fields, five groups and zero drift. Daily native backups are enabled with uploads, seven retained archives and 20:30 UTC start. Added only Funnel 8443 to loopback 8080; existing Taylor Funnel 443 to 8787 and active MinIO remain intact. External `/srv/status` returned 200/ok; guest `/latest.json` returned 403 without topic data. The backup predates this configuration and has not yet undergone full native restore.
 
-Native AI admin routes returned 404 until `discourse_ai_enabled` was enabled. The pinned site-setting update requires its actual setting name in the JSON body; a generic `value` body is not proof of change. Installed the encrypted tool secret, 12 custom tools and Bà Mối agent 1; read back generated persona `Ba_Moi_bot` (ID -1201). Captured its separate single-user key and proved both bot keys work only as their own user (200) and cannot impersonate system (403). The ten runtime variable names are verified in both Vercel environments; no installation key or admin password is deployed. The provider key and default LLM are absent; `ai_bot_enabled` remains false and the theme CTA remains unset.
+Native AI admin routes returned 404 until `discourse_ai_enabled` was enabled. The pinned site-setting update requires its actual setting name in the JSON body; a generic `value` body is not proof of change. Installed the native tool secret, 12 custom tools and Bà Mối agent 1; read back generated persona `Ba_Moi_bot` (ID -1201). Captured its separate single-user key and proved both bot keys work only as their own user (200) and cannot impersonate system (403). The ten runtime variable names are verified in both Vercel environments; no installation key or admin password is deployed. The provider key and default LLM are absent; `ai_bot_enabled` remains false and the theme CTA remains unset.
 
 Live installer check exposed an object-key-order comparison defect and native false-versus-null tool-option serialization. Corrected these without loosening array order, enum values, required fields, tool IDs or secret bindings. Six installer tests include native serialization and negative drift cases; updated the existing payload assertion. Live `--check` now reports no drift. Full verification passes 32 files / 307 tests, typecheck, lint and whitespace checks. Native fix route `2206303d-d928-45dc-8620-e74b259d05a3` is verified and closed.
 
@@ -1242,3 +1242,94 @@ The real five-minute Cron -> pg_net -> production retry path delivered the outag
 Both closure notices reached their intended native recipients (attempts1/2); the other member hears only that the chat ended. Lan's production `consent delete` with explicit confirmation returned `deleted`, and read-only SQL found zero remaining member, profile, card, discovery, daily-opening, interest, match, relay-topic/message, block or matching outbound-payload rows. Native historical messages remain readable as disclosed in consent. Nam's production `consent pause` returned `paused`; the pool retains 30 labelled sample members/cards, zero non-fixture members and zero discoverable synthetic profiles. Native fixture accounts remain for later actual model acceptance. Whitelisted nonsecret evidence is retained in `docs/verification/live-service-20261005.json`; private raw messages, fixture credentials and environment values are not included.
 
 This docs/evidence checkpoint changes no deployed application source. Full source verification remains 307 tests/typecheck/lint and both hosted checks green for `1787b83`; JSON parsing and `git diff --check` validate the new records. The existing PR will retain the docs checkpoint's exact-head hosted status after push. Actual native model conversation, review-only Vietnamese AI moderation and phone layout remain required before invitations. Live native model inventory still contains zero configured models/credentials, the default LLM is null, `ai_bot_enabled=false` and the theme CTA is unset. The pending dedicated-provider question has not received a credential; no other project's key was borrowed. The in-app browser tab binding continues to time out. The phase is not marked complete and the PR is not merged.
+
+## 2026-10-05: Corrupted-chat recovery and native AI acceptance
+
+Recovered **Understand the repository** (`01a0f286-232d-7220-b250-fcc465094fcc`).
+App history fails with SQLite code 11, but its archived 30,103,891-byte JSONL
+has 6,115 valid records, no malformed lines and SHA-256
+`741cf9ec4b3c3b27b90350f0d0e8de59574cc16760c828992245ee8b3e596352`.
+The last project tool at Oct4 18:13 UTC investigated member login for phone QA.
+No global database repair was attempted while chats were active. ASUS/Git were
+intact. Fetched/pulled `feat/ba-moi` fast-forward; both required checks passed
+base head `5fc2d64`, run `37223252017`. Continue existing PR #1.
+
+Parallel MECE workstreams: native workers independently inspected ASUS runtime/
+deployment traces and local AI acceptance contracts read-only; the coordinator
+owns credential binding, real AI/moderation/phone checks, cleanup, evidence and
+Git/PR assembly. Preserve runtime/config → model → actual AI/moderation and live
+fixture → phone/cleanup → backup dependencies. Workers did not edit, push,
+deploy, launch CI or reviews. Native routes/feedback are closed. Earlier primary
+and targeted review results were retained/read/acknowledged; no source change
+requires a duplicate assembly review for this operational checkpoint.
+
+The user supplied Infisical **That Space / prod / OPENROUTER_API_KEY**, then
+refreshed Mac Mini CLI login. Read the dedicated value in memory; configured
+native secret `that_space_openrouter` (2) and `anthropic/claude-sonnet-5` model
+(1, open_router). Provider tools and native streaming/non-streaming validation
+passed. No key value was printed or put in Git, Vercel or launcher. Native secret
+binding is verified; this record does not claim encryption at rest. Set ignored
+operator model/group IDs to 1/10, enable native AI for registered members and
+set theme CTA from `Ba_Moi_bot` readback. Final installer check has no drift.
+
+Non-staff `ts_qa_lan` (3) and `ts_qa_nam` (4) used native persona PMs 33/23.
+All 12 tool names appear in successful native audit records: Lan 36/36, Nam 20/20.
+Four numbered disclosures, adult/explicit consent, one-field interview, explicit
+bundled answers, card approval, no-match handling, real interest/acceptance,
+pause/resume and confirmation before reveal/block/deletion passed. This completes
+the older model/moderation/phone gates while preserving historical evidence.
+
+Model-created match `db8ad502-d7a0-495b-a823-1b37d5d3bf33` has relay rooms 43/41;
+own member 200, other member 404, participants owner/thu_duyen only. Four initial
+intents completed, Lan's two via scheduled attempt two after native cooldowns.
+One-sided reveal withheld identity; both approvals reached `revealed` and
+both notices arrived, native posts 111/115. Final native readback establishes
+that Lan's scheduled post 115 at 04:40:01.839 UTC preceded confirmed block
+post 116 at 04:40:54.667. This supersedes an intermediate assumption that the
+queued notice had been withheld after closure; the actual timestamps prove
+positive delivery before block. Both closure notices 118/124 were read back.
+Do not infer native delivery from queue metadata alone. Model-driven
+confirmed deletion leaves all eleven residual counts zero. The other profile
+is paused, no synthetic profile is discoverable and 30 labelled samples remain;
+disclosed native synthetic PM history remains readable.
+
+Native review-only classifier apply/check passed with model 1. Benign post 59
+had no review; Vietnamese scam/abuse post 62 created pending reviewable 4 without
+hiding, deletion, silencing, suspension or an extra reply. PM 66 and bot 67 had
+no review; member review access 403. Soft-deleted only owned public topics 34/36/40.
+
+The browse skill used owned Chromium while Aside was unavailable. Actual
+375×812 rendering passed login, latest, Bà Mối CTA/native composer, all 15 profile
+fields, gallery, portfolio and event/RSVP. Real phone pause post 82 was acknowledged.
+Event also passed 768/1440; final latest console has no errors. ProseMirror needs
+click/type for an application-recognized draft; wait for saved post/backend
+acknowledgment before navigating. API-created TL0 fixtures hit the first-day
+reply cap; promoted only those two to TL1, matching default_invitee_trust_level=1.
+No quotas changed and both remain non-staff. Some upstream labels remain English.
+
+Cold CSS503/page502 coincided with a 32.729-second Pitchfork timeout in PG exec,
+rotational-disk pressure some/full avg10 93.56/85.99 and heavy I/O wait. No observed
+OOM/Docker restart. The native supervisor recovered workers/Sidekiq by 03:45 UTC;
+warm signed-in pages, native AI and posting then passed. No operator restart,
+rebuild, Nginx rate-limit adjustment or host tuning. Taylor MinIO/Funnel 443→8787
+remain active; forum 8443→8080. Warm recovery does not prove cold-I/O reliability:
+check signed-in pages/native posting before invitations, beyond the health URL.
+
+The fresh post-acceptance backup includes database and 16 upload files:
+`th-t-space-2026-10-05-045818-v20261001073226.tar.gz`, 5,323,203 bytes,
+remote/local SHA-256 `21069e653bd565b6705db6cb9764fa7df6317f6d06fe4003e160dbe92d5f330f`.
+Copied off-host to ignored mode-600 storage; outer/database gzip integrity pass.
+No second restore drill is claimed; the earlier isolated restore evidence stands.
+The pinned backups API compares `with_uploads` to string `"true"`; an initial
+JSON boolean produced a database-only archive, then the corrected string request
+produced the verified full archive. API success starts a background process,
+so an immediate idle status does not prove its child has finished booting.
+Owned browser server was stopped; browse learnings/end metadata are recorded.
+
+Nonsecret evidence is in `docs/verification/session-recovery-20261005.json`.
+Credentials, raw PMs and backups stay in ignored private operator storage.
+Deployed source remains `1787b83`; this checkpoint changes documentation only.
+JSON parsing, whitespace and actual credential-value checks passed (19 distinct
+private values checked, zero found). Inspect the existing PR's new exact-head
+hosted checks after push. No real invitations or merge;
+full Tử Vi/charts/readings/PDF remain excluded.
