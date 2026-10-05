@@ -1,9 +1,13 @@
 /**
- * Smoke test: verifies the landing page renders with correct branding content.
+ * Smoke test: the public homepage renders its brand and truthful capabilities.
+ *
+ * Public-surface behaviour (community URL, signup vs login) is covered by
+ * LandingPage.test.tsx. This file only guards what must be true regardless of
+ * configuration.
  */
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-// Mock Next.js modules that require a full Next.js environment
+
 vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({
@@ -42,31 +46,53 @@ vi.mock("next/link", () => ({
 // Import the page component after mocks are set up
 import HomePage from "@/app/page";
 
+const originalDiscourseUrl = process.env.DISCOURSE_URL;
+const originalRegistration = process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
+
 describe("Landing Page Smoke Test", () => {
-  it("renders Thật Space branding text", () => {
-    render(<HomePage />);
-    // Check that branded text is present
-    const elements = screen.getAllByText(/Thật Space/i);
-    expect(elements.length).toBeGreaterThan(0);
+  beforeEach(() => {
+    delete process.env.DISCOURSE_URL;
+    delete process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
   });
 
-  it("renders the main tagline", () => {
+  afterEach(() => {
+    process.env.DISCOURSE_URL = originalDiscourseUrl;
+    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = originalRegistration;
+  });
+
+  it("renders the Thật Space brand name as the page heading", () => {
+    render(<HomePage />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thật Space");
+  });
+
+  it("serves the brand logo", () => {
+    render(<HomePage />);
+    expect(screen.getByAltText("Thật Space")).toHaveAttribute("src", "/logo.jpg");
+  });
+
+  it("renders the Vietnamese tagline", () => {
     render(<HomePage />);
     expect(
-      screen.getByText(/A private space for women to connect/i)
+      screen.getByText("Một không gian để kết nối, chia sẻ và tìm người đồng hành."),
     ).toBeInTheDocument();
   });
 
-  it("renders the Join the Community CTA", () => {
+  it("renders the three capability sections", () => {
     render(<HomePage />);
-    const ctaButtons = screen.getAllByText(/Join the Community/i);
-    expect(ctaButtons.length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("heading", { name: "Cộng đồng thành viên", level: 3 }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Bà Mối", level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Quyền chủ động", level: 3 }),
+    ).toBeInTheDocument();
   });
 
-  it("renders the three feature cards", () => {
-    render(<HomePage />);
-    expect(screen.getByText("Forum")).toBeInTheDocument();
-    expect(screen.getByText("Tử Vi Horoscope")).toBeInTheDocument();
-    expect(screen.getByText("Matchmaking")).toBeInTheDocument();
+  it("keeps every visitor-facing string in Vietnamese with no placeholder copy", () => {
+    const { container } = render(<HomePage />);
+    const text = container.textContent ?? "";
+    expect(text).not.toMatch(/lorem ipsum/i);
+    expect(text).not.toMatch(/A private space for women/i);
+    expect(text).not.toMatch(/Join the Community/i);
   });
 });

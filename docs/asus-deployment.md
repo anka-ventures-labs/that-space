@@ -161,8 +161,8 @@ THAT_SPACE_COMMUNITY_BOOTSTRAP=1 bundle exec rails runner /shared/source/discour
 THAT_SPACE_PRESENTATION_BOOTSTRAP=1 bundle exec rails runner /shared/source/discourse/presentation/bootstrap.rb -- --check
 ```
 
-The manifest keeps login, invite-only access and staff approval enabled, and
-sets the no-email beta mode (`disable_emails: non-staff`) and Vietnamese locale.
+The manifest keeps `login_required` on and sets the no-email mode
+(`enable_smtp: false`, `disable_emails: all`) with the Vietnamese locale.
 Therefore a guest cannot see the community during first startup, before these
 reconcilers run.
 

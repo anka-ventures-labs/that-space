@@ -92,8 +92,20 @@ module ThatSpace
     end
 
     def validate_manifest!
-      unless %w[login_required invite_only must_approve_users].all? { |setting| @manifest.fetch("site_settings").fetch(setting) == true }
-        raise Error, "The community requires private login, invitations and staff approval"
+      admission_contract = {
+        "login_required" => true,
+        "allow_new_registrations" => true,
+        "enable_signup_cta" => true,
+        "invite_only" => false,
+        "invite_code" => "",
+        "must_approve_users" => false,
+        "enable_local_logins" => false,
+        "auth_skip_create_confirm" => false,
+        "enable_smtp" => false,
+        "disable_emails" => "all"
+      }
+      unless admission_contract.all? { |setting, expected| @manifest.fetch("site_settings").fetch(setting) == expected }
+        raise Error, "The community requires Google-only self-service signup with login-gated member content"
       end
       raise Error, "Unsupported community manifest schema" unless @manifest["schema_version"] == 1
       raise Error, "Unexpected community manifest id" unless @manifest["manifest_id"] == MANIFEST_ID

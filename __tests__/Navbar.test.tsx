@@ -1,141 +1,49 @@
-/**
- * Tests for Navbar component.
- * Verifies nav links, logo, hamburger button, sticky positioning, and active link logic.
- */
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-// Mock next/image
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+
 vi.mock("next/image", () => ({
   __esModule: true,
-  default: function MockImage({
-    src,
-    alt,
-    ...props
-  }: {
-    src: string;
-    alt: string;
-    [key: string]: unknown;
-  }) {
+  default: function MockImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} {...props} />;
   },
 }));
-
-// Mock next/link
 vi.mock("next/link", () => ({
   __esModule: true,
-  default: function MockLink({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-    [key: string]: unknown;
-  }) {
-    return (
-      <a href={href} {...props}>
-        {children}
-      </a>
-    );
+  default: function MockLink({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) {
+    return <a href={href} {...props}>{children}</a>;
   },
 }));
 
-// Mock usePathname — default to "/" (home, no active nav link)
 const mockUsePathname = vi.fn(() => "/");
-vi.mock("next/navigation", () => ({
-  usePathname: () => mockUsePathname(),
-}));
+vi.mock("next/navigation", () => ({ usePathname: () => mockUsePathname() }));
 
 import Navbar from "@/components/Navbar";
 
 describe("Navbar", () => {
-  beforeEach(() => {
-    mockUsePathname.mockReturnValue("/");
+  beforeEach(() => mockUsePathname.mockReturnValue("/"));
+
+  it("renders the public routes and configured community link", () => {
+    render(<Navbar communityUrl="https://community.example.test" communityPublicRegistrationEnabled={false} />);
+    expect(screen.getAllByRole("link", { name: "Trang chủ" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Cộng đồng" })[0]).toHaveAttribute("href", "https://community.example.test");
+    expect(screen.getAllByRole("link", { name: "Quyền riêng tư" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Liên hệ" }).length).toBeGreaterThan(0);
   });
 
-  it("renders logo image from /logo.jpg", () => {
-    render(<Navbar />);
-    const logo = screen.getAllByAltText("Thật Space");
-    expect(logo.length).toBeGreaterThan(0);
-    expect(logo[0]).toHaveAttribute("src", "/logo.jpg");
+  it("points members to login until public registration is enabled", () => {
+    const { rerender } = render(<Navbar communityUrl="https://community.example.test" communityPublicRegistrationEnabled={false} />);
+    expect(screen.getByRole("link", { name: "Đăng nhập thành viên" })).toHaveAttribute("href", "https://community.example.test/login");
+    rerender(<Navbar communityUrl="https://community.example.test" communityPublicRegistrationEnabled />);
+    expect(screen.getByRole("link", { name: "Đăng ký" })).toHaveAttribute("href", "https://community.example.test/signup");
   });
 
-  it("renders all four nav links", () => {
-    render(<Navbar />);
-    expect(screen.getAllByText("Forum").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Tử Vi").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Matchmaking").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Profile").length).toBeGreaterThan(0);
-  });
-
-  it("has a hamburger button with aria-label", () => {
-    render(<Navbar />);
-    const hamburger = screen.getByRole("button", { name: /toggle menu/i });
-    expect(hamburger).toBeInTheDocument();
-  });
-
-  it("navbar has sticky top-0 class for sticky positioning", () => {
-    render(<Navbar />);
-    const nav = screen.getByRole("navigation");
-    expect(nav.className).toMatch(/sticky/);
-    expect(nav.className).toMatch(/top-0/);
-  });
-
-  it("applies active class to Forum link when on /forum", () => {
-    mockUsePathname.mockReturnValue("/forum");
-    render(<Navbar />);
-    // All "Forum" links — find the desktop one (the <a> with href /forum)
-    const forumLinks = screen.getAllByRole("link", { name: "Forum" });
-    expect(forumLinks.length).toBeGreaterThan(0);
-    // At least one forum link should have the active style (space before means NOT hover:border-b-2)
-    const activeLink = forumLinks.find((el) =>
-      el.className.includes(" border-b-2 border-[#C4A882]")
-    );
-    expect(activeLink).toBeDefined();
-  });
-
-  it("non-active links do not have active border class", () => {
-    mockUsePathname.mockReturnValue("/forum");
-    render(<Navbar />);
-    const profileLinks = screen.getAllByRole("link", { name: "Profile" });
-    // Active class has " border-b-2 border-[#C4A882]" (space before means NOT hover:border-b-2).
-    // Inactive links have "hover:border-b-2" which does NOT include " border-b-2 border-[#C4A882]".
-    const hasActive = profileLinks.some((el) =>
-      el.className.includes(" border-b-2 border-[#C4A882]")
-    );
-    expect(hasActive).toBe(false);
-  });
-
-  it("hamburger button toggles mobile menu visibility", () => {
-    render(<Navbar />);
-    const hamburger = screen.getByRole("button", { name: /toggle menu/i });
-    // Initially the mobile menu links are not visible
-    const allLinks = screen.getAllByRole("link", { name: "Forum" });
-    // There should only be 1 instance (desktop); mobile menu is hidden
-    expect(allLinks.length).toBe(1);
-
-    // Click hamburger to open
-    fireEvent.click(hamburger);
-    // Now mobile menu should show — more "Forum" links
-    const allLinksAfter = screen.getAllByRole("link", { name: "Forum" });
-    expect(allLinksAfter.length).toBeGreaterThan(1);
-  });
-
-  it("mobile menu closes when a link is clicked", () => {
-    render(<Navbar />);
-    const hamburger = screen.getByRole("button", { name: /toggle menu/i });
-
-    // Open menu
-    fireEvent.click(hamburger);
-    const mobileLinks = screen.getAllByRole("link", { name: "Forum" });
-    expect(mobileLinks.length).toBeGreaterThan(1);
-
-    // Click the last "Forum" link (mobile version)
-    fireEvent.click(mobileLinks[mobileLinks.length - 1]);
-
-    // Menu should close — back to 1 Forum link
-    const linksAfterClose = screen.getAllByRole("link", { name: "Forum" });
-    expect(linksAfterClose.length).toBe(1);
+  it("opens and closes the mobile menu", () => {
+    render(<Navbar communityUrl="https://community.example.test" communityPublicRegistrationEnabled={false} />);
+    const menu = screen.getByRole("button", { name: "Chuyển menu" });
+    fireEvent.click(menu);
+    expect(screen.getAllByRole("link", { name: "Cộng đồng" }).length).toBeGreaterThan(1);
+    fireEvent.click(screen.getAllByRole("link", { name: "Cộng đồng" }).at(-1)!);
+    expect(screen.getAllByRole("link", { name: "Cộng đồng" })).toHaveLength(1);
   });
 });

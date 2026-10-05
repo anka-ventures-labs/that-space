@@ -3,23 +3,24 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getPublicSiteConfig } from "@/lib/public-site";
 
 const playfair = Playfair_Display({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-playfair",
   display: "swap",
 });
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Thật Space — A Private Community for Women",
+  title: "Thật Space — Kết nối, chia sẻ và đồng hành",
   description:
-    "A private space for Vietnamese women to connect, grow, and discover through community, horoscope readings, and meaningful connections.",
+    "Một không gian để kết nối, chia sẻ và tìm người đồng hành.",
 };
 
 export default function RootLayout({
@@ -27,12 +28,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const publicSite = getPublicSiteConfig();
+
   return (
     <html lang="vi" className={`${playfair.variable} ${inter.variable}`}>
       <body className="bg-[#F5F0E8] text-[#5C3D2E] font-[family-name:var(--font-inter)]">
-        <Navbar />
+        <Navbar
+          communityUrl={publicSite.communityUrl}
+          communityPublicRegistrationEnabled={publicSite.communityPublicRegistrationEnabled}
+        />
         <main>{children}</main>
-        <Footer />
+        <Footer contactHref={publicSite.contactHref} />
       </body>
     </html>
   );

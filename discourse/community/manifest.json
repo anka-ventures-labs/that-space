@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "manifest_id": "that-space-community",
-  "revision": "2026-10-01-v1",
+  "revision": "2026-10-05-public-self-service-v1",
   "provenance": {
     "onboarding_source": "Google Drive template 1YlrxlqGv_VJOG3IvkUt8Sf1LihA6HDTn",
     "recovered_on": "2026-10-01",
@@ -15,11 +15,16 @@
     "default_locale": "vi",
     "allow_user_locale": true,
     "login_required": true,
-    "invite_only": true,
-    "must_approve_users": true,
-    "enable_local_logins": true,
+    "allow_new_registrations": true,
+    "enable_signup_cta": true,
+    "invite_only": false,
+    "invite_code": "",
+    "must_approve_users": false,
+    "enable_local_logins": false,
+    "auth_skip_create_confirm": false,
     "discourse_automation_enabled": true,
-    "disable_emails": "non-staff",
+    "enable_smtp": false,
+    "disable_emails": "all",
     "personal_message_enabled_groups": ["admins", "moderators", "trust_level_0"]
   },
   "categories": [

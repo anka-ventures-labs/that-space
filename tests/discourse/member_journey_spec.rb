@@ -3,11 +3,9 @@
 require_relative "spec_helper"
 
 RSpec.describe "Thật Space member acceptance", type: :request do
-  let!(:admin) { Fabricate(:admin) }
-
   around do |example|
     # Core skips this production callback for its fabricated-user test suites.
-    # Invite acceptance must exercise actual automatic membership at creation.
+    # Self-service activation must exercise actual automatic membership.
     User.set_callback(:create, :after, :ensure_in_trust_level_group)
     example.run
   ensure
@@ -20,89 +18,112 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     SiteSetting.fast_typing_threshold = "disabled"
     SiteSetting.auto_approve_email_domains = ""
     SiteSetting.flag_post_allowed_groups = [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|")
+    UsersController.any_instance.stubs(:honeypot_value).returns(nil)
+    UsersController.any_instance.stubs(:challenge_value).returns(nil)
   end
 
-  def create_pending_invited_member
-    invite = Fabricate(:invite, invited_by: admin, email: "acceptance-member@example.com")
-    login_code = EmailLoginCode.generate!(email: invite.email)
+  def stage_verified_google_signup
+    SiteSetting.google_oauth2_client_id = "acceptance-client"
+    SiteSetting.google_oauth2_client_secret = "acceptance-secret"
+    SiteSetting.enable_google_oauth2_logins = true
 
-    post "/session/login-code/verify.json",
+    authentication = Auth::Result.new
+    authentication.email = "google-member@example.com"
+    authentication.username = "google_member"
+    authentication.name = "Google Member"
+    authentication.email_valid = true
+    authentication.authenticator_name = "google_oauth2"
+    authentication.extra_data = { provider: "google_oauth2", uid: "acceptance-google-uid" }.with_indifferent_access
+    session[:authentication] = authentication.session_data
+  end
+
+  # Google is the only admission path, so a completed OAuth handoff is what
+  # creates the account. No password is set and no activation email is sent.
+  def create_google_member
+    stage_verified_google_signup
+    post "/u.json",
          params: {
-           invite_key: invite.invite_key,
-           code: login_code.code,
-           username: "acceptance_member",
-           name: "Acceptance Member",
-         }
-
-    expect(response.status).to eq(200)
-    expect(response.parsed_body.fetch("user_fields_required")).to eq(true)
-    expect(User.find_by_email(invite.email)).to be_nil
-    expect(invite.reload).not_to be_redeemed
-    expect(login_code.reload.consumed_at).to be_nil
-
-    post "/session/login-code/verify.json",
-         params: {
-           invite_key: invite.invite_key,
-           code: login_code.code,
-           username: "acceptance_member",
-           name: "Acceptance Member",
+           email: "google-member@example.com",
+           username: "google_member",
+           name: "Google Member",
            user_fields: that_space_signup_fields,
          }
 
-    member = User.find_by_email(invite.email)
-    expect(member).to be_present
     expect(response.status).to eq(200)
-    expect(response.parsed_body).to eq("pending_approval" => true)
+    expect(response.parsed_body).to include("success" => true, "active" => true)
+
+    member = User.find_by_email!("google-member@example.com")
     expect(member).to be_active
-    expect(member).not_to be_approved
-    expect(member).not_to be_moderator
-    that_space_signup_fields.each do |field_id, submitted_answer|
-      expect(Array(member.user_fields.fetch(field_id))).to eq(Array(submitted_answer))
-    end
-    expect(invite.reload).to be_redeemed
-    expect(login_code.reload.consumed_at).to be_present
-    expect(session[:current_user_id]).to be_nil
+    expect(member).to be_email_confirmed
+    expect(session[:current_user_id]).to eq(member.id)
+    expect(configured_group("role.user").reload.users).to include(member)
 
     member
   end
 
-  def approve_and_log_in(member)
-    sign_in(admin)
-    put "/admin/users/#{member.id}/approve.json"
-    expect(response.status).to eq(200)
-    expect(member.reload).to be_approved
-    expect(member).not_to be_moderator
+  it "refuses a password signup outright rather than creating an account that could never activate" do
+    post "/u.json",
+         params: {
+           email: "acceptance-member@example.com",
+           username: "acceptance_member",
+           name: "Acceptance Member",
+           password: "a sufficiently strong acceptance password",
+           user_fields: that_space_signup_fields,
+         }
 
-    delete "/session/#{admin.username}.json", xhr: true
+    expect(response.status).to eq(403)
+    expect(User.find_by_email("acceptance-member@example.com")).to be_nil
+  end
+
+  it "refuses password login so no unverified identity can reach member content" do
+    member = create_google_member
+
+    delete "/session/#{member.username}.json", xhr: true
     expect(response.status).to eq(200)
     expect(session[:current_user_id]).to be_nil
-    login_code = EmailLoginCode.generate!(email: member.email)
-    post "/session/login-code/verify.json", params: { email: member.email, code: login_code.code }
+    post "/session.json", params: { login: member.email, password: "a sufficiently strong acceptance password" }
+
+    expect(response.status).not_to eq(200)
+    expect(session[:current_user_id]).to be_nil
+  end
+
+  it "requires every onboarding answer after a verified Google handoff before creating and linking the account" do
+    stage_verified_google_signup
+
+    post "/u.json",
+         params: {
+           email: "google-member@example.com",
+           username: "google_member",
+           name: "Google Member",
+           user_fields: that_space_signup_fields.except(that_space_signup_fields.keys.first),
+         }
 
     expect(response.status).to eq(200)
-    expect(response.parsed_body.dig("user", "id")).to eq(member.id)
+    expect(response.parsed_body).to include("success" => false)
+    expect(User.find_by_email("google-member@example.com")).to be_nil
+
+    post "/u.json",
+         params: {
+           email: "google-member@example.com",
+           username: "google_member",
+           name: "Google Member",
+           user_fields: that_space_signup_fields,
+         }
+
+    member = User.find_by_email!("google-member@example.com")
+    expect(response.status).to eq(200)
+    expect(response.parsed_body).to include("success" => true, "active" => true)
+    expect(member).to be_active
+    expect(member).to be_email_confirmed
     expect(session[:current_user_id]).to eq(member.id)
+    expect(member.user_associated_accounts.find_by!(provider_name: "google_oauth2").provider_uid).to eq(
+      "acceptance-google-uid",
+    )
     expect(configured_group("role.user").reload.users).to include(member)
   end
 
-  it "uses the native invite endpoint to require every onboarding field before creating a pending member" do
-    create_pending_invited_member
-  end
-
-  it "keeps a pending invitee out through the native login-code endpoint" do
-    member = create_pending_invited_member
-    login_code = EmailLoginCode.generate!(email: member.email)
-
-    post "/session/login-code/verify.json", params: { email: member.email, code: login_code.code }
-
-    expect(response.status).to eq(200)
-    expect(response.parsed_body).to eq("pending_approval" => true)
-    expect(session[:current_user_id]).to be_nil
-  end
-
-  it "creates a topic and reply through HTTP after native approval, then queues a real moderation review" do
-    member = create_pending_invited_member
-    approve_and_log_in(member)
+  it "creates a topic and reply through HTTP after a Google signup, then queues a real moderation review" do
+    member = create_google_member
 
     category = configured_category("introduction")
     expect(member.reload.in_any_groups?([Group[:trust_level_0].id])).to eq(true), member.group_users.pluck(:group_id).inspect
@@ -181,8 +202,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
   end
 
   it "keeps onboarding answers out of another member's profile response" do
-    member = create_pending_invited_member
-    approve_and_log_in(member)
+    member = create_google_member
     private_field = configured_user_field("relationship_status")
     other_member = Fabricate(:user, refresh_auto_groups: true)
 

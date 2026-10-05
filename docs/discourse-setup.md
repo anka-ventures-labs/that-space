@@ -54,10 +54,9 @@ env:
   UNICORN_WORKERS: 2
   DISCOURSE_HOSTNAME: ubuntu-asus.tail349cbf.ts.net
   DISCOURSE_DEVELOPER_EMAILS: "<Minh's admin email>"
-  # No outgoing email in the beta: an admin activates accounts by hand.
-  DISCOURSE_SMTP_ADDRESS: localhost
-  DISCOURSE_SMTP_PORT: 25
-  DISCOURSE_SMTP_ENABLE_START_TLS: false
+  # No outgoing email at all. Google is the only admission path, so no
+  # activation or password-reset mail is ever needed. Do not set an SMTP host
+  # here without sending a real test email.
 volumes:
   - volume: { host: /var/discourse/shared/standalone, guest: /shared }
   - volume: { host: /var/discourse/shared/standalone/log/var-log, guest: /var/log }
@@ -111,14 +110,36 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
 
 ## 5. Site settings
 
-- **Access:**
-  - `login_required`, `invite_only` and `must_approve_users` on
-  - `enable_local_logins` on
-  - Google login stays off until Minh adds OAuth at the end
+- **Access:** Google is the only admission path, so a verified Google identity
+  replaces email activation. `login_required` stays on and category permissions
+  still rely on that global boundary.
+  - `allow_new_registrations` and `enable_signup_cta` on
+  - `invite_only` off, `invite_code` empty, `must_approve_users` off
+  - `enable_local_logins` **off**: Discourse returns 403 for a password signup or
+    password login when it is off, so no account can be created that could never
+    activate. Google sign-in still works because a completed OAuth handoff
+    satisfies `UserAuthenticator#has_authenticator?`.
+  - `auth_skip_create_confirm` off
+  - `enable_google_oauth2_logins` stays off until Minh supplies the client ID
+    and secret and registers the exact redirect URI below. Leave it off while
+    the values are still placeholders, or the login appears and fails.
+- **Google redirect URI:** register this exact string, including the port and
+  with no trailing slash. Google matches redirect URIs exactly, so a missing
+  `:8443` fails with `redirect_uri_mismatch`:
+
+  ```text
+  https://ubuntu-asus.tail349cbf.ts.net:8443/auth/google_oauth2/callback
+  ```
+
 - **Language:**
   - `default_locale` is `vi`
   - `allow_user_locale` is on
-- **Email:** `disable_emails` is `non-staff` or `yes`, since there's no SMTP.
+- **Email:** no mailer is configured, so `enable_smtp` is off and
+  `disable_emails` is `all`. Members are notified in-app instead. Do not add an
+  SMTP host without also sending a real test email; a half-configured mailer
+  looks healthy and silently drops every message.
+- **Access recovery:** with no password path, a member who loses their Google
+  account has no self-service recovery and needs staff help.
 - **AI:**
   - `discourse_ai_enabled` on
   - An LLM for OpenRouter (provider `open_router`, with Minh's key) that

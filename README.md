@@ -12,15 +12,21 @@ Live demo: https://that-space-demo.vercel.app
 
 Private community: https://ubuntu-asus.tail349cbf.ts.net:8443
 
+Public admission is Google-only: the launcher sets `enable_local_logins=false`
+and there is no mailer, so password signup returns 403 rather than creating an
+account that could never activate. See [site settings](docs/discourse-setup.md#5-site-settings)
+for the exact redirect URI to register.
+
 ## Status
 
-- Clickable mockup. Forum threads, replies, matchmaking profiles, readings, and
-  testimonials are placeholder copy in `lib/` and the page files.
-- The reply box, the Tử Vi form, and the "Generate Reading" and "Download PDF
-  Report" buttons are static. Only navigation, the mobile menu, and the
-  matchmaking compatibility modal are interactive.
-- Testimonial and member names are fictional. Replace them with real, consented
-  content before any public launch.
+- The public homepage, `/privacy`, `/terms` and `/contact` describe real,
+  current capabilities in Vietnamese. `/`, `/forum`, `/tuvi`, `/matchmaking` and
+  `/profile` remain a demo: threads, replies, matchmaking profiles, readings and
+  testimonials are placeholder copy in `lib/` and the page files, and the reply
+  box, Tử Vi form and matchmaking modal are the only interactive parts. Set
+  `COMMUNITY_PUBLIC_REGISTRATION_ENABLED=true` only once Google sign-in works on
+  the live forum; the site then advertises `/signup` instead of `/login`.
+- Member-facing features live in the Discourse community, not these demo pages.
 - Bà Mối can be verified locally without a server or cloud account. Start with
   [local beta readiness](docs/local-beta-readiness.md); the product contract is
   in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).

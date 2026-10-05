@@ -1,25 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Footer() {
+type FooterProps = {
+  contactHref?: string;
+};
+
+export default function Footer({ contactHref = "/contact" }: FooterProps) {
   return (
-    <footer className="bg-[#F5F0E8] border-t border-[#C4A882]/40 text-[#5C3D2E] py-12 mt-16">
-      <div className="max-w-6xl mx-auto px-4 flex flex-col items-center gap-4">
-        <Link href="/" className="flex items-center gap-3 group">
-          <Image
-            src="/logo.jpg"
-            alt="Thật Space"
-            width={56}
-            height={56}
-            className="rounded-full object-cover border-2 border-[#C4A882] group-hover:border-[#5C3D2E] transition-colors"
-          />
+    <footer className="mt-16 border-t border-[#C4A882]/40 bg-[#F5F0E8] py-12 text-[#5C3D2E]">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4">
+        <Link href="/" className="group flex items-center gap-3">
+          <Image src="/logo.jpg" alt="Thật Space" width={56} height={56} className="rounded-full border-2 border-[#C4A882] object-cover transition-colors group-hover:border-[#5C3D2E]" />
         </Link>
-        <p className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-center">
-          Thật Space — A private space for women to connect, grow, and discover
-        </p>
-        <p className="text-sm text-[#C4A882] text-center">
-          © 2024 Thật Space. All rights reserved.
-        </p>
+        <p className="text-center font-[family-name:var(--font-playfair)] text-lg font-semibold">Thật Space — Kết nối, chia sẻ và tìm người đồng hành.</p>
+        <nav aria-label="Liên kết chân trang" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+          <Link href="/privacy" className="transition-colors hover:text-[#C4A882]">Quyền riêng tư</Link>
+          <Link href="/terms" className="transition-colors hover:text-[#C4A882]">Điều khoản</Link>
+          <Link href={contactHref} className="transition-colors hover:text-[#C4A882]">Liên hệ</Link>
+        </nav>
+        <p className="text-center text-sm text-[#C4A882]">© {new Date().getFullYear()} Thật Space</p>
       </div>
     </footer>
   );
