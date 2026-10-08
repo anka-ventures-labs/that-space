@@ -14,13 +14,14 @@ this phase. See the [current execution plan](plans/2026-10-01-whole-app.md).
 
 ## The product in one paragraph
 
-Thật Space is a private community for Vietnamese women, running on Discourse.
-Each member has her own AI matchmaker, Bà Mối, whom she messages directly
-inside the forum. Bà Mối learns about her and puts an anonymous card, with
-nothing that identifies her, into a shared pool. She can ask Bà Mối to open the
-daily Duyên box and bring back someone highly compatible, or ask "find me
-someone who…". Bà Mối describes that person without revealing who they are. If
-she sends an interest signal, the other person's Bà Mối tells them about her
+Thật Space is a private community for any adult aged 18 or older, running on
+Discourse. Membership is not restricted by gender. Each participating member
+has an AI matchmaker, Bà Mối, whom they message directly inside the forum. Bà
+Mối learns about them and puts an anonymous card, with nothing that identifies
+them, into a shared pool. A member can ask Bà Mối to open the daily Duyên box
+and bring back someone highly compatible, or ask "find me someone who…". Bà
+Mối describes that person without revealing who they are. If a member sends an
+interest signal, the other person's Bà Mối tells them about the anonymous card
 and how the two might fit. If both say yes, an anonymous chat opens, relayed by
 a bot. Nobody's identity is revealed unless both choose to reveal it.
 

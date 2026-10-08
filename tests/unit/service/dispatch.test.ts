@@ -11,6 +11,18 @@ beforeAll(async () => {
 afterAll(async () => h.close())
 
 describe('tool auth and envelope', () => {
+  it('fails closed before touching member data when the service is disabled', async () => {
+    const user = testUser('disabled')
+    h.deps.config.enabled = false
+    try {
+      const result = await h.call('status', user)
+      expect(result).toMatchObject({ status: 503, body: { ok: false, error: 'service_disabled' } })
+      expect(await getMemberByDiscourseId(h.db, user.user_id)).toBeNull()
+    } finally {
+      h.deps.config.enabled = true
+    }
+  })
+
   it('rejects a missing, wrong or malformed secret', async () => {
     const user = testUser('lan')
     expect((await h.call('status', user, {}, { secret: null })).status).toBe(401)

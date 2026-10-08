@@ -242,9 +242,10 @@ off the ASUS, and prove a restore into an isolated instance before inviting
 members. A backup that has not been restored is not sufficient recovery
 evidence.
 
-Before invitations, verify private guest denial, staff-assisted activation and
-recovery, upload access through the Funnel, restart recovery, backup/restore,
-phone layout, Vietnamese moderation behavior, and the real Bà Mối relay. The
+Before invitations, verify private guest denial, the required 18+ attestation,
+staff-assisted activation and recovery, upload access through the Funnel,
+restart recovery, backup/restore, phone layout, Vietnamese moderation behavior,
+and that Bà Mối is unavailable to members. The
 repository's GitHub acceptance checks validate the pinned build; they do not
 replace these live checks.
 
@@ -268,7 +269,9 @@ native secret binding are installed; installer check reports no drift.
 Persona and relay keys pass own-user access and reject impersonation. All ten
 service runtime variable names are present in this project's Vercel preview and
 production environments. At this initial checkpoint, no provider key or default
-LLM was configured and member AI conversations were disabled. Resumed
+LLM was configured and member AI conversations were disabled. This is
+historical evidence from before the 2026-10-08 adult-attestation field and
+controlled-pilot manifest. Resumed
 acceptance below supersedes that state.
 
 An initial pre-community backup was copied off-host to ignored
@@ -364,6 +367,10 @@ A real phone UI pause message was acknowledged. Event layout also passed at
 768/1440 pixels. Some upstream editor/event strings remain English. Only the
 two API-created fixtures were promoted to TL1, matching the invited-member
 default; neither is staff and no site quota was relaxed.
+
+That rendered checkpoint is historical: the initial public pilot now requires
+16 signup fields (the 18+ attestation plus those 15 questions) and must hide the
+Bà Mối CTA until the separate safety gate is complete.
 
 Cold rotational-disk I/O caused worker timeouts and temporary 502/503 responses.
 The native supervisor recovered without manual restart or speculative tuning.

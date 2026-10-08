@@ -4,8 +4,10 @@ import { render, screen } from "@testing-library/react";
 vi.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) {
+    const imageProps = { ...props };
+    delete imageProps.priority;
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
+    return <img src={src} alt={alt} {...imageProps} />;
   },
 }));
 
@@ -19,37 +21,59 @@ vi.mock("next/link", () => ({
 import HomePage from "@/app/page";
 
 const originalDiscourseUrl = process.env.DISCOURSE_URL;
-const originalRegistration = process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
+const originalCommunityLinkEnabled = process.env.PUBLIC_COMMUNITY_LINK_ENABLED;
+const originalSupportEmail = process.env.PUBLIC_SUPPORT_EMAIL;
+
+function restoreEnv(name: string, value: string | undefined) {
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
 
 afterEach(() => {
-  process.env.DISCOURSE_URL = originalDiscourseUrl;
-  process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = originalRegistration;
+  restoreEnv("DISCOURSE_URL", originalDiscourseUrl);
+  restoreEnv("PUBLIC_COMMUNITY_LINK_ENABLED", originalCommunityLinkEnabled);
+  restoreEnv("PUBLIC_SUPPORT_EMAIL", originalSupportEmail);
 });
 
 describe("Landing Page", () => {
-  it("uses the configured community URL and keeps public registration off by default", () => {
+  it("offers a controlled pilot and only links existing members to the community", () => {
     process.env.DISCOURSE_URL = "https://community.example.test/";
-    delete process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
+    process.env.PUBLIC_COMMUNITY_LINK_ENABLED = "true";
+    process.env.PUBLIC_SUPPORT_EMAIL = "hello@example.test";
     render(<HomePage />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thật Space");
-    expect(screen.getByRole("link", { name: "Vào cộng đồng" })).toHaveAttribute("href", "https://community.example.test");
-    expect(screen.getByRole("link", { name: "Đăng nhập thành viên beta" })).toHaveAttribute("href", "https://community.example.test/login");
-    expect(screen.queryByRole("link", { name: "Đăng ký tham gia" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Yêu cầu tham gia thử nghiệm" })).toHaveAttribute("href", "/contact");
+    expect(screen.getByRole("link", { name: "Đăng nhập thành viên" })).toHaveAttribute("href", "https://community.example.test/login");
+    expect(screen.queryByRole("link", { name: /đăng ký/i })).not.toBeInTheDocument();
   });
 
-  it("uses signup only when public registration is explicitly enabled", () => {
-    process.env.DISCOURSE_URL = "https://community.example.test";
-    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = "true";
+  it("does not emit a broken community or login link when the community URL is absent", () => {
+    delete process.env.DISCOURSE_URL;
+    process.env.PUBLIC_COMMUNITY_LINK_ENABLED = "true";
+    process.env.PUBLIC_SUPPORT_EMAIL = "hello@example.test";
     render(<HomePage />);
 
-    expect(screen.getByRole("link", { name: "Đăng ký tham gia" })).toHaveAttribute("href", "https://community.example.test/signup");
+    expect(screen.getByRole("link", { name: "Yêu cầu tham gia thử nghiệm" })).toHaveAttribute("href", "/contact");
+    expect(screen.queryByRole("link", { name: "Đăng nhập thành viên" })).not.toBeInTheDocument();
   });
 
-  it("describes member-only community and opt-in Bà Mối controls", () => {
+  it("keeps community links and invitation wording closed unless their independent gates are configured", () => {
+    process.env.DISCOURSE_URL = "https://community.example.test/";
+    delete process.env.PUBLIC_COMMUNITY_LINK_ENABLED;
+    delete process.env.PUBLIC_SUPPORT_EMAIL;
     render(<HomePage />);
-    expect(screen.getByText(/Thảo luận, bộ sưu tập ảnh, portfolio và sự kiện/)).toBeInTheDocument();
-    expect(screen.getByText(/tạm dừng hoặc chặn kết nối/i)).toBeInTheDocument();
+
+    expect(screen.queryByRole("link", { name: "Đăng nhập thành viên" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Xem trạng thái tiếp nhận" })).toHaveAttribute("href", "/contact");
+    expect(screen.getByText(/đang chuẩn bị kênh tiếp nhận/i)).toBeInTheDocument();
+  });
+
+  it("states the 18+ open eligibility and the Bà Mối launch boundary", () => {
+    render(<HomePage />);
+    expect(screen.getByText(/không phân biệt giới tính/i)).toBeInTheDocument();
+    expect(screen.getByText(/chưa mở trong đợt thử nghiệm cộng đồng đầu tiên/i)).toBeInTheDocument();
+    expect(screen.getByText(/không tự động được đưa vào Bà Mối/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /quyền riêng tư/i })).toHaveAttribute("href", "/privacy");
   });
 });

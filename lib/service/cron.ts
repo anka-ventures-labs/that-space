@@ -8,6 +8,10 @@ import type { ServiceDeps } from './deps'
 import { retryDuePosts } from './outbox'
 
 export async function handleRetryRequest(request: Request, deps: ServiceDeps): Promise<Response> {
+  if (!deps.config.enabled) {
+    deps.log({ event: 'cron_retry', status: 503, outcome: 'service_disabled' })
+    return Response.json({ ok: false, error: 'service_disabled' }, { status: 503 })
+  }
   if (!bearerMatches(request.headers.get('authorization'), deps.config.cronSecret)) {
     return Response.json({ ok: false }, { status: 401 })
   }

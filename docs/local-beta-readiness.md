@@ -1,5 +1,9 @@
 # Bà Mối local beta readiness
 
+> Historical service checkpoint. Public-surface and launch claims in this file
+> are superseded by the
+> [2026-10-08 controlled public soft-launch plan](plans/2026-10-08-controlled-public-soft-launch.md).
+
 Checkpoint: 2026-10-01, branch `feat/ba-moi`. The user authorized completing the
 existing beta locally before renting a server. No AWS resource, live database
 migration, Discourse installation, or deployment is part of this checkpoint.

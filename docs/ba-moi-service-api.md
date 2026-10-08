@@ -6,6 +6,10 @@ sentence the member reads in conversation. The service returns facts, plus
 
 ## Calling convention
 
+The API is unavailable unless `BA_MOI_ENABLED=true`. The initial community
+pilot keeps it false. While disabled, tool, webhook and retry routes return 503
+before loading database or bot credentials.
+
 `POST /api/ba-moi/v1/<tool>`, with header `Authorization: Bearer $BA_MOI_TOOL_SECRET`.
 
 ```json
@@ -26,6 +30,7 @@ sentence the member reads in conversation. The service returns facts, plus
   Bà Mối opens a new private message titled "Bà Mối có tin cho bạn".
 
 **Status codes:**
+- 503: the service launch switch is off (`error: "service_disabled"`).
 - 401: a missing or wrong secret.
 - 404: an unknown tool.
 - 400: a malformed body or envelope.

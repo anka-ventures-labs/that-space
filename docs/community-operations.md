@@ -1,25 +1,31 @@
 # Vận hành cộng đồng Thật Space
 
-Áp dụng cho bản beta dùng Discourse. Người dùng mới cần lời mời và phê duyệt
-của quản trị viên. Artist, Host, Observer và các lựa chọn Q1 là nhóm sở thích;
+Áp dụng cho bản beta dùng Discourse, dành cho bất kỳ ai từ đủ 18 tuổi và không
+giới hạn giới tính. Người dùng mới cần lời mời và phê duyệt của quản trị viên.
+Artist, Host, Observer và các lựa chọn Q1 là nhóm sở thích;
 chúng không cấp quyền quản trị hay kiểm duyệt.
 
 ## Tiếp nhận thành viên
 
-1. Gửi lời mời sau khi thống nhất cách kích hoạt tài khoản của beta. Khi chưa
+1. Tiếp nhận yêu cầu qua địa chỉ hỗ trợ công khai. Xác nhận người đăng ký tự
+   khai từ đủ 18 tuổi; không yêu cầu ảnh giấy tờ tùy thân. Dừng mời khi pilot
+   đạt 20 thành viên hoặc khi đội ngũ không còn đủ sức hỗ trợ.
+2. Gửi lời mời sau khi thống nhất cách kích hoạt tài khoản của beta. Khi chưa
    có email hoạt động, dùng quy trình kích hoạt và khôi phục có hỗ trợ của quản
    trị viên đã được kiểm chứng trên máy chủ.
-2. Thành viên hoàn thành 15 câu hỏi. Câu trả lời mặc định chỉ thành viên đó và
+3. Thành viên xác nhận điều kiện 18+ và hoàn thành 15 câu hỏi cộng đồng. Câu trả lời mặc định chỉ thành viên đó và
    nhân sự có quyền quản trị xem được; thành viên khác không xem được qua hồ sơ
    hoặc thẻ người dùng.
-3. Phê duyệt trong quản trị người dùng. Kiểm tra đăng nhập, bài giới thiệu và
+4. Phê duyệt trong quản trị người dùng. Kiểm tra đăng nhập, bài giới thiệu và
    thông báo trả lời.
-4. Q1 được ánh xạ sang nhóm ở lần đăng nhập đầu. Khi thành viên sửa Q1, nhân sự
+5. Q1 được ánh xạ sang nhóm ở lần đăng nhập đầu. Khi thành viên sửa Q1, nhân sự
    cập nhật lại nhóm và bỏ nhóm cũ; Automation hiện tại chỉ thêm nhóm.
 
-Không dùng câu trả lời đăng ký làm thẻ ghép đôi. Bà Mối có quy trình đồng ý,
-phỏng vấn và xác nhận thẻ riêng. Quản trị viên vẫn có thể đọc PM trong Discourse;
-lời đồng ý của Bà Mối cần nói rõ điều này.
+Không dùng câu trả lời đăng ký làm thẻ ghép đôi. Bà Mối chưa mở trong pilot đầu
+tiên: giữ `BA_MOI_ENABLED=false`, danh sách nhóm được phép trống và nút giao diện
+ẩn. Khi mở ở giai đoạn sau, Bà Mối phải có quy trình đồng ý, phỏng vấn và xác
+nhận thẻ riêng. Quản trị viên vẫn có thể đọc PM trong Discourse; lời đồng ý của
+Bà Mối cần nói rõ điều này.
 
 ## Bài viết, tác phẩm và sự kiện
 

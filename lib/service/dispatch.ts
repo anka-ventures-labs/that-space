@@ -72,6 +72,7 @@ export async function handleToolRequest(name: string, request: Request, deps: Se
     return Response.json(body, { status })
   }
 
+  if (!deps.config.enabled) return respond(503, failure('service_disabled'))
   if (!bearerMatches(request.headers.get('authorization'), deps.config.toolSecret)) return respond(401, failure('unauthorized'))
   const tool = Object.hasOwn(TOOLS, name) ? TOOLS[name] : undefined
   if (!tool) return respond(404, failure('not_found_tool'))

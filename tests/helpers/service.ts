@@ -101,6 +101,7 @@ export async function createHarness(options: { now?: Date; seed?: number } = {})
     db,
     discourse: discourse.client,
     config: {
+      enabled: true,
       toolSecret: TOOL_SECRET,
       webhookSecret: WEBHOOK_SECRET,
       cronSecret: CRON_SECRET,

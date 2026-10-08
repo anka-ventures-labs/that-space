@@ -1,5 +1,9 @@
 # Thật Space self-service public soft launch
 
+> Superseded on 2026-10-08 by
+> [the controlled adult public soft-launch plan](2026-10-08-controlled-public-soft-launch.md).
+> The public self-service admission described below must not be enabled.
+
 The user explicitly requested self-service public admission and branded OAuth
 on Oct5, superseding the invitation/staff-activation admission model. Keep
 existing forum posts, uploads, signup answers and Bà Mối private behind login.

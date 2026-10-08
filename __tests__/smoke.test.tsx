@@ -19,8 +19,10 @@ vi.mock("next/image", () => ({
     alt: string;
     [key: string]: unknown;
   }) {
+    const imageProps = { ...props };
+    delete imageProps.priority;
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
+    return <img src={src} alt={alt} {...imageProps} />;
   },
 }));
 
@@ -47,17 +49,14 @@ vi.mock("next/link", () => ({
 import HomePage from "@/app/page";
 
 const originalDiscourseUrl = process.env.DISCOURSE_URL;
-const originalRegistration = process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
 
 describe("Landing Page Smoke Test", () => {
   beforeEach(() => {
     delete process.env.DISCOURSE_URL;
-    delete process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
   });
 
   afterEach(() => {
     process.env.DISCOURSE_URL = originalDiscourseUrl;
-    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = originalRegistration;
   });
 
   it("renders the Thật Space brand name as the page heading", () => {
@@ -73,18 +72,18 @@ describe("Landing Page Smoke Test", () => {
   it("renders the Vietnamese tagline", () => {
     render(<HomePage />);
     expect(
-      screen.getByText("Một không gian để kết nối, chia sẻ và tìm người đồng hành."),
+      screen.getByText("Một không gian riêng tư để kết nối, chia sẻ và tìm người đồng hành."),
     ).toBeInTheDocument();
   });
 
   it("renders the three capability sections", () => {
     render(<HomePage />);
     expect(
-      screen.getByRole("heading", { name: "Cộng đồng thành viên", level: 3 }),
+      screen.getByRole("heading", { name: "Cộng đồng riêng tư", level: 3 }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Bà Mối", level: 3 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Dành cho người từ 18 tuổi", level: 3 })).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Quyền chủ động", level: 3 }),
+      screen.getByRole("heading", { name: "Thử nghiệm có kiểm soát", level: 3 }),
     ).toBeInTheDocument();
   });
 
@@ -94,5 +93,6 @@ describe("Landing Page Smoke Test", () => {
     expect(text).not.toMatch(/lorem ipsum/i);
     expect(text).not.toMatch(/A private space for women/i);
     expect(text).not.toMatch(/Join the Community/i);
+    expect(text).not.toMatch(/chỉ dành cho phụ nữ/i);
   });
 });

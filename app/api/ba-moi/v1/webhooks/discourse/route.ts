@@ -1,4 +1,4 @@
-import { getDeps } from '@/lib/service/deps'
+import { baMoiDisabledResponse, baMoiEnabled, getDeps } from '@/lib/service/deps'
 import { handleDiscourseWebhook } from '@/lib/service/relay'
 
 export const runtime = 'nodejs'
@@ -7,5 +7,6 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 15
 
 export async function POST(request: Request) {
+  if (!baMoiEnabled()) return baMoiDisabledResponse()
   return handleDiscourseWebhook(request, getDeps())
 }

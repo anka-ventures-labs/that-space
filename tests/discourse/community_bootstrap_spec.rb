@@ -31,6 +31,12 @@ RSpec.describe "Thật Space community bootstrap" do
       Group[:trust_level_0].id,
     )
 
+    adult_attestation = configured_user_field("adult_attestation")
+    expect(adult_attestation.on_signup?).to eq(true)
+    expect(adult_attestation.show_on_profile).to eq(false)
+    expect(adult_attestation.show_on_user_card).to eq(false)
+    expect(adult_attestation.searchable).to eq(false)
+
     that_space_manifest.fetch("groups").each do |definition|
       group = Group.find_by!(name: definition.fetch("name"))
       expect(group.full_name).to eq(definition.fetch("full_name"))

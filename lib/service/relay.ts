@@ -65,11 +65,12 @@ export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): P
 
 export async function handleDiscourseWebhook(request: Request, deps: ServiceDeps): Promise<Response> {
   const started = Date.now()
-  const body = new Uint8Array(await request.arrayBuffer())
   const respond = (status: number, outcome: string) => {
     deps.log({ event: 'webhook', status, outcome, ms: Date.now() - started })
     return Response.json({ ok: status === 200, outcome }, { status })
   }
+  if (!deps.config.enabled) return respond(503, 'service_disabled')
+  const body = new Uint8Array(await request.arrayBuffer())
   if (!verifyWebhookSignature(body, request.headers.get('x-discourse-event-signature'), deps.config.webhookSecret)) {
     return respond(401, 'bad_signature')
   }

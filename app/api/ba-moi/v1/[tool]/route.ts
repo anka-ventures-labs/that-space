@@ -1,4 +1,4 @@
-import { getDeps } from '@/lib/service/deps'
+import { baMoiDisabledResponse, baMoiEnabled, getDeps } from '@/lib/service/deps'
 import { handleToolRequest } from '@/lib/service/dispatch'
 
 export const runtime = 'nodejs'
@@ -9,5 +9,6 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 export async function POST(request: Request, { params }: { params: Promise<{ tool: string }> }) {
+  if (!baMoiEnabled()) return baMoiDisabledResponse()
   return handleToolRequest((await params).tool, request, getDeps())
 }

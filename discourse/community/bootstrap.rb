@@ -95,17 +95,17 @@ module ThatSpace
       admission_contract = {
         "login_required" => true,
         "allow_new_registrations" => true,
-        "enable_signup_cta" => true,
-        "invite_only" => false,
+        "enable_signup_cta" => false,
+        "invite_only" => true,
         "invite_code" => "",
-        "must_approve_users" => false,
-        "enable_local_logins" => false,
+        "must_approve_users" => true,
+        "enable_local_logins" => true,
         "auth_skip_create_confirm" => false,
         "enable_smtp" => false,
         "disable_emails" => "yes"
       }
       unless admission_contract.all? { |setting, expected| @manifest.fetch("site_settings").fetch(setting) == expected }
-        raise Error, "The community requires Google-only self-service signup with login-gated member content"
+        raise Error, "The controlled adult pilot requires invitations, staff approval, and login-gated member content"
       end
       raise Error, "Unsupported community manifest schema" unless @manifest["schema_version"] == 1
       raise Error, "Unexpected community manifest id" unless @manifest["manifest_id"] == MANIFEST_ID
@@ -115,6 +115,16 @@ module ThatSpace
       validate_unique!(@manifest.fetch("groups"), "name", "group name")
       validate_unique!(@manifest.fetch("user_fields"), "key", "user field")
       validate_unique!(@manifest.fetch("user_fields"), "question", "user field question")
+
+      adult_attestation = @manifest.fetch("user_fields").find { |field| field.fetch("key") == "adult_attestation" }
+      unless adult_attestation == {
+        "key" => "adult_attestation",
+        "question" => "Tôi xác nhận mình từ 18 tuổi trở lên.",
+        "type" => "dropdown",
+        "options" => ["Tôi xác nhận"]
+      }
+        raise Error, "The controlled pilot requires the exact 18+ signup attestation"
+      end
 
       categories = @manifest.fetch("categories").to_h { |category| [category.fetch("key"), category] }
       categories.each_value do |category|

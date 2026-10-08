@@ -38,6 +38,8 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_css(".that-space-member-welcome", visible: true)
     expect(page).to have_link("Xem Triển lãm", href: configured_category("exhibition").url)
     expect(page).to have_link("Xem lịch gặp gỡ", href: "/upcoming-events")
+    expect(page).not_to have_button("Nhắn Bà Mối")
+    expect(page).not_to have_button("Trò chuyện cùng Bà Mối")
     retain_theme_screenshot("that-space-desktop")
   end
 

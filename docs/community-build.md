@@ -60,8 +60,9 @@ The community reconciler owns its marked categories/groups, external-ID user
 fields and named role automation. Same-named unowned records cause a conflict;
 resolve ownership deliberately before reapplying. It creates 13 categories
 (including four art subcategories), staff-post/member-read announcements, five
-private interest groups, and all 15 required, editable signup questions. Answers
-are excluded from other members' profiles/cards/search. They never populate
+private interest groups, one required 18+ attestation, and all 15 required,
+editable community signup questions. Answers are excluded from other members'
+profiles/cards/search. They never populate
 the matchmaking pool without its separate consent flow. Interest groups grant
 neither trust levels nor staff access.
 
@@ -86,8 +87,9 @@ profiles allow bios, headers and featured topics. Follow is enabled for approved
 members with topic notifications and opt-out. Hosts may create their own events;
 members can RSVP; Host interest membership does not permit staff administration.
 
-The theme links forum, gallery, events and the member's profile. Set its
-`ba_moi_username` to the actual installed AI account after running the existing
+The theme links forum, gallery, events and the member's profile. Keep
+`ba_moi_username` unset for the initial pilot. Set it to the installed AI
+account only after completing the later Bà Mối safety gate and running the existing
 Bà Mối installer/probe. Until then its private-message CTA is omitted. It uses
 Discourse's composer and private-message permissions. Gallery/event links are
 same-site paths. Vietnamese navigation, palette and logo are included for

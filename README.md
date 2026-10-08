@@ -1,160 +1,166 @@
 # Thật Space
 
-A private community for Vietnamese women: a forum, Tử Vi (Vietnamese astrology)
-readings, and spiritual matchmaking. This repository contains the static Next.js
-**frontend demo**, **Discourse community build**, and **Bà Mối beta backend**:
-onboarding, member presentation, matching, private Postgres data, Discourse AI
-tools, and an anonymous chat relay. Discourse provides the member interface and
-authentication. The private community and service are installed; actual AI
-conversation, review-only AI moderation and phone acceptance remain pending.
+Thật Space is a private Vietnamese community for **any person aged 18 or
+older**. Membership is not restricted by gender.
 
-Live demo: https://that-space-demo.vercel.app
+This repository contains three deliberately separate surfaces:
 
-Private community: https://ubuntu-asus.tail349cbf.ts.net:8443
+- a public Next.js brochure;
+- a private Discourse community build;
+- the Bà Mối matchmaking service, which is disabled for the initial pilot.
 
-Public admission is Google-only: the launcher sets `enable_local_logins=false`
-and there is no mailer, so password signup returns 403 rather than creating an
-account that could never activate. See [site settings](docs/discourse-setup.md#5-site-settings)
-for the exact redirect URI to register.
+Public site: <https://that-space-demo.vercel.app>
 
-## Status
+Private community: <https://ubuntu-asus.tail349cbf.ts.net:8443>
 
-- The public homepage, `/privacy`, `/terms` and `/contact` describe real,
-  current capabilities in Vietnamese. `/`, `/forum`, `/tuvi`, `/matchmaking` and
-  `/profile` remain a demo: threads, replies, matchmaking profiles, readings and
-  testimonials are placeholder copy in `lib/` and the page files, and the reply
-  box, Tử Vi form and matchmaking modal are the only interactive parts. Set
-  `COMMUNITY_PUBLIC_REGISTRATION_ENABLED=true` only once Google sign-in works on
-  the live forum; the site then advertises `/signup` instead of `/login`.
-- Member-facing features live in the Discourse community, not these demo pages.
-- Bà Mối can be verified locally without a server or cloud account. Start with
-  [local beta readiness](docs/local-beta-readiness.md); the product contract is
-  in [docs/ba-moi-spec.md](docs/ba-moi-spec.md).
-- The community build is versioned under `discourse/`, with pinned extensions
-  and real Discourse request/browser tests. See [community build](docs/community-build.md)
-  for reproduction, application, privacy boundaries and remaining live gates. The
-  [whole-app execution plan](docs/plans/2026-10-01-whole-app.md) covers community
-  onboarding, profiles, artwork, events, Bà Mối integration and the
-  local-development-to-production sequence. Full Tử Vi charts/readings/PDFs
-  remain out of scope for this phase; future astrology work should reuse Moon.
-- The current [ASUS deployment checkpoint](docs/asus-deployment.md#observed-oct5-live-checkpoint)
-  records synthetic member acceptance, private-upload checks, scheduled retry
-  recovery and the isolated native restore. No real members have been invited;
-  the native AI bot stays disabled until its dedicated model works.
+## Launch status
+
+The approved soft-launch shape is a public brochure plus a controlled private
+pilot of at most 20 adults:
+
+- public routes are `/`, `/privacy`, `/terms`, and `/contact`;
+- the former static forum, profile, Tử Vi, and matchmaking demo routes have
+  been removed;
+- anyone aged 18 or older may request an invitation through the configured
+  support address;
+- Discourse requires an invitation, an explicit 18+ attestation, all 15
+  community onboarding answers, and staff approval;
+- admission controls manage pilot capacity and safety; they are not a gender or
+  identity-document gate;
+- onboarding answers are private by default and are not sent to Bà Mối;
+- `BA_MOI_ENABLED=false` is the default and all Bà Mối HTTP ingress fails
+  closed while disabled.
+
+The complete decision, operator checks, stop conditions, and deferred Bà Mối
+work are in the [controlled public soft-launch plan](docs/plans/2026-10-08-controlled-public-soft-launch.md).
 
 ## Getting started
 
-Requires Node.js 20 or later. Vercel builds with Node 24; the recovery was
-verified locally on Node 22.
+Requires Node.js 20 or later. Vercel builds with Node 24.
 
 ```bash
 npm ci
-npm run dev        # http://localhost:3000
+cp .env.example .env.local
+npm run dev
 ```
+
+`PUBLIC_SUPPORT_EMAIL` opens invitation intake. A community link additionally
+requires both `DISCOURSE_URL` and `PUBLIC_COMMUNITY_LINK_ENABLED=true`; keep the
+flag false until the member path passes external acceptance. Do not add real
+secrets to tracked files.
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Vitest: pages, matching core, migrated data layer, service and local acceptance |
-| `npm run test:beta` | Two complete member journeys using disposable Postgres and fake Discourse; no external services or secrets |
-| `npm run typecheck` | Typecheck |
+| `npm test` | Vitest page, matching, data-layer, service, and local journey tests |
+| `npm run test:beta` | Two complete Bà Mối journeys against disposable Postgres and fake Discourse |
+| `npm run typecheck` | TypeScript validation |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
-| `npm run build` | Production build (18 static pages) |
-| `npm run seed:samples` | Replace the 30 labelled sample members in the Supabase pool (reads `DATABASE_URL` from `.env.local`) |
+| `npm run build` | Production Next.js build |
+| GitHub `Discourse community acceptance` | Pinned native Discourse request/browser acceptance suite |
+| Manifest `--check` from the runbook | Report drift from the controlled community manifest |
 
-## Pages
+## Public routes
 
 | Route | Content |
 | --- | --- |
-| `/` | Hero, three feature cards, testimonials, call to action |
-| `/forum` | Category sidebar and 10 sample threads from `lib/forum-data.ts` |
-| `/forum/[slug]` | Thread with replies, statically generated from `forumThreads` |
-| `/tuvi` | Birth-information form and a sample reading |
-| `/matchmaking` | Six profiles with a compatibility modal, from `lib/matchmaking-data.ts` |
-| `/profile` | Sample member profile with readings and matches |
+| `/` | Pilot scope, adult eligibility, community boundary, and feature status |
+| `/privacy` | Community data handling and the disabled Bà Mối boundary |
+| `/terms` | 18+ eligibility, pilot admission, and conduct terms |
+| `/contact` | Invitation, support, and safety-reporting channel |
 
-## Layout and conventions
+`PUBLIC_SUPPORT_EMAIL` must be configured before invitation intake opens. If it
+is missing, the public CTAs become status-only and `/contact` says intake is
+closed instead of creating a broken or circular link. `DISCOURSE_URL` never
+publishes a link by itself: `PUBLIC_COMMUNITY_LINK_ENABLED=true` is also
+required, and still never creates a public signup link.
+
+## Repository map
 
 ```text
-app/              App Router routes
-components/       Navbar (client component) and Footer
-lib/              Demo data: forum threads, matchmaking profiles
-lib/matching/     Bà Mối matching core: lunar calendar, tuổi, day pillar, filters, scores, privacy
-lib/db/           Bà Mối data layer: postgres.js client, repository, sample members
-lib/service/      Bà Mối service: tool handlers, relay, outbox, Vietnamese copy
-lib/discourse/    Discourse API client and webhook signature check
-app/api/ba-moi/   Route handlers: /v1/<tool>, /v1/webhooks/discourse, /v1/cron/retry-posts
-supabase/         Supabase CLI config and SQL migrations
-scripts/          One-off scripts (seed-samples.ts, run with tsx)
-discourse/        Community/onboarding, branded theme, extension pins and Bà Mối agent/tools
+app/              Public pages and disabled-by-default Bà Mối route handlers
+components/       Shared public navigation and footer
+lib/matching/     Bà Mối compatibility, privacy, and filtering core
+lib/db/           Bà Mối Postgres data layer and sample members
+lib/service/      Tool handlers, relay, outbox, copy, and launch switch
+lib/discourse/    Discourse API client and webhook verification
+supabase/         Supabase CLI config and additive SQL migrations
+scripts/          Install, verification, and maintenance scripts
+discourse/        Community manifest, bootstrap, theme, agent, and deployment pin
 tests/discourse/  Native Discourse request and browser acceptance
-__tests__/        Vitest + Testing Library page tests (jsdom)
-tests/unit/       Vitest unit tests (node); tests/unit/db runs on PGlite
-tests/integration/ Local beta acceptance journeys through the real dispatcher
-tests/helpers/    Test database: PGlite + migrations, reached through postgres.js
-public/logo.jpg   Brand logo, served at /logo.jpg
+__tests__/        Public-page tests in jsdom
+tests/unit/       Node unit tests; database suites use PGlite
+tests/integration/Local Bà Mối journeys through the real dispatcher
 ```
 
-- `@/*` maps to the repository root, as in Moon, so code imports `@/lib/...`,
-  `@/components/...` and `@/app/...`.
-- Brand colors live in `tailwind.config.ts`: `primary` `#5C3D2E`, `secondary`
-  `#C4A882`, `cream` `#F5F0E8`. Playfair Display (headings) and Inter (body) are
-  exposed as CSS variables by `app/layout.tsx`.
-- `/forum/[slug]` derives `generateStaticParams()` from `lib/forum-data.ts`, so a
-  thread added there gets its own page at build time.
-- `next.config.js` sets `images.unoptimized` so the logo renders without the
-  image optimization server.
-- Tests run on Vitest: page tests in `__tests__/` use jsdom, and unit tests in
-  `tests/unit/` use node. They mock `next/image` and `next/link`. The
-  `console.error` about the `priority` prop, caused by the image mock, is
-  expected.
-- `progress-7b613403-….txt` is the log of the agent run that built the demo. It
-  records the user stories (US-001 to US-009) and codebase patterns.
+Brand colors live in `tailwind.config.ts`. Playfair Display and Inter are loaded
+by `app/layout.tsx`. `next.config.js` keeps the logo unoptimized so the static
+public surface does not depend on the image optimization server.
 
-## Bà Mối data (Supabase)
+## Controlled community admission
 
-The service's database is a free Supabase project in its own organization.
-Copy `.env.example` to `.env.local` and fill it in; never commit it.
+The source of truth is `discourse/community/manifest.json`. The manifest
+enforces:
 
-```bash
-set -a; . ./.env.local; set +a        # SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
-supabase link --project-ref "$SUPABASE_PROJECT_REF"
-supabase db push                       # applies supabase/migrations/*.sql
-npm run seed:samples                   # 30 labelled sample members
-```
+- `login_required=true`;
+- `allow_new_registrations=true` only so invitation redemption works;
+- `enable_signup_cta=false`;
+- `invite_only=true`;
+- `must_approve_users=true`;
+- `enable_local_logins=true` for the native invitation path;
+- outgoing email disabled until a real mailer is configured and tested.
 
-- The service connects through the transaction pooler (`DATABASE_URL`, port
-  6543) with postgres.js and prepared statements off. RLS is on everywhere with
-  no policies, and the public Data API roles hold no privileges.
-- Migrations are additive. Take a `pg_dump` before any change that touches
-  member data.
-- Tests never touch Supabase: `tests/helpers/pglite-db.ts` gives each suite an
-  in-memory PGlite with the same migrations.
-- The service API the persona calls is documented in
-  [docs/ba-moi-service-api.md](docs/ba-moi-service-api.md). Its environment
-  variables are listed in `.env.example`.
+The first required signup field is the exact 18+ self-attestation. The next 15
+fields are Thảo's community onboarding questions. Do not collect identity-
+document images. Apply changes with `--check` first and follow
+[community operations](docs/community-operations.md).
+
+## Bà Mối boundary
+
+Bà Mối is not available to pilot members yet. Keep all three controls in place:
+
+1. `BA_MOI_ENABLED=false` in the service environment;
+2. `BA_MOI_ALLOWED_GROUP_IDS` empty in the Discourse installer configuration;
+3. the theme's Bà Mối username unset so no member CTA appears.
+
+With the service switch off, tool, webhook, and retry endpoints return HTTP 503
+before loading database or bot credentials. The underlying service can still be
+verified locally with `npm run test:beta`.
+
+Before enabling Bà Mối, complete the safety gates in the launch plan: fresh
+server-bound confirmation for sensitive actions, rolling cross-message contact
+protection, outbox failure-injection coverage, live provider acceptance, an
+incident owner, and updated processor disclosures.
+
+## Data and secrets
+
+Copy `.env.example` to the ignored `.env.local`; never commit values. The Bà
+Mối service uses Supabase's transaction pooler with prepared statements off.
+RLS is enabled without client policies, and public Data API roles hold no table
+privileges. Tests use an in-memory PGlite database and never contact Supabase.
+
+Migrations are additive. Take a verified backup before a production data
+change. The service API contract lives in
+[docs/ba-moi-service-api.md](docs/ba-moi-service-api.md).
 
 ## Deployment
 
-The demo runs on the Vercel project `that-space-demo` (team "Minh Nguyen's
-projects"). It was deployed from the Vercel CLI, and the project is intentionally
-**not** connected to this GitHub repository, so pushes and pull requests never
-trigger Vercel builds.
+The Vercel project is intentionally not connected to Git, so a push or pull
+request does not deploy. Follow the studio local-first policy:
 
-Deploy according to the studio's Vercel policy in
-`anka-ventures-labs/anka-dev-infra` (`docs/vercel-build-cost-control.md`). Build a
-preview first, smoke-test its URL, and promote to production only after a human
-approves. Do not connect Git auto-deploy.
+1. required GitHub checks must pass on the exact intended commit;
+2. pull the intended Vercel environment;
+3. run `vercel build` locally and inspect the mapped output for Linux-x64 native
+   compatibility;
+4. deploy that exact output with `vercel deploy --prebuilt` to a preview;
+5. smoke-test the preview in a real browser;
+6. promote to production only after explicit operator approval.
 
-On 2026-10-05 the user approved staging a production-target local prebuilt with
-`--skip-domain`, testing it, then manually promoting it because the current CLI
-would rebuild a promoted preview remotely. Deployment
-`dpl_ENbPZPxbsomoaYwAq9jYvWpvAPPr`, built from `1787b83`, now serves the canonical
-alias in `sin1`. The clean archive's mapped-file audit found no native binaries
-or operator environment references. See [the session log](docs/SESSION_LOG.md)
-for that authorization and evidence; never upload this operator checkout's
-`.vercel/output`.
+Do not connect Git auto-deploy and do not upload `.vercel` or environment
+values. The previous production evidence points to commit `1787b83` and is not
+evidence for the current release. Record the new exact commit and deployment ID
+under `docs/verification/` when promotion occurs.
 
-To link a checkout to the existing project without creating a new one:
+To link a clean checkout to the existing project:
 
 ```bash
 vercel link --yes --team minh-nguyens-projects-3a747261 --project that-space-demo
@@ -162,22 +168,8 @@ vercel link --yes --team minh-nguyens-projects-3a747261 --project that-space-dem
 
 ## Provenance
 
-This source was never in Git. On 2026-09-27 it was recovered from the production
-deployment `dpl_96qbsSc72amjziWADYYJ8UQL72Ts` (deployed 2026-02-23) through the
-Vercel API, checked against Vercel's SHA-1 file digests, and imported unchanged.
-See [docs/SESSION_LOG.md](docs/SESSION_LOG.md).
-
-## Known issues
-
-- `next@15.5.26`: `npm audit --omit=dev` reports one moderate Next.js advisory,
-  fixed only in Next.js 16, and a high advisory in the PostCSS bundled inside
-  Next.js. That one is build-time only and concerns processing attacker-supplied
-  CSS source maps. The upgrade from 14.2.5 cleared its critical and runtime
-  advisories.
-- Dev tooling: `npm audit` also reports advisories in Vitest 2.1.9 and its
-  Vite and esbuild. They affect the Vitest UI and dev servers, which this repo
-  doesn't run (`vitest run` only). The fix is Vitest 5, a major upgrade that
-  replaces `environmentMatchGlobs`; it's deferred.
-- `logo.jpg` at the repository root duplicates `public/logo.jpg`. Only the
-  `public/` copy is served.
-- The footer copyright reads "© 2024".
+The original public demo was recovered from a Vercel deployment on 2026-09-27,
+verified against Vercel file digests, and imported into Git. See
+[the session log](docs/SESSION_LOG.md). Historical plans and verification files
+describe earlier states; the 2026-10-08 controlled plan is authoritative for
+this release.

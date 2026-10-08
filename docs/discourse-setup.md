@@ -110,19 +110,18 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
 
 ## 5. Site settings
 
-- **Access:** Google is the only admission path, so a verified Google identity
-  replaces email activation. `login_required` stays on and category permissions
+- **Access:** the initial pilot accepts any adult aged 18 or older, but admission
+  is capped and controlled. `login_required` stays on and category permissions
   still rely on that global boundary.
-  - `allow_new_registrations` and `enable_signup_cta` on
-  - `invite_only` off, `invite_code` empty, `must_approve_users` off
-  - `enable_local_logins` **off**: Discourse returns 403 for a password signup or
-    password login when it is off, so no account can be created that could never
-    activate. Google sign-in still works because a completed OAuth handoff
-    satisfies `UserAuthenticator#has_authenticator?`.
+  - `allow_new_registrations` on so invitation redemption works;
+    `enable_signup_cta` off so there is no public self-service CTA
+  - `invite_only` and `must_approve_users` on; `invite_code` empty
+  - `enable_local_logins` on for the native invitation path. An invitation and
+    staff approval are still both required.
   - `auth_skip_create_confirm` off
-  - `enable_google_oauth2_logins` stays off until Minh supplies the client ID
-    and secret and registers the exact redirect URI below. Leave it off while
-    the values are still placeholders, or the login appears and fails.
+  - Google login is optional for a later pilot. Keep it off until real
+    credentials and the exact callback are tested; it never bypasses the
+    invitation or approval policy.
 - **Google redirect URI:** register this exact string, including the port and
   with no trailing slash. Google matches redirect URIs exactly, so a missing
   `:8443` fails with `redirect_uri_mismatch`:
@@ -140,8 +139,8 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
   Members are notified in-app instead. Do not add an
   SMTP host without also sending a real test email; a half-configured mailer
   looks healthy and silently drops every message.
-- **Access recovery:** with no password path, a member who loses their Google
-  account has no self-service recovery and needs staff help.
+- **Access recovery:** no transactional mailer is configured, so test the
+  staff-assisted invite, login and recovery path before each invitation batch.
 - **AI:**
   - `discourse_ai_enabled` on
   - An LLM for OpenRouter (provider `open_router`, with Minh's key) that
@@ -149,8 +148,8 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
 - **Members:**
   - `personal_message_enabled_groups` must include the members, so they can
     message Bà Mối.
-  - Create the categories and user fields (Thảo's 15 signup questions) from
-    the spec.
+  - Create the 18+ attestation and Thảo's 15 private signup questions from the
+    manifest.
   - Automation's "user group membership through badge or user field" script
     sets each member's group from question 1.
 - **Backups:**

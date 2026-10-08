@@ -8,23 +8,20 @@ function isEnabled(value: string | undefined) {
 }
 
 export function getPublicSiteConfig() {
-  const communityUrl = normalizeUrl(process.env.DISCOURSE_URL);
+  const configuredCommunityUrl = normalizeUrl(process.env.DISCOURSE_URL);
+  const communityUrl = isEnabled(process.env.PUBLIC_COMMUNITY_LINK_ENABLED)
+    ? configuredCommunityUrl
+    : "";
   const supportEmail = process.env.PUBLIC_SUPPORT_EMAIL?.trim() || undefined;
-  const communityPublicRegistrationEnabled = isEnabled(
-    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED,
-  );
 
   return {
     communityUrl,
-    communityPublicRegistrationEnabled,
     supportEmail,
-    communityHref: communityUrl || "/",
-    loginHref: communityUrl ? `${communityUrl}/login` : "/login",
-    signupHref: communityUrl ? `${communityUrl}/signup` : "/signup",
+    intakeOpen: Boolean(supportEmail),
+    loginHref: communityUrl ? `${communityUrl}/login` : undefined,
+    joinHref: "/contact",
     contactHref: supportEmail
       ? `mailto:${supportEmail}`
-      : communityUrl
-        ? `${communityUrl}/about`
-        : "/contact",
+      : "/contact",
   };
 }

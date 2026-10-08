@@ -5,8 +5,10 @@
 import { z } from 'zod'
 import { getDb, type Db } from '@/lib/db/db'
 import { createDiscourseClient, type DiscourseClient } from '@/lib/discourse/client'
+import { ERROR_MESSAGES } from './copy'
 
 const EnvSchema = z.object({
+  BA_MOI_ENABLED: z.string().optional().transform((value) => value?.trim().toLowerCase() === 'true'),
   BA_MOI_TOOL_SECRET: z.string().min(32),
   DISCOURSE_WEBHOOK_SECRET: z.string().min(16),
   CRON_SECRET: z.string().min(32),
@@ -21,6 +23,7 @@ const EnvSchema = z.object({
 })
 
 export interface ServiceConfig {
+  enabled: boolean
   toolSecret: string
   webhookSecret: string
   cronSecret: string
@@ -44,6 +47,15 @@ export function logEvent(event: Record<string, unknown>): void {
   console.log(JSON.stringify({ at: new Date().toISOString(), ...event }))
 }
 
+export function baMoiEnabled(value: string | undefined = process.env.BA_MOI_ENABLED): boolean {
+  return value?.trim().toLowerCase() === 'true'
+}
+
+/** Used by route handlers before loading database or bot credentials. */
+export function baMoiDisabledResponse(): Response {
+  return Response.json({ ok: false, error: 'service_disabled', message_vi: ERROR_MESSAGES.service_disabled }, { status: 503 })
+}
+
 let deps: ServiceDeps | null = null
 
 export function getDeps(): ServiceDeps {
@@ -61,6 +73,7 @@ export function getDeps(): ServiceDeps {
       apiKeys: { [env.BA_MOI_PERSONA_USERNAME]: env.DISCOURSE_PERSONA_API_KEY, [env.BA_MOI_RELAY_USERNAME]: env.DISCOURSE_RELAY_API_KEY },
     }),
     config: {
+      enabled: env.BA_MOI_ENABLED,
       toolSecret: env.BA_MOI_TOOL_SECRET,
       webhookSecret: env.DISCOURSE_WEBHOOK_SECRET,
       cronSecret: env.CRON_SECRET,

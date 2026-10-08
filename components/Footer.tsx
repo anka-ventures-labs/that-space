@@ -14,11 +14,11 @@ export default function Footer({ contactHref = "/contact" }: FooterProps) {
         </Link>
         <p className="text-center font-[family-name:var(--font-playfair)] text-lg font-semibold">Thật Space — Kết nối, chia sẻ và tìm người đồng hành.</p>
         <nav aria-label="Liên kết chân trang" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
-          <Link href="/privacy" className="transition-colors hover:text-[#C4A882]">Quyền riêng tư</Link>
-          <Link href="/terms" className="transition-colors hover:text-[#C4A882]">Điều khoản</Link>
-          <Link href={contactHref} className="transition-colors hover:text-[#C4A882]">Liên hệ</Link>
+          <Link href="/privacy" className="transition-colors hover:text-[#7A5542]">Quyền riêng tư</Link>
+          <Link href="/terms" className="transition-colors hover:text-[#7A5542]">Điều khoản</Link>
+          <Link href={contactHref} className="transition-colors hover:text-[#7A5542]">Liên hệ</Link>
         </nav>
-        <p className="text-center text-sm text-[#C4A882]">© {new Date().getFullYear()} Thật Space</p>
+        <p className="text-center text-sm text-[#5C3D2E]/70">© {new Date().getFullYear()} Thật Space</p>
       </div>
     </footer>
   );

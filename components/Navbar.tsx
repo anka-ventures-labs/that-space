@@ -7,25 +7,18 @@ import { useState } from "react";
 
 type NavbarProps = {
   communityUrl: string;
-  communityPublicRegistrationEnabled: boolean;
+  intakeOpen: boolean;
 };
 
-export default function Navbar({
-  communityUrl,
-  communityPublicRegistrationEnabled,
-}: NavbarProps) {
+export default function Navbar({ communityUrl, intakeOpen }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const communityHref = communityUrl || "/";
-  const membershipHref = communityUrl
-    ? `${communityUrl}/${communityPublicRegistrationEnabled ? "signup" : "login"}`
-    : `/${communityPublicRegistrationEnabled ? "signup" : "login"}`;
-  const membershipLabel = communityPublicRegistrationEnabled
-    ? "Đăng ký"
-    : "Đăng nhập thành viên";
+  const normalizedCommunityUrl = communityUrl.trim().replace(/\/+$/, "");
   const navLinks = [
     { href: "/", label: "Trang chủ", external: false },
-    { href: communityHref, label: "Cộng đồng", external: Boolean(communityUrl) },
+    ...(normalizedCommunityUrl
+      ? [{ href: normalizedCommunityUrl, label: "Cộng đồng", external: true }]
+      : []),
     { href: "/privacy", label: "Quyền riêng tư", external: false },
     { href: "/contact", label: "Liên hệ", external: false },
   ];
@@ -49,14 +42,27 @@ export default function Navbar({
               </li>
             );
           })}
+          {normalizedCommunityUrl && (
+            <li>
+              <Link href={`${normalizedCommunityUrl}/login`} className="text-sm font-medium text-[#5C3D2E]/70 transition-colors hover:text-[#5C3D2E]">
+                Đăng nhập
+              </Link>
+            </li>
+          )}
           <li>
-            <Link href={membershipHref} className="rounded-full bg-[#5C3D2E] px-4 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#C4A882]">
-              {membershipLabel}
+            <Link href="/contact" className="rounded-full bg-[#5C3D2E] px-4 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
+              {intakeOpen ? "Yêu cầu tham gia" : "Trạng thái tiếp nhận"}
             </Link>
           </li>
         </ul>
 
-        <button className="rounded-md p-2 text-[#5C3D2E] transition-colors hover:bg-[#C4A882]/20 md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Chuyển menu">
+        <button
+          className="rounded-md p-2 text-[#5C3D2E] transition-colors hover:bg-[#C4A882]/20 md:hidden"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Chuyển menu"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
+        >
           {menuOpen ? (
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           ) : (
@@ -66,7 +72,7 @@ export default function Navbar({
       </div>
 
       {menuOpen && (
-        <div className="space-y-3 border-t border-[#C4A882]/30 bg-[#F5F0E8] px-4 py-4 md:hidden">
+        <div id="mobile-navigation" className="space-y-3 border-t border-[#C4A882]/30 bg-[#F5F0E8] px-4 py-4 md:hidden">
           {navLinks.map((link) => {
             const isActive = !link.external && pathname === link.href;
             return (
@@ -75,8 +81,13 @@ export default function Navbar({
               </Link>
             );
           })}
-          <Link href={membershipHref} onClick={() => setMenuOpen(false)} className="block rounded-full bg-[#5C3D2E] px-4 py-2 text-center text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#C4A882]">
-            {membershipLabel}
+          {normalizedCommunityUrl && (
+            <Link href={`${normalizedCommunityUrl}/login`} onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-[#5C3D2E]/70 hover:bg-[#C4A882]/20 hover:text-[#5C3D2E]">
+              Đăng nhập thành viên
+            </Link>
+          )}
+          <Link href="/contact" onClick={() => setMenuOpen(false)} className="block rounded-full bg-[#5C3D2E] px-4 py-2 text-center text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
+            {intakeOpen ? "Yêu cầu tham gia" : "Trạng thái tiếp nhận"}
           </Link>
         </div>
       )}
