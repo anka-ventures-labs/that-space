@@ -1,31 +1,35 @@
 # Vận hành cộng đồng Thật Space
 
-Áp dụng cho bản beta dùng Discourse, dành cho bất kỳ ai từ đủ 18 tuổi và không
-giới hạn giới tính. Người dùng mới cần lời mời và phê duyệt của quản trị viên.
-Artist, Host, Observer và các lựa chọn Q1 là nhóm sở thích;
+Áp dụng cho bản ra mắt mềm dùng Discourse, dành cho bất kỳ ai từ đủ 18 tuổi và
+không giới hạn giới tính. Người dùng mới tự đăng ký bằng Google; không cần lời
+mời hay phê duyệt của quản trị viên. Artist, Host, Observer và các lựa chọn Q1
+là nhóm sở thích;
 chúng không cấp quyền quản trị hay kiểm duyệt.
 
 ## Tiếp nhận thành viên
 
-1. Tiếp nhận yêu cầu qua địa chỉ hỗ trợ công khai. Xác nhận người đăng ký tự
-   khai từ đủ 18 tuổi; không yêu cầu ảnh giấy tờ tùy thân. Dừng mời khi pilot
-   đạt 20 thành viên hoặc khi đội ngũ không còn đủ sức hỗ trợ.
-2. Gửi lời mời sau khi thống nhất cách kích hoạt tài khoản của beta. Khi chưa
-   có email hoạt động, dùng quy trình kích hoạt và khôi phục có hỗ trợ của quản
-   trị viên đã được kiểm chứng trên máy chủ.
-3. Thành viên xác nhận điều kiện 18+ và hoàn thành 15 câu hỏi cộng đồng. Câu trả lời mặc định chỉ thành viên đó và
+1. Thành viên chọn Đăng ký, hoàn tất Google OAuth, xác nhận điều kiện 18+ và
+   hoàn thành 15 câu hỏi cộng đồng. Không yêu cầu ảnh giấy tờ tùy thân.
+2. Câu trả lời mặc định chỉ thành viên đó và
    nhân sự có quyền quản trị xem được; thành viên khác không xem được qua hồ sơ
    hoặc thẻ người dùng.
-4. Phê duyệt trong quản trị người dùng. Kiểm tra đăng nhập, bài giới thiệu và
-   thông báo trả lời.
-5. Q1 được ánh xạ sang nhóm ở lần đăng nhập đầu. Khi thành viên sửa Q1, nhân sự
+3. Q1 được ánh xạ sang nhóm ở lần đăng nhập đầu. Khi thành viên sửa Q1, nhân sự
    cập nhật lại nhóm và bỏ nhóm cũ; Automation hiện tại chỉ thêm nhóm.
+4. Nếu người dùng mất tài khoản Google, quy trình khôi phục cần nhân sự hỗ trợ
+   vì hệ thống không có mật khẩu cục bộ hay email giao dịch.
 
-Không dùng câu trả lời đăng ký làm thẻ ghép đôi. Bà Mối chưa mở trong pilot đầu
-tiên: giữ `BA_MOI_ENABLED=false`, danh sách nhóm được phép trống và nút giao diện
-ẩn. Khi mở ở giai đoạn sau, Bà Mối phải có quy trình đồng ý, phỏng vấn và xác
-nhận thẻ riêng. Quản trị viên vẫn có thể đọc PM trong Discourse; lời đồng ý của
-Bà Mối cần nói rõ điều này.
+Không dùng câu trả lời đăng ký làm thẻ ghép đôi. Bà Mối có quy trình đồng ý,
+phỏng vấn và xác nhận thẻ riêng. Quản trị viên vẫn có thể đọc PM trong
+Discourse; lời đồng ý của Bà Mối nói rõ điều này. Mọi thành viên thường thuộc
+`trust_level_0` được dùng Bà Mối; giữ tên bot và nhóm cho phép đồng bộ với trình
+cài đặt.
+
+Lộ diện, kết thúc, chặn và xóa dữ liệu cần hai lượt: dịch vụ phát token ngắn
+hạn, dùng một lần, gắn với đúng thành viên, chủ đề, bài viết khởi tạo, hành động
+và đối tượng. Dịch vụ chỉ chấp nhận token từ một bài viết thành viên mới hơn;
+Bà Mối vì vậy chỉ gửi lại token sau câu xác nhận tiếp theo. Trước lộ diện, bộ
+chuyển tiếp giữ lại thông tin liên hệ kể cả khi thành viên chia chúng thành nhiều
+tin nhắn. Phần văn bản tạm này bị xóa ngay khi lộ diện, kết thúc hoặc chặn.
 
 ## Bài viết, tác phẩm và sự kiện
 

@@ -82,12 +82,14 @@ export interface TestUser {
   username: string
   /** Her private-message thread with Bà Mối. */
   topic_id: number
+  /** The human post that triggered the current Bà Mối turn. */
+  post_id: number
 }
 
 let nextUser = 100
 export function testUser(username: string): TestUser {
   nextUser++
-  return { user_id: nextUser, username, topic_id: 4000 + nextUser }
+  return { user_id: nextUser, username, topic_id: 4000 + nextUser, post_id: 30_000 + nextUser * 10 }
 }
 
 export type ToolResponse = { status: number; body: Record<string, any> } // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -120,7 +122,8 @@ export async function createHarness(options: { now?: Date; seed?: number } = {})
     const secret = extra.secret === undefined ? TOOL_SECRET : extra.secret
     if (secret !== null) headers.Authorization = `Bearer ${secret}`
     const auth = extra.auth ?? {
-      user_id: user.user_id, username: user.username, topic_id: user.topic_id, private_message: true, participants: `${user.username}, ba_moi`,
+      user_id: user.user_id, username: user.username, topic_id: user.topic_id, post_id: user.post_id,
+      private_message: true, participants: `${user.username}, ba_moi`,
     }
     const response = await handleToolRequest(tool, new Request(`https://svc.test/api/ba-moi/v1/${tool}`, {
       method: 'POST', headers, body: JSON.stringify({ auth, args }),
@@ -163,6 +166,24 @@ export async function createHarness(options: { now?: Date; seed?: number } = {})
 }
 
 export type Harness = Awaited<ReturnType<typeof createHarness>>
+
+/** Performs the explicit two-step confirmation contract used by sensitive tools. */
+export async function confirmedCall(h: Harness, tool: string, user: TestUser, args: Record<string, unknown>) {
+  const challenge = await h.call(tool, user, args)
+  if (challenge.body.error !== 'confirm_required' || typeof challenge.body.confirmation_token !== 'string') {
+    throw new Error(`expected confirmation challenge, got ${JSON.stringify(challenge.body)}`)
+  }
+  return h.call(tool, user, { ...args, confirmation_token: challenge.body.confirmation_token }, {
+    auth: {
+      user_id: user.user_id,
+      username: user.username,
+      topic_id: user.topic_id,
+      post_id: user.post_id + 1,
+      private_message: true,
+      participants: `${user.username}, ba_moi`,
+    },
+  })
+}
 
 /** A full profile the interview would produce; override per test. */
 export const PROFILE = {

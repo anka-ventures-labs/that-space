@@ -1,11 +1,12 @@
 /** Matches: opening the relay threads, listing, and end, block or reveal. */
 import { z } from 'zod'
 import {
-  closeMatch, getCard, getMatchForMember, getMember, getProfile, getRelayTopic, insertBlock, insertRelayTopic,
-  listMatchesForMember, poolBuckets, setReveal, type Match,
+  clearRelayContactTailsForMatch, closeMatch, getCard, getMatchForMember, getMember, getProfile, getRelayTopic,
+  insertBlock, insertRelayTopic, listMatchesForMember, poolBuckets, setReveal, type Match,
 } from '@/lib/db/repo'
 import { addressLabel, aliasFor, calculateAge } from '@/lib/matching/privacy'
 import { redactAliasForCurrentPool, redactCardForCurrentPool } from '../cards'
+import { confirmationRequired, consumeConfirmation } from '../confirmation'
 import { BLOCK_CONFIRMED, CONSENT_VERSION, MATCH_ENDED, matchOpened, relayIntro, relayTitle, revealAsked, revealed } from '../copy'
 import { deliverAll, queue } from '../outbox'
 import { defineTool, fail, type ToolContext, type ToolResult } from '../tool'
@@ -62,7 +63,11 @@ export const matches = defineTool(z.object({}), async ({ deps: { db, config }, m
   return { ok: true, matches: rows }
 })
 
-const MatchActionArgs = z.object({ match_id: z.uuid(), action: z.enum(['end', 'block', 'reveal']) })
+const MatchActionArgs = z.object({
+  match_id: z.uuid(),
+  action: z.enum(['end', 'block', 'reveal']),
+  confirmation_token: z.string().max(2048).optional(),
+})
 
 export const matchAction = defineTool(MatchActionArgs, async (ctx, args) => {
   const { deps, member } = ctx
@@ -73,11 +78,15 @@ export const matchAction = defineTool(MatchActionArgs, async (ctx, args) => {
     if (!match) return fail('not_found')
     if (match.state === 'closed') return fail('closed')
     if (args.action === 'reveal' && match.state === 'revealed') return { ok: true, result: 'revealed' }
+    if (!(await consumeConfirmation(ctx, args.confirmation_token, `match:${args.action}`, match.id, db))) {
+      return await confirmationRequired(ctx, `match:${args.action}`, match.id, db)
+    }
     const otherId = match.memberA === member.id ? match.memberB : match.memberA
 
     if (args.action !== 'reveal') {
       if (args.action === 'block') await insertBlock(db, member.id, otherId)
       await closeMatch(db, match.id, args.action === 'block' ? 'blocked' : 'ended')
+      await clearRelayContactTailsForMatch(db, match.id)
       // The other side is told the chat ended, never that she was blocked.
       keys.push(await queue(db, `closed:${match.id}:${otherId}`, { kind: 'relay_post', matchId: match.id, memberId: otherId, raw: MATCH_ENDED, allowClosed: true }, ctx.now))
       keys.push(await queue(db, `closed:${match.id}:${member.id}`, {
@@ -90,6 +99,7 @@ export const matchAction = defineTool(MatchActionArgs, async (ctx, args) => {
     const updated = await setReveal(db, match.id, member.id)
     if (!updated) return fail('not_found')
     if (updated.state === 'revealed' && match.state !== 'revealed') {
+      await clearRelayContactTailsForMatch(db, match.id)
       // Both have asked: each side gets the other's Discourse profile link.
       for (const [me, other] of [[member.id, otherId], [otherId, member.id]]) {
         const [topic, otherMember] = await Promise.all([getRelayTopic(db, match.id, me), getMember(db, other)])

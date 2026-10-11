@@ -95,17 +95,18 @@ module ThatSpace
       admission_contract = {
         "login_required" => true,
         "allow_new_registrations" => true,
-        "enable_signup_cta" => false,
-        "invite_only" => true,
+        "enable_signup_cta" => true,
+        "invite_only" => false,
         "invite_code" => "",
-        "must_approve_users" => true,
-        "enable_local_logins" => true,
+        "must_approve_users" => false,
+        "enable_local_logins" => false,
+        "enable_google_oauth2_logins" => true,
         "auth_skip_create_confirm" => false,
         "enable_smtp" => false,
         "disable_emails" => "yes"
       }
       unless admission_contract.all? { |setting, expected| @manifest.fetch("site_settings").fetch(setting) == expected }
-        raise Error, "The controlled adult pilot requires invitations, staff approval, and login-gated member content"
+        raise Error, "The public launch requires Google-only self-service signup with login-gated member content"
       end
       raise Error, "Unsupported community manifest schema" unless @manifest["schema_version"] == 1
       raise Error, "Unexpected community manifest id" unless @manifest["manifest_id"] == MANIFEST_ID
@@ -123,7 +124,7 @@ module ThatSpace
         "type" => "dropdown",
         "options" => ["Tôi xác nhận"]
       }
-        raise Error, "The controlled pilot requires the exact 18+ signup attestation"
+        raise Error, "Public self-service signup requires the exact 18+ attestation"
       end
 
       categories = @manifest.fetch("categories").to_h { |category| [category.fetch("key"), category] }

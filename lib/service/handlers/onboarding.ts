@@ -9,6 +9,7 @@ import { dailyOpeningConsumesTurn } from '@/lib/matching/pick'
 import { vnDate } from '@/lib/matching/privacy'
 import type { MemberProfile } from '@/lib/matching/types'
 import { SUMMARY_MAX_LENGTH, buildCard, summaryViolations, templateSummary } from '../cards'
+import { confirmationRequired, consumeConfirmation } from '../confirmation'
 import { CONSENT_TEXT, CONSENT_VERSION, MATCH_ENDED } from '../copy'
 import { hasCurrentConsent } from '../consent'
 import { INTEREST_DAILY_LIMIT, SEARCH_DAILY_LIMIT, nextVnDayStart, vnDayStart } from '../limits'
@@ -51,8 +52,8 @@ const ConsentArgs = z.object({
   action: z.enum(['opt_in', 'pause', 'resume', 'delete']),
   /** She said she is 18 or older, as part of agreeing. */
   adult_confirmed: z.boolean().optional(),
-  /** She explicitly confirmed deleting her data. */
-  confirm: z.boolean().optional(),
+  /** Fresh token returned by the service after it asks for confirmation. */
+  confirmation_token: z.string().max(2048).optional(),
 })
 
 export const consent = defineTool(ConsentArgs, async (ctx, args) => {
@@ -70,7 +71,9 @@ export const consent = defineTool(ConsentArgs, async (ctx, args) => {
       await setMemberStatus(db, member.id, 'active')
       return { ok: true, paused: false }
     case 'delete':
-      if (args.confirm !== true) return fail('confirm_required')
+      if (!(await consumeConfirmation(ctx, args.confirmation_token, 'delete', 'member-data'))) {
+        return await confirmationRequired(ctx, 'delete', 'member-data')
+      }
       return deleteEverything(ctx)
   }
 })

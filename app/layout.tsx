@@ -18,9 +18,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Thật Space — Cộng đồng riêng tư cho người trưởng thành",
+  title: "Thật Space — Kết nối có chủ đích cùng Bà Mối",
   description:
-    "Cộng đồng riêng tư dành cho bất kỳ ai từ đủ 18 tuổi muốn kết nối, chia sẻ và đồng hành.",
+    "Cộng đồng riêng tư và Bà Mối AI dành cho bất kỳ ai từ đủ 18 tuổi muốn kết nối có chủ đích.",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className="bg-[#F5F0E8] text-[#5C3D2E] font-[family-name:var(--font-inter)]">
         <Navbar
           communityUrl={publicSite.communityUrl}
-          intakeOpen={publicSite.intakeOpen}
+          publicRegistrationEnabled={publicSite.publicRegistrationEnabled}
         />
         <main>{children}</main>
         <Footer contactHref={publicSite.contactHref} />

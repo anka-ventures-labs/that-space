@@ -7,10 +7,10 @@ import { useState } from "react";
 
 type NavbarProps = {
   communityUrl: string;
-  intakeOpen: boolean;
+  publicRegistrationEnabled: boolean;
 };
 
-export default function Navbar({ communityUrl, intakeOpen }: NavbarProps) {
+export default function Navbar({ communityUrl, publicRegistrationEnabled }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const normalizedCommunityUrl = communityUrl.trim().replace(/\/+$/, "");
@@ -50,8 +50,8 @@ export default function Navbar({ communityUrl, intakeOpen }: NavbarProps) {
             </li>
           )}
           <li>
-            <Link href="/contact" className="rounded-full bg-[#5C3D2E] px-4 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
-              {intakeOpen ? "Yêu cầu tham gia" : "Trạng thái tiếp nhận"}
+            <Link href={publicRegistrationEnabled && normalizedCommunityUrl ? `${normalizedCommunityUrl}/signup` : "/contact"} className="rounded-full bg-[#5C3D2E] px-4 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
+              {publicRegistrationEnabled ? "Đăng ký" : "Liên hệ"}
             </Link>
           </li>
         </ul>
@@ -86,8 +86,8 @@ export default function Navbar({ communityUrl, intakeOpen }: NavbarProps) {
               Đăng nhập thành viên
             </Link>
           )}
-          <Link href="/contact" onClick={() => setMenuOpen(false)} className="block rounded-full bg-[#5C3D2E] px-4 py-2 text-center text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
-            {intakeOpen ? "Yêu cầu tham gia" : "Trạng thái tiếp nhận"}
+          <Link href={publicRegistrationEnabled && normalizedCommunityUrl ? `${normalizedCommunityUrl}/signup` : "/contact"} onClick={() => setMenuOpen(false)} className="block rounded-full bg-[#5C3D2E] px-4 py-2 text-center text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
+            {publicRegistrationEnabled ? "Đăng ký" : "Liên hệ"}
           </Link>
         </div>
       )}

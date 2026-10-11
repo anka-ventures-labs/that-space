@@ -104,6 +104,54 @@ export async function setMemberStatus(db: Db, memberId: string, status: MemberSt
   await db.query(`update members set status = $2, updated_at = now() where id = $1`, [memberId, status])
 }
 
+export async function createConfirmationChallenge(db: Db, challenge: {
+  nonce: string
+  memberId: string
+  topicId: number
+  action: string
+  resource: string
+  issuedPostId: number
+  issuedAt: Date
+  expiresAt: Date
+}): Promise<void> {
+  // Keep only a short operational audit window; no message text or token is stored.
+  await db.query(
+    `delete from confirmation_challenges where member_id = $1 and expires_at < $2::timestamptz - interval '7 days'`,
+    [challenge.memberId, iso(challenge.issuedAt)],
+  )
+  await db.query(
+    `insert into confirmation_challenges
+       (nonce, member_id, topic_id, action, resource, issued_post_id, issued_at, expires_at)
+     values ($1, $2, $3, $4, $5, $6, $7::timestamptz, $8::timestamptz)`,
+    [challenge.nonce, challenge.memberId, challenge.topicId, challenge.action, challenge.resource,
+      challenge.issuedPostId, iso(challenge.issuedAt), iso(challenge.expiresAt)],
+  )
+}
+
+/** Atomically consumes a challenge only from a later human-authored Discourse post. */
+export async function consumeConfirmationChallenge(db: Db, challenge: {
+  nonce: string
+  memberId: string
+  topicId: number
+  action: string
+  resource: string
+  issuedPostId: number
+  currentPostId: number
+  now: Date
+}): Promise<boolean> {
+  const rows = await db.query(
+    `update confirmation_challenges
+       set consumed_at = $8::timestamptz, consumed_post_id = $7
+     where nonce = $1 and member_id = $2 and topic_id = $3 and action = $4 and resource = $5
+       and issued_post_id = $6 and issued_post_id < $7
+       and consumed_at is null and expires_at >= $8::timestamptz
+     returning nonce`,
+    [challenge.nonce, challenge.memberId, challenge.topicId, challenge.action, challenge.resource,
+      challenge.issuedPostId, challenge.currentPostId, iso(challenge.now)],
+  )
+  return rows.length === 1
+}
+
 /** Removes every sample member (and, by cascade, anything that referenced one). Returns how many. */
 export async function deleteSampleMembers(db: Db): Promise<number> {
   const rows = await db.query(`delete from members where is_sample returning id`)
@@ -649,6 +697,33 @@ export async function countRelayMessagesSince(db: Db, memberId: string, since: D
     [memberId, iso(since)],
   )
   return row.n
+}
+
+/** Short rolling context used only to detect contact details split across messages. */
+export async function getRelayContactTail(db: Db, matchId: string, memberId: string): Promise<string> {
+  const [row] = await db.query<{ textTail: string }>(
+    `select text_tail as "textTail" from relay_contact_windows where match_id = $1 and member_id = $2`,
+    [matchId, memberId],
+  )
+  return row?.textTail ?? ''
+}
+
+export async function setRelayContactTail(db: Db, matchId: string, memberId: string, textTail: string): Promise<void> {
+  await db.query(
+    `insert into relay_contact_windows (match_id, member_id, text_tail, updated_at)
+     values ($1, $2, $3, now())
+     on conflict (match_id, member_id) do update set text_tail = excluded.text_tail, updated_at = now()`,
+    [matchId, memberId, textTail],
+  )
+}
+
+export async function clearRelayContactTail(db: Db, matchId: string, memberId: string): Promise<void> {
+  await db.query(`delete from relay_contact_windows where match_id = $1 and member_id = $2`, [matchId, memberId])
+}
+
+/** Discard both sides' rolling plaintext as soon as the anonymous boundary ends. */
+export async function clearRelayContactTailsForMatch(db: Db, matchId: string): Promise<void> {
+  await db.query(`delete from relay_contact_windows where match_id = $1`, [matchId])
 }
 
 // ── Pending Discourse posts (retry queue) ──────────────────────────────────

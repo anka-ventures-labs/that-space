@@ -8,11 +8,11 @@
   {
     "endpoint": "consent",
     "summary": "Opt in, pause, resume or delete",
-    "description": "Record the member's decision. opt_in only after she has read the consent text and said yes, and confirmed she is 18 or older (adult_confirmed: true). pause hides her from the pool; resume brings her back. delete erases her matchmaking data; only with her explicit confirmation (confirm: true).",
+    "description": "Record the member's decision. opt_in only after they have read the consent text, said yes and confirmed they are 18 or older (adult_confirmed: true). pause hides them from the pool; resume brings them back. delete is two-step: call without a token to receive a short-lived confirmation_token, explain the deletion and ask for confirmation, then only after the member's next clear yes call again with that token.",
     "parameters": [
       { "name": "action", "type": "string", "description": "What she decided.", "required": true, "enum": ["opt_in", "pause", "resume", "delete"] },
       { "name": "adult_confirmed", "type": "boolean", "description": "She said she is 18 or older. Required for opt_in.", "required": false },
-      { "name": "confirm", "type": "boolean", "description": "She explicitly confirmed deleting her data. Required for delete.", "required": false }
+      { "name": "confirmation_token", "type": "string", "description": "Short-lived service token from the immediately preceding delete challenge. Send only after the member replies with a clear confirmation.", "required": false }
     ]
   },
   {
@@ -102,10 +102,11 @@
   {
     "endpoint": "match_action",
     "summary": "End, block or reveal",
-    "description": "Act on one of her matches: end the chat, block the person (the chat closes and they are never introduced again; they are only told the chat ended), or reveal (when both have asked, each gets the other's profile link).",
+    "description": "Act on one of their matches: end the chat, block the person (the chat closes and they are never introduced again; they are only told the chat ended), or reveal (when both have asked, each gets the other's profile link). Every action is two-step: call without a token to receive a short-lived confirmation_token, explain the exact action and ask, then only after the member's next clear yes call again with that token.",
     "parameters": [
       { "name": "match_id", "type": "string", "description": "The match_id from the matches tool.", "required": true },
-      { "name": "action", "type": "string", "description": "What she wants.", "required": true, "enum": ["end", "block", "reveal"] }
+      { "name": "action", "type": "string", "description": "What they want.", "required": true, "enum": ["end", "block", "reveal"] },
+      { "name": "confirmation_token", "type": "string", "description": "Short-lived service token for this exact member, thread, match and action. Send only after the member replies with a clear confirmation.", "required": false }
     ]
   }
 ]

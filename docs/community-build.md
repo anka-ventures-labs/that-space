@@ -66,12 +66,14 @@ profiles/cards/search. They never populate
 the matchmaking pool without its separate consent flow. Interest groups grant
 neither trust levels nor staff access.
 
-Privacy is enforced at the site boundary by required login, invitations and staff
-approval. Category ACLs use Discourse's standard `everyone` audience inside that
-private site, with staff-only posting in announcements. This permits native
+Privacy is enforced at the site boundary by required login. Google is the only
+self-service identity path; local passwords are disabled, and signup requires
+the 18+ attestation plus all community fields. Category ACLs use Discourse's
+standard `everyone` audience inside that private site, with staff-only posting
+in announcements. This permits native
 profile featured topics; core refuses to feature topics in group-restricted
-categories. The reconciler requires those three private-site settings in its
-manifest, and request acceptance denies guest topic reads and uploads.
+categories. The reconciler requires this admission contract in its manifest,
+and request acceptance denies guest topic reads and uploads.
 
 Q1 membership is assigned by the enabled native first-login Automation script. Editing
 Q1 later requires staff to reconcile interest-group membership: the native script
@@ -83,14 +85,13 @@ The presentation reconciler stores theme ownership in `PluginStore`, detects
 source/field/settings drift, imports local pinned sources, preserves unrelated
 child components, and sets the default member theme. The gallery uses image
 tiles; the artist's Tác phẩm tab queries her own topics in Triển lãm. Member
-profiles allow bios, headers and featured topics. Follow is enabled for approved
+profiles allow bios, headers and featured topics. Follow is enabled for
 members with topic notifications and opt-out. Hosts may create their own events;
 members can RSVP; Host interest membership does not permit staff administration.
 
-The theme links forum, gallery, events and the member's profile. Keep
-`ba_moi_username` unset for the initial pilot. Set it to the installed AI
-account only after completing the later Bà Mối safety gate and running the existing
-Bà Mối installer/probe. Until then its private-message CTA is omitted. It uses
+The theme links forum, gallery, events and the member's profile. Set
+`ba_moi_username` to the exact installed AI account after running the existing
+Bà Mối installer/probe. Its private-message CTA is part of the public launch. It uses
 Discourse's composer and private-message permissions. Gallery/event links are
 same-site paths. Vietnamese navigation, palette and logo are included for
 desktop/mobile. Inter and Playfair Display are self-hosted theme assets with
@@ -102,17 +103,17 @@ alongside failure diagnostics.
 
 ## Acceptance and live boundaries
 
-The request/browser specs exercise native invite field validation, pending
-approval, staff approval/login, topics/replies, notifications, moderation flags,
-private profile answers, member profiles/artwork, following/opt-out, Host events/
-RSVP, theme import/drift, guest navigation and the Bà Mối composer. Test members
-and events are synthetic. These tests do not claim outgoing email delivery or
-an actual AI model response.
+The request/browser specs exercise a completed Google OAuth handoff, rejection
+of password signup/login, all 16 required fields, topics/replies, notifications,
+moderation flags, private profile answers, member profiles/artwork,
+following/opt-out, Host events/RSVP, theme import/drift, guest navigation and the
+Bà Mối composer. Test members and events are synthetic. These tests do not
+claim outgoing email delivery or an actual AI model response.
 
-The no-email beta requires staff-assisted activation/recovery. Native login-code
-fixtures test the Discourse path but do not prove receipt of email. Before live
-invitations, verify the chosen activation/recovery procedure, actual reverse
-proxy upload access, restart, backup/restore and narrow phone behavior. The
+The no-email release uses Google verification in place of activation mail and
+requires staff-assisted recovery when a member loses their Google account.
+Before public promotion, verify the real OAuth callback, actual reverse proxy
+upload access, restart, backup/restore and narrow phone behavior. The
 configuration denies anonymous upload downloads through Discourse; direct
 storage/proxy access must also be tested on the chosen host. Staff workflows are
 recorded in [Vietnamese community operations](community-operations.md).

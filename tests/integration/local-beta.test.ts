@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { getMemberByDiscourseId } from '@/lib/db/repo'
 import { HELD_CONTACT, MATCH_ENDED } from '@/lib/service/copy'
-import { HIM, HIS_SUMMARY, PROFILE, createHarness, onboard, testUser, type Harness, type TestUser } from '../helpers/service'
+import { HIM, HIS_SUMMARY, PROFILE, confirmedCall, createHarness, onboard, testUser, type Harness, type TestUser } from '../helpers/service'
 
 let h: Harness | undefined
 
@@ -94,15 +94,15 @@ describe('local Bà Mối beta acceptance', () => {
     expect(service.discourse.postsIn(topicLan)).toEqual([HELD_CONTACT])
     expect(service.discourse.postsIn(topicNam)).toEqual([])
 
-    expect((await service.call('match_action', lan, { match_id: match.match_id, action: 'reveal' })).body.result).toBe('waiting_for_other')
-    expect((await service.call('match_action', nam, { match_id: match.match_id, action: 'reveal' })).body.result).toBe('revealed')
+    expect((await confirmedCall(service, 'match_action', lan, { match_id: match.match_id, action: 'reveal' })).body.result).toBe('waiting_for_other')
+    expect((await confirmedCall(service, 'match_action', nam, { match_id: match.match_id, action: 'reveal' })).body.result).toBe('revealed')
     expect(service.discourse.postsIn(topicLan).join('\n')).toContain('https://forum.test/u/nam')
     expect(service.discourse.postsIn(topicNam).join('\n')).toContain('https://forum.test/u/lan')
 
     expect((await service.webhook({ ...heldPost, id: 71003 })).body.outcome).toBe('relayed')
     expect(service.discourse.postsIn(topicNam).join('\n')).toContain('0912 345 678')
 
-    expect((await service.call('match_action', nam, { match_id: match.match_id, action: 'block' })).body.result).toBe('blocked')
+    expect((await confirmedCall(service, 'match_action', nam, { match_id: match.match_id, action: 'block' })).body.result).toBe('blocked')
     expect((await service.webhook({ ...heldPost, id: 71004, raw: 'Còn đó không?' })).body.outcome).toBe('ignored_closed')
     service.setNow(new Date(service.now.getTime() + 24 * 60 * 60 * 1000))
     expect((await service.call('box_open', lan)).body.result).toBe('no_match')
@@ -122,7 +122,7 @@ describe('local Bà Mối beta acceptance', () => {
 
     service.discourse.clear()
     service.discourse.failNext(1)
-    expect((await service.call('consent', lan, { action: 'delete', confirm: true })).body).toMatchObject({ ok: true, deleted: true })
+    expect((await confirmedCall(service, 'consent', lan, { action: 'delete' })).body).toMatchObject({ ok: true, deleted: true })
     expect(await getMemberByDiscourseId(service.db, lan.user_id)).toBeNull()
     expect(service.discourse.postsIn(topicNam)).toEqual([])
 

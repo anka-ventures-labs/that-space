@@ -24,28 +24,27 @@ describe("Navbar", () => {
   beforeEach(() => mockUsePathname.mockReturnValue("/"));
 
   it("renders the public routes and configured community link", () => {
-    render(<Navbar communityUrl="https://community.example.test" intakeOpen />);
+    render(<Navbar communityUrl="https://community.example.test" publicRegistrationEnabled />);
     expect(screen.getAllByRole("link", { name: "Trang chủ" }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: "Cộng đồng" })[0]).toHaveAttribute("href", "https://community.example.test");
     expect(screen.getAllByRole("link", { name: "Quyền riêng tư" }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: "Liên hệ" }).length).toBeGreaterThan(0);
   });
 
-  it("shows member login and a separate invitation request without public signup", () => {
-    render(<Navbar communityUrl="https://community.example.test/" intakeOpen />);
+  it("shows member login and direct public signup", () => {
+    render(<Navbar communityUrl="https://community.example.test/" publicRegistrationEnabled />);
     expect(screen.getByRole("link", { name: "Đăng nhập" })).toHaveAttribute("href", "https://community.example.test/login");
-    expect(screen.getByRole("link", { name: "Yêu cầu tham gia" })).toHaveAttribute("href", "/contact");
-    expect(screen.queryByRole("link", { name: "Đăng ký" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Đăng ký" })).toHaveAttribute("href", "https://community.example.test/signup");
   });
 
   it("omits community links when no community URL is configured", () => {
-    render(<Navbar communityUrl="" intakeOpen={false} />);
+    render(<Navbar communityUrl="" publicRegistrationEnabled={false} />);
     expect(screen.queryByRole("link", { name: "Cộng đồng" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /đăng nhập/i })).not.toBeInTheDocument();
   });
 
   it("opens and closes the mobile menu", () => {
-    render(<Navbar communityUrl="https://community.example.test" intakeOpen />);
+    render(<Navbar communityUrl="https://community.example.test" publicRegistrationEnabled />);
     const menu = screen.getByRole("button", { name: "Chuyển menu" });
     expect(menu).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(menu);
@@ -56,9 +55,12 @@ describe("Navbar", () => {
     expect(screen.getAllByRole("link", { name: "Cộng đồng" })).toHaveLength(1);
   });
 
-  it("labels the contact CTA as status-only while intake is closed", () => {
-    render(<Navbar communityUrl="" intakeOpen={false} />);
-    expect(screen.getByRole("link", { name: "Trạng thái tiếp nhận" })).toHaveAttribute("href", "/contact");
-    expect(screen.queryByRole("link", { name: "Yêu cầu tham gia" })).not.toBeInTheDocument();
+  it("uses contact as the fallback while registration is not published", () => {
+    render(<Navbar communityUrl="" publicRegistrationEnabled={false} />);
+    expect(screen.getAllByRole("link", { name: "Liên hệ" })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "Liên hệ" })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ href: expect.stringContaining("/contact") })]),
+    );
+    expect(screen.queryByRole("link", { name: "Đăng ký" })).not.toBeInTheDocument();
   });
 });

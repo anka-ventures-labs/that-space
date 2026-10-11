@@ -62,7 +62,7 @@ describe('migration', () => {
   it('turns RLS on for every table and adds no policies', async () => {
     const tables = await db.query<{ relname: string; relrowsecurity: boolean }>(
       `select relname, relrowsecurity from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r'`)
-    expect(tables).toHaveLength(11)
+    expect(tables).toHaveLength(13)
     expect(tables.every((t) => t.relrowsecurity)).toBe(true)
     const [policies] = await db.query<{ n: number }>(`select count(*)::int as n from pg_policies`)
     expect(policies.n).toBe(0)

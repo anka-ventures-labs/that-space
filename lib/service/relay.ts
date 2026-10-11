@@ -5,14 +5,15 @@
  * Nothing in the body is trusted beyond ids checked against the database.
  */
 import {
-  countRelayMessagesSince, getMatchForMember, getMember, getRelayTopicByDiscourseId, insertRelayMessage,
-  listRelayTopicsForMatch, lockMemberQuota, type RelayStatus,
+  clearRelayContactTail, countRelayMessagesSince, getMatchForMember, getMember, getRelayContactTail,
+  getRelayTopicByDiscourseId, insertRelayMessage, listRelayTopicsForMatch, lockMemberQuota,
+  setRelayContactTail, type RelayStatus,
 } from '@/lib/db/repo'
 import { PostWebhookSchema, REGULAR_POST_TYPE, verifyWebhookSignature, type PostWebhook } from '@/lib/discourse/webhook'
 import { HELD_ATTACHMENT, HELD_CONTACT, RATE_LIMITED, TOO_LONG, relayedMessage } from './copy'
 import type { ServiceDeps } from './deps'
 import { deliver, queue } from './outbox'
-import { RELAY_MAX_LENGTH, RELAY_PER_MINUTE, decideRelay } from './relay-policy'
+import { RELAY_MAX_LENGTH, RELAY_PER_MINUTE, decideRelay, nextRelayContactTail } from './relay-policy'
 
 export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): Promise<string> {
   const { db, config } = deps
@@ -42,7 +43,8 @@ export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): P
       status = 'rate_limited'
       notice = RATE_LIMITED
     } else {
-      const decision = decideRelay(post.raw, current.state === 'revealed')
+      const priorText = current.state === 'revealed' ? '' : await getRelayContactTail(tx, match.id, sender.id)
+      const decision = decideRelay(post.raw, current.state === 'revealed', priorText)
       if (decision.action === 'drop') return { key: null, outcome: 'dropped_empty' }
       if (decision.action === 'hold') {
         status = 'held'
@@ -54,6 +56,12 @@ export async function relayPost(deps: ServiceDeps, post: PostWebhook['post']): P
     }
     const messageId = await insertRelayMessage(tx, { matchId: match.id, fromMember: sender.id, sourcePostId: post.id, status })
     if (messageId === null) return { key: null, outcome: 'replay' }
+    if (current.state === 'revealed') {
+      await clearRelayContactTail(tx, match.id, sender.id)
+    } else if (status === 'relayed' && text !== null) {
+      const priorText = await getRelayContactTail(tx, match.id, sender.id)
+      await setRelayContactTail(tx, match.id, sender.id, nextRelayContactTail(priorText, text))
+    }
     const key = text !== null ? await queue(tx, `relay:${post.id}`, {
       kind: 'relay_post', matchId: match.id, memberId: target.memberId, raw: relayedMessage(target.aliasForOther, text), text, relayMessageId: messageId,
     }, deps.now()) : await queue(tx, `relay-notice:${post.id}`, { kind: 'relay_post', matchId: match.id, memberId: sender.id, raw: notice! }, deps.now())

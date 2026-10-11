@@ -14,10 +14,19 @@ import PrivacyPage from "@/app/privacy/page";
 import TermsPage from "@/app/terms/page";
 
 const originalSupportEmail = process.env.PUBLIC_SUPPORT_EMAIL;
+const originalDiscourseUrl = process.env.DISCOURSE_URL;
+const originalCommunityLinkEnabled = process.env.PUBLIC_COMMUNITY_LINK_ENABLED;
+const originalPublicRegistrationEnabled = process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
 
 afterEach(() => {
   if (originalSupportEmail === undefined) delete process.env.PUBLIC_SUPPORT_EMAIL;
   else process.env.PUBLIC_SUPPORT_EMAIL = originalSupportEmail;
+  if (originalDiscourseUrl === undefined) delete process.env.DISCOURSE_URL;
+  else process.env.DISCOURSE_URL = originalDiscourseUrl;
+  if (originalCommunityLinkEnabled === undefined) delete process.env.PUBLIC_COMMUNITY_LINK_ENABLED;
+  else process.env.PUBLIC_COMMUNITY_LINK_ENABLED = originalCommunityLinkEnabled;
+  if (originalPublicRegistrationEnabled === undefined) delete process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED;
+  else process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = originalPublicRegistrationEnabled;
 });
 
 describe("public launch pages", () => {
@@ -29,20 +38,35 @@ describe("public launch pages", () => {
 
     render(<PrivacyPage />);
     expect(screen.getByText(/không yêu cầu ảnh giấy tờ tùy thân/i)).toBeInTheDocument();
-    expect(screen.getByText(/Bà Mối chưa mở/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bà Mối là tính năng tự nguyện/i)).toBeInTheDocument();
+    expect(screen.getByText(/OpenRouter và Anthropic/i)).toBeInTheDocument();
   });
 
-  it("uses the configured support address for invitation requests", () => {
+  it("uses the configured support address for member support", () => {
     process.env.PUBLIC_SUPPORT_EMAIL = "hello@example.test";
     render(<ContactPage />);
     expect(screen.getByRole("link", { name: "Gửi email cho đội ngũ" })).toHaveAttribute("href", "mailto:hello@example.test");
   });
 
-  it("fails visibly instead of creating a circular contact link when support is absent", () => {
+  it("offers signup and login support paths when a public email is absent", () => {
     delete process.env.PUBLIC_SUPPORT_EMAIL;
+    process.env.DISCOURSE_URL = "https://community.example.test";
+    process.env.PUBLIC_COMMUNITY_LINK_ENABLED = "true";
+    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = "true";
     render(<ContactPage />);
-    expect(screen.getByText(/Kênh tiếp nhận yêu cầu đang được cấu hình/i)).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /liên hệ qua/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /đăng ký bằng Google/i })).toHaveAttribute("href", "https://community.example.test/signup");
+    expect(screen.getByRole("link", { name: /đăng nhập để nhận hỗ trợ/i })).toHaveAttribute("href", "https://community.example.test/login");
+  });
+
+  it("does not promise signup from support while public registration is paused", () => {
+    delete process.env.PUBLIC_SUPPORT_EMAIL;
+    process.env.DISCOURSE_URL = "https://community.example.test";
+    process.env.PUBLIC_COMMUNITY_LINK_ENABLED = "true";
+    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED = "false";
+    render(<ContactPage />);
+    expect(screen.getByText(/đăng ký mới đang tạm dừng/i)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /đăng ký bằng Google/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /đăng nhập để nhận hỗ trợ/i })).toHaveAttribute("href", "https://community.example.test/login");
   });
 
   it("renders a Vietnamese, home-only not-found escape hatch", () => {

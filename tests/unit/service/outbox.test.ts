@@ -3,7 +3,7 @@ import type { Db } from '@/lib/db/db'
 import { claimDuePosts, enqueuePost, MAX_POST_ATTEMPTS } from '@/lib/db/repo'
 import { send } from '@/lib/service/outbox'
 import { revealAsked, revealed } from '@/lib/service/copy'
-import { HIM, HIS_SUMMARY, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
+import { HIM, HIS_SUMMARY, confirmedCall, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
 
 function failQueue(db: Db): Db {
   return {
@@ -32,7 +32,7 @@ describe('durable Discourse delivery', () => {
     h.discourse.clear()
     h.discourse.failNext(1)
     await h.webhook({ id: 88091, topic_id: topicA, user_id: a.user_id, raw: 'Tin nhắn đang chờ' })
-    expect((await h.call('match_action', b, { match_id: matchId, action: 'block' })).body.result).toBe('blocked')
+    expect((await confirmedCall(h, 'match_action', b, { match_id: matchId, action: 'block' })).body.result).toBe('blocked')
     h.setNow(new Date(Date.now() + 3600_000))
     await h.cron()
     expect(h.discourse.postsIn(topicB).join('\n')).not.toContain('Tin nhắn đang chờ')
@@ -81,7 +81,7 @@ describe('durable Discourse delivery', () => {
     h.discourse.failNext(1)
     await h.webhook({ id: 88093, topic_id: topicA, user_id: a.user_id, raw: 'Nội dung riêng tư đang chờ' })
     expect(await h.db.query("select id from pending_posts where status = 'pending'")).toHaveLength(1)
-    await h.call('consent', a, { action: 'delete', confirm: true })
+    await confirmedCall(h, 'consent', a, { action: 'delete' })
     expect(JSON.stringify(await h.db.query('select payload from pending_posts'))).not.toContain('Nội dung riêng tư đang chờ')
     h.setNow(new Date(h.now.getTime() + 3600_000))
     await h.cron()
@@ -125,7 +125,7 @@ describe('durable Discourse delivery', () => {
     await h.cron()
     expect(h.discourse.postsIn(topicB)).toEqual(['**Em ấy:**\n\nMột tin nhắn chờ'])
     // Reveal is semantic and repeatable even when both requests arrive together.
-    const responses = await Promise.all([a, b].map((user) => h.call('match_action', user, { match_id: matchId, action: 'reveal' })))
+    const responses = await Promise.all([a, b].map((user) => confirmedCall(h, 'match_action', user, { match_id: matchId, action: 'reveal' })))
     expect(responses.map((r) => r.body.result)).toEqual(expect.arrayContaining(['revealed']))
     expect((await h.call('match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('revealed')
   })
@@ -135,12 +135,12 @@ describe('durable Discourse delivery', () => {
     await h.db.query("update relay_topics set alias_for_other = 'Em ấy L.' where discourse_topic_id = $1", [topicB])
     h.discourse.clear()
     h.discourse.failNext(1)
-    await h.call('match_action', a, { match_id: matchId, action: 'reveal' })
+    await confirmedCall(h, 'match_action', a, { match_id: matchId, action: 'reveal' })
     h.setNow(new Date(h.now.getTime() + 60_000))
     await h.cron()
     expect(h.discourse.postsIn(topicB)).toEqual([revealAsked('Em ấy')])
     h.discourse.failNext(2)
-    await h.call('match_action', b, { match_id: matchId, action: 'reveal' })
+    await confirmedCall(h, 'match_action', b, { match_id: matchId, action: 'reveal' })
     h.setNow(new Date(h.now.getTime() + 60_000))
     await h.cron()
     expect(h.discourse.postsIn(topicB)).toContain(revealed('Em ấy', a.username, `https://forum.test/u/${a.username}`))

@@ -2,12 +2,14 @@
  * What the relay does with one post's text (plan: webhook and relay policy).
  * Text only, always: attachments are never relayed. Quotes and @mentions are
  * always stripped. Before a reveal, text with any contact detail (phone,
- * email, link, social handle, spelled-out digits) is held.
+ * email, link, social handle, spelled-out digits) is held. A rolling tail of
+ * prior relayed text catches details split across several posts.
  */
 import { findContactDetails } from '@/lib/matching/contact'
 
 export const RELAY_MAX_LENGTH = 1200
 export const RELAY_PER_MINUTE = 12
+export const RELAY_CONTACT_WINDOW_CHARS = 256
 
 // Discourse uploads (upload://), markdown images, HTML media, attachment links.
 const ATTACHMENT_RE = /upload:\/\/|!\[[^\]]*\]\([^)]*\)|<\s*(?:img|video|audio|iframe|source)\b|\|attachment\]/i
@@ -22,7 +24,11 @@ export type RelayDecision =
   | { action: 'hold'; reason: 'contact' | 'attachment' }
   | { action: 'drop' }
 
-export function decideRelay(raw: string, revealed: boolean): RelayDecision {
+export function nextRelayContactTail(priorText: string, text: string): string {
+  return `${priorText}\n${text}`.slice(-RELAY_CONTACT_WINDOW_CHARS)
+}
+
+export function decideRelay(raw: string, revealed: boolean, priorText = ''): RelayDecision {
   if (ATTACHMENT_RE.test(raw)) return { action: 'hold', reason: 'attachment' }
   let text = raw
   for (let previous = ''; previous !== text;) {
@@ -31,6 +37,15 @@ export function decideRelay(raw: string, revealed: boolean): RelayDecision {
   }
   text = text.replace(STRAY_QUOTE_TAG_RE, '').replace(MARKDOWN_QUOTE_RE, '').replace(MENTION_RE, '$1').replace(/\n{3,}/g, '\n\n').trim()
   if (!text) return { action: 'drop' }
-  if (!revealed && findContactDetails(text).length > 0) return { action: 'hold', reason: 'contact' }
+  if (!revealed) {
+    // Check both a natural message boundary and direct concatenation. The
+    // latter catches deliberate splits such as "lan@" + "gmail.com" or
+    // "za" + "lo" without changing what the recipient sees.
+    const joined = nextRelayContactTail(priorText, text)
+    const compactJoin = `${priorText}${text}`.slice(-RELAY_CONTACT_WINDOW_CHARS)
+    if (findContactDetails(joined).length > 0 || findContactDetails(compactJoin).length > 0) {
+      return { action: 'hold', reason: 'contact' }
+    }
+  }
   return { action: 'relay', text }
 }

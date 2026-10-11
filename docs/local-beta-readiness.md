@@ -2,7 +2,7 @@
 
 > Historical service checkpoint. Public-surface and launch claims in this file
 > are superseded by the
-> [2026-10-08 controlled public soft-launch plan](plans/2026-10-08-controlled-public-soft-launch.md).
+> [2026-10-11 public self-service launch plan](plans/2026-10-11-public-self-service-launch.md).
 
 Checkpoint: 2026-10-01, branch `feat/ba-moi`. The user authorized completing the
 existing beta locally before renting a server. No AWS resource, live database
@@ -80,7 +80,7 @@ Mocked admin-API tests prove drift detection; no live installer check has run.
 
 Existing signals/matches deliberately survive profile edits, while pause removes
 discovery visibility. Historical Discourse messages survive service deletion.
-Contact detection is heuristic; splitting contact details across messages can
-bypass it. Outbound delivery has a remote acceptance/receipt crash window and
-therefore cannot guarantee exactly once. These limits are carried into live
-acceptance, rather than represented as locally solved.
+Contact detection remains heuristic, but the launch service now evaluates a
+rolling cross-message window before reveal. Outbound delivery still has a remote
+acceptance/receipt crash window and therefore cannot guarantee exactly once.
+That remaining delivery limit is carried into live acceptance.

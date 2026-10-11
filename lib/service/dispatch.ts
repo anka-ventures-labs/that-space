@@ -32,6 +32,7 @@ const EnvelopeSchema = z.object({
     username: z.string().trim().min(1).max(60),
     name: z.string().trim().max(120).nullish(),
     topic_id: z.number().int().positive().nullish(),
+    post_id: z.number().int().positive().nullish(),
     /** Whether the conversation is a private message; only then can it be her thread with Bà Mối. */
     private_message: z.boolean().nullish(),
     /** The private message's usernames, comma-separated (Discourse AI's context.participants). */
@@ -100,7 +101,9 @@ export async function handleToolRequest(name: string, request: Request, deps: Se
       personaTopicId: personaThread(auth, deps.config.personaUsername),
     })
     memberId = member.id
-    const result = await tool.run({ deps, member, now: deps.now(), requestId }, args.data as never)
+    const result = await tool.run({
+      deps, member, topicId: auth.topic_id ?? null, postId: auth.post_id ?? null, now: deps.now(), requestId,
+    }, args.data as never)
     return respond(200, result)
   } catch (error) {
     deps.log({ event: 'tool_error', requestId, tool: name, memberId, error: error instanceof Error ? error.name : 'Error' })

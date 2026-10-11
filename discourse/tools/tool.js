@@ -31,6 +31,7 @@ function invoke(params) {
     user_id: context.user_id,
     username: context.username,
     topic_id: context.topic_id,
+    post_id: context.post_id,
     private_message: context.private_message,
     participants: context.participants,
   };

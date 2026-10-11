@@ -12,14 +12,17 @@ export function getPublicSiteConfig() {
   const communityUrl = isEnabled(process.env.PUBLIC_COMMUNITY_LINK_ENABLED)
     ? configuredCommunityUrl
     : "";
+  const publicRegistrationEnabled = Boolean(communityUrl) && isEnabled(
+    process.env.COMMUNITY_PUBLIC_REGISTRATION_ENABLED,
+  );
   const supportEmail = process.env.PUBLIC_SUPPORT_EMAIL?.trim() || undefined;
 
   return {
     communityUrl,
+    publicRegistrationEnabled,
     supportEmail,
-    intakeOpen: Boolean(supportEmail),
     loginHref: communityUrl ? `${communityUrl}/login` : undefined,
-    joinHref: "/contact",
+    signupHref: publicRegistrationEnabled ? `${communityUrl}/signup` : "/contact",
     contactHref: supportEmail
       ? `mailto:${supportEmail}`
       : "/contact",

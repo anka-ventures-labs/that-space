@@ -6,7 +6,7 @@ import {
 } from '@/lib/service/copy'
 import { decideRelay } from '@/lib/service/relay-policy'
 import fixture from '../../fixtures/discourse/post_created.json'
-import { BOT_USER_IDS, HIM, HIS_SUMMARY, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
+import { BOT_USER_IDS, HIM, HIS_SUMMARY, confirmedCall, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
 
 describe('relay policy', () => {
   it('holds contact details before a reveal and relays them after', () => {
@@ -14,6 +14,13 @@ describe('relay policy', () => {
       expect(decideRelay(text, false), text).toEqual({ action: 'hold', reason: 'contact' })
       expect(decideRelay(text, true).action, text).toBe('relay')
     }
+  })
+
+  it('holds contact details assembled across message boundaries', () => {
+    expect(decideRelay('23 45 67', false, '09 01')).toEqual({ action: 'hold', reason: 'contact' })
+    expect(decideRelay('gmail.com', false, 'lan@')).toEqual({ action: 'hold', reason: 'contact' })
+    expect(decideRelay('lo mình nhé', false, 'add za')).toEqual({ action: 'hold', reason: 'contact' })
+    expect(decideRelay('23 45 67', true, '09 01').action).toBe('relay')
   })
 
   it('never relays attachments, even after a reveal', () => {
@@ -95,6 +102,15 @@ describe('the relay webhook', () => {
     expect(h.discourse.postsIn(topicB)).toEqual([])
   })
 
+  it('holds the final fragment of a phone number split across relayed posts', async () => {
+    const { a, topicA, topicB } = await matchedPair(h)
+    h.discourse.clear()
+    expect((await h.webhook(post(topicA, a.user_id, '09 01'))).body.outcome).toBe('relayed')
+    expect((await h.webhook(post(topicA, a.user_id, '23 45 67'))).body.outcome).toBe('held')
+    expect(h.discourse.postsIn(topicB)).toEqual([relayedMessage('Em ấy', '09 01')])
+    expect(h.discourse.postsIn(topicA)).toEqual([HELD_CONTACT])
+  })
+
   it('enforces the length and rate limits', async () => {
     const { a, topicA, topicB } = await matchedPair(h)
     h.discourse.clear()
@@ -108,13 +124,17 @@ describe('the relay webhook', () => {
   it('reveals only when both ask, then relays contact details, text only', async () => {
     const { a, b, topicA, topicB, matchId } = await matchedPair(h)
     h.discourse.clear()
-    expect((await h.call('match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('waiting_for_other')
+    expect((await h.webhook(post(topicA, a.user_id, 'Chào anh'))).body.outcome).toBe('relayed')
+    expect((await h.db.query(`select 1 from relay_contact_windows where match_id = $1`, [matchId]))).toHaveLength(1)
+    h.discourse.clear()
+    expect((await confirmedCall(h, 'match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('waiting_for_other')
     expect(h.discourse.postsIn(topicB)).toEqual([revealAsked('Em ấy')])
-    expect((await h.call('match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('waiting_for_other')
+    expect((await confirmedCall(h, 'match_action', a, { match_id: matchId, action: 'reveal' })).body.result).toBe('waiting_for_other')
     expect(h.discourse.postsIn(topicB)).toHaveLength(1) // asking twice notifies once
     expect((await h.webhook(post(topicA, a.user_id, 'sđt em 0912345678'))).body.outcome).toBe('held')
 
-    expect((await h.call('match_action', b, { match_id: matchId, action: 'reveal' })).body.result).toBe('revealed')
+    expect((await confirmedCall(h, 'match_action', b, { match_id: matchId, action: 'reveal' })).body.result).toBe('revealed')
+    expect((await h.db.query(`select 1 from relay_contact_windows where match_id = $1`, [matchId]))).toHaveLength(0)
     expect(h.discourse.postsIn(topicA)).toContain(revealed('Anh ấy', 'nam', 'https://forum.test/u/nam'))
     expect(h.discourse.postsIn(topicB)).toContain(revealed('Em ấy', 'lan', 'https://forum.test/u/lan'))
     expect((await h.webhook(post(topicA, a.user_id, 'sđt em 0912345678'))).body.outcome).toBe('relayed')
@@ -125,7 +145,11 @@ describe('the relay webhook', () => {
   it('ends a chat for both, then relays nothing more', async () => {
     const { a, b, topicA, topicB, matchId } = await matchedPair(h)
     h.discourse.clear()
-    expect((await h.call('match_action', b, { match_id: matchId, action: 'end' })).body.result).toBe('ended')
+    expect((await h.webhook(post(topicA, a.user_id, 'Chào anh'))).body.outcome).toBe('relayed')
+    expect((await h.db.query(`select 1 from relay_contact_windows where match_id = $1`, [matchId]))).toHaveLength(1)
+    h.discourse.clear()
+    expect((await confirmedCall(h, 'match_action', b, { match_id: matchId, action: 'end' })).body.result).toBe('ended')
+    expect((await h.db.query(`select 1 from relay_contact_windows where match_id = $1`, [matchId]))).toHaveLength(0)
     expect(h.discourse.postsIn(topicA)).toEqual([MATCH_ENDED])
     expect(h.discourse.postsIn(topicB)).toEqual([MATCH_ENDED])
     expect((await h.webhook(post(topicA, a.user_id, 'còn đó không?'))).body.outcome).toBe('ignored_closed')
@@ -135,7 +159,7 @@ describe('the relay webhook', () => {
   it('blocks without telling the other side, and they are never introduced again', async () => {
     const { a, b, topicA, topicB, matchId } = await matchedPair(h)
     h.discourse.clear()
-    expect((await h.call('match_action', a, { match_id: matchId, action: 'block' })).body.result).toBe('blocked')
+    expect((await confirmedCall(h, 'match_action', a, { match_id: matchId, action: 'block' })).body.result).toBe('blocked')
     expect(h.discourse.postsIn(topicA)).toEqual([BLOCK_CONFIRMED])
     expect(h.discourse.postsIn(topicB)).toEqual([MATCH_ENDED])
     h.setNow(new Date(h.now.getTime() + 24 * 3600 * 1000))
@@ -146,7 +170,7 @@ describe('the relay webhook', () => {
   it('tells the other side when a member deletes her data', async () => {
     const { a, topicB } = await matchedPair(h)
     h.discourse.clear()
-    await h.call('consent', a, { action: 'delete', confirm: true })
+    await confirmedCall(h, 'consent', a, { action: 'delete' })
     expect(h.discourse.postsIn(topicB)).toEqual([MATCH_ENDED])
     expect(await getMemberByDiscourseId(h.db, a.user_id)).toBeNull()
   })

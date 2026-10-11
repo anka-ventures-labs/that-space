@@ -110,18 +110,16 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
 
 ## 5. Site settings
 
-- **Access:** the initial pilot accepts any adult aged 18 or older, but admission
-  is capped and controlled. `login_required` stays on and category permissions
+- **Access:** Google is the only admission path, so a verified Google identity
+  replaces email activation. `login_required` stays on and category permissions
   still rely on that global boundary.
-  - `allow_new_registrations` on so invitation redemption works;
-    `enable_signup_cta` off so there is no public self-service CTA
-  - `invite_only` and `must_approve_users` on; `invite_code` empty
-  - `enable_local_logins` on for the native invitation path. An invitation and
-    staff approval are still both required.
+  - `allow_new_registrations` and `enable_signup_cta` on
+  - `invite_only` off, `invite_code` empty, `must_approve_users` off
+  - `enable_local_logins` **off**: password signup and login return 403, while a
+    completed Google OAuth handoff satisfies the native authenticator contract.
   - `auth_skip_create_confirm` off
-  - Google login is optional for a later pilot. Keep it off until real
-    credentials and the exact callback are tested; it never bypasses the
-    invitation or approval policy.
+  - `enable_google_oauth2_logins` on only after real client credentials and the
+    exact callback below are installed and tested.
 - **Google redirect URI:** register this exact string, including the port and
   with no trailing slash. Google matches redirect URIs exactly, so a missing
   `:8443` fails with `redirect_uri_mismatch`:
@@ -139,8 +137,8 @@ must return `ok`. After that, set `force_https` to true in the admin settings.
   Members are notified in-app instead. Do not add an
   SMTP host without also sending a real test email; a half-configured mailer
   looks healthy and silently drops every message.
-- **Access recovery:** no transactional mailer is configured, so test the
-  staff-assisted invite, login and recovery path before each invitation batch.
+- **Access recovery:** with no password path, a member who loses their Google
+  account has no self-service recovery and needs staff help.
 - **AI:**
   - `discourse_ai_enabled` on
   - An LLM for OpenRouter (provider `open_router`, with Minh's key) that

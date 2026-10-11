@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "manifest_id": "that-space-community",
-  "revision": "2026-10-08-controlled-adult-pilot-v1",
+  "revision": "2026-10-11-public-self-service-v1",
   "provenance": {
     "onboarding_source": "Google Drive template 1YlrxlqGv_VJOG3IvkUt8Sf1LihA6HDTn",
     "recovered_on": "2026-10-01",
@@ -16,11 +16,12 @@
     "allow_user_locale": true,
     "login_required": true,
     "allow_new_registrations": true,
-    "enable_signup_cta": false,
-    "invite_only": true,
+    "enable_signup_cta": true,
+    "invite_only": false,
     "invite_code": "",
-    "must_approve_users": true,
-    "enable_local_logins": true,
+    "must_approve_users": false,
+    "enable_local_logins": false,
+    "enable_google_oauth2_logins": true,
     "auth_skip_create_confirm": false,
     "discourse_automation_enabled": true,
     "enable_smtp": false,
@@ -93,7 +94,7 @@
     }
   },
   "known_limits": [
-    "The pilot relies on self-attested age plus staff screening and does not collect identity-document images.",
+    "Public registration relies on an exact 18+ self-attestation and Google identity; it does not collect identity-document images.",
     "The native Automation script adds a member to the selected Q1 group at first login. It does not remove a prior role group when an editable answer changes; staff must reconcile changed roles until an official reversible script is available.",
     "No onboarding answer is sent to Bà Mối or its matchmaking pool by this configuration. That requires the separate consent and card-confirmation flow."
   ]

@@ -6,9 +6,9 @@ sentence the member reads in conversation. The service returns facts, plus
 
 ## Calling convention
 
-The API is unavailable unless `BA_MOI_ENABLED=true`. The initial community
-pilot keeps it false. While disabled, tool, webhook and retry routes return 503
-before loading database or bot credentials.
+The public launch sets `BA_MOI_ENABLED=true`. While the emergency switch is
+false, tool, webhook and retry routes return 503 before loading database or bot
+credentials.
 
 `POST /api/ba-moi/v1/<tool>`, with header `Authorization: Bearer $BA_MOI_TOOL_SECRET`.
 
@@ -45,7 +45,7 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
 | Tool | Args | Success |
 |---|---|---|
 | `status` | none | `opted_in`, `consent` (`{ version, text }` until she agrees to this version; show it word for word), `paused`, `missing` (interview fields still needed), `married_friendship_only`, `card` (`none`, `needs_confirmation` or `confirmed`), `box_available`, `next_box_at`, `search_results_left`, `interests_left`, `pending_signals`, `open_matches` |
-| `consent` | `action`: `opt_in` (needs `adult_confirmed: true`), `pause`, `resume`, or `delete` (needs `confirm: true`) | `opted_in`, `paused` or `deleted` |
+| `consent` | `action`: `opt_in` (needs `adult_confirmed: true`), `pause`, `resume`, or `delete`; delete requires the service-issued `confirmation_token` from the preceding challenge | `opted_in`, `paused` or `deleted` |
 | `profile_update` | Any of: `intent`, `gender`, `seeking`, `birth_date` (YYYY-MM-DD), `birth_time` (HH:MM, or `null` for "không nhớ"), `city`, `age_min`, `age_max`, `marital`, `children`, `wants_children`, `hobbies` (1–8), `open_answer`, `occupation` | `missing`, `card_needs_confirmation`, `age_range` (defaults to her age ±5 once the birth date is known) |
 | `card_preview` | none | `card`, `template_summary`, `current_summary`, `confirmed`, `summary_max_length` |
 | `card_confirm` | `summary_text` (10–400 characters, written by the persona) | `card`, `in_pool` |
@@ -55,7 +55,7 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
 | `signals` | none | `signals: [{ signal_id, card, fit, expires_at }]`: the sender's card and the fit from her side |
 | `signal_respond` | `signal_id`, `response` (`accept`, `decline` or `dismiss`) | `result`: `matched`, `declined` or `dismissed` |
 | `matches` | none | `matches: [{ match_id, alias, state, i_asked_to_reveal, they_asked_to_reveal, chat_url }]` |
-| `match_action` | `match_id`, `action` (`end`, `block` or `reveal`) | `result`: `ended`, `blocked`, `waiting_for_other` or `revealed` |
+| `match_action` | `match_id`, `action` (`end`, `block` or `reveal`) and, after a challenge, its service-issued `confirmation_token` | `result`: `ended`, `blocked`, `waiting_for_other` or `revealed` |
 
 **An introduction** is `{ discovery_id, card, fit, is_sample }`.
 - **`card`** is the other person's anonymous card:
@@ -104,6 +104,19 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
 - **Relay limit:** policy, the per-sender one-minute count and receipt storage
   share that same transaction lock. Simultaneous webhooks stay within 12 messages
   per minute; excess posts receive a notice in the sender's thread.
+- **Consequential confirmation:** delete, reveal, block and end first return
+  `confirm_required` with a random HMAC-signed token. The token expires after ten
+  minutes and is bound to the member, current Discourse topic, triggering post,
+  action and target. Its nonce is stored without message text or raw token. The
+  service accepts it once, and only from a later member post in that same topic;
+  the persona therefore asks again and resends it only after the member's next
+  clear confirmation.
+- **Rolling contact detection:** before reveal, the relay keeps at most 256
+  characters of already-relayed text per sender and match. It evaluates both
+  message boundaries and direct concatenation so a phone, email or social handle
+  split across posts is held. Both sides' temporary windows are removed
+  immediately after mutual reveal, end or block, and also cascade on member or
+  match deletion.
 - **What searches can match:** only what cards show, so a search can't reveal
   what a card hides. Her keywords count as her interests while that search is
   scored.

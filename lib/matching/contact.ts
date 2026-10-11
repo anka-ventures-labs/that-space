@@ -4,8 +4,8 @@
  * (VN default) and linkify-it finds URLs and emails. A small layer adds
  * platform keywords, obfuscated emails and spelled-out Vietnamese digits.
  *
- * Known limit: a number split across several messages can slip through. The
- * relay mitigates this with a warning and the reveal prompt, not a perfect block.
+ * The relay supplies a rolling cross-message window so fragments in separate
+ * posts are evaluated together before reveal.
  */
 import { findPhoneNumbersInText } from 'libphonenumber-js'
 import { linkifyit } from 'linkify-it'

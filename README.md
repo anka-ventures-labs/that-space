@@ -7,7 +7,7 @@ This repository contains three deliberately separate surfaces:
 
 - a public Next.js brochure;
 - a private Discourse community build;
-- the Bà Mối matchmaking service, which is disabled for the initial pilot.
+- the full Bà Mối matchmaking service.
 
 Public site: <https://that-space-demo.vercel.app>
 
@@ -15,24 +15,25 @@ Private community: <https://ubuntu-asus.tail349cbf.ts.net:8443>
 
 ## Launch status
 
-The approved soft-launch shape is a public brochure plus a controlled private
-pilot of at most 20 adults:
+The approved soft-launch shape is public self-service membership for any adult,
+with the full community and Bà Mối experience available from day one:
 
 - public routes are `/`, `/privacy`, `/terms`, and `/contact`;
 - the former static forum, profile, Tử Vi, and matchmaking demo routes have
   been removed;
-- anyone aged 18 or older may request an invitation through the configured
-  support address;
-- Discourse requires an invitation, an explicit 18+ attestation, all 15
-  community onboarding answers, and staff approval;
-- admission controls manage pilot capacity and safety; they are not a gender or
-  identity-document gate;
+- anyone aged 18 or older may register with Google, without an invitation or
+  staff approval;
+- Discourse requires an explicit 18+ attestation and all 15 private community
+  onboarding answers;
 - onboarding answers are private by default and are not sent to Bà Mối;
-- `BA_MOI_ENABLED=false` is the default and all Bà Mối HTTP ingress fails
-  closed while disabled.
+- Bà Mối is available to ordinary registered members, with separate consent,
+  a private interview, anonymous discovery, signals, relay chat, mutual reveal,
+  pause, block, end and deletion;
+- soft-launch capacity is controlled through a small first announcement and
+  active monitoring rather than invite-only admission.
 
-The complete decision, operator checks, stop conditions, and deferred Bà Mối
-work are in the [controlled public soft-launch plan](docs/plans/2026-10-08-controlled-public-soft-launch.md).
+The release sequence and acceptance gates are in the
+[public self-service launch plan](docs/plans/2026-10-11-public-self-service-launch.md).
 
 ## Getting started
 
@@ -44,10 +45,11 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`PUBLIC_SUPPORT_EMAIL` opens invitation intake. A community link additionally
-requires both `DISCOURSE_URL` and `PUBLIC_COMMUNITY_LINK_ENABLED=true`; keep the
-flag false until the member path passes external acceptance. Do not add real
-secrets to tracked files.
+The public community link requires `DISCOURSE_URL` and
+`PUBLIC_COMMUNITY_LINK_ENABLED=true`. Direct signup additionally requires
+`COMMUNITY_PUBLIC_REGISTRATION_ENABLED=true`. Production sets
+`BA_MOI_ENABLED=true`; changing it to false is the emergency service stop. Do
+not add real secrets to tracked files.
 
 | Command | Purpose |
 | --- | --- |
@@ -63,21 +65,22 @@ secrets to tracked files.
 
 | Route | Content |
 | --- | --- |
-| `/` | Pilot scope, adult eligibility, community boundary, and feature status |
-| `/privacy` | Community data handling and the disabled Bà Mối boundary |
-| `/terms` | 18+ eligibility, pilot admission, and conduct terms |
-| `/contact` | Invitation, support, and safety-reporting channel |
+| `/` | Bà Mối-led product, adult eligibility, public signup, and community features |
+| `/privacy` | Community/Bà Mối data handling and active processors |
+| `/terms` | 18+ eligibility, account rules, and conduct terms |
+| `/contact` | Account, data, community, and Bà Mối support |
 
-`PUBLIC_SUPPORT_EMAIL` must be configured before invitation intake opens. If it
-is missing, the public CTAs become status-only and `/contact` says intake is
-closed instead of creating a broken or circular link. `DISCOURSE_URL` never
-publishes a link by itself: `PUBLIC_COMMUNITY_LINK_ENABLED=true` is also
-required, and still never creates a public signup link.
+If `PUBLIC_SUPPORT_EMAIL` is absent, `/contact` directs visitors through the
+public Google signup or member login path before they contact staff inside the
+community; it does not link guests into a login redirect loop.
+`DISCOURSE_URL` never publishes a link by itself:
+`PUBLIC_COMMUNITY_LINK_ENABLED=true` is also required. The signup CTA appears
+only when the independent public-registration flag is true.
 
 ## Repository map
 
 ```text
-app/              Public pages and disabled-by-default Bà Mối route handlers
+app/              Public pages and Bà Mối route handlers
 components/       Shared public navigation and footer
 lib/matching/     Bà Mối compatibility, privacy, and filtering core
 lib/db/           Bà Mối Postgres data layer and sample members
@@ -96,40 +99,44 @@ Brand colors live in `tailwind.config.ts`. Playfair Display and Inter are loaded
 by `app/layout.tsx`. `next.config.js` keeps the logo unoptimized so the static
 public surface does not depend on the image optimization server.
 
-## Controlled community admission
+## Public self-service admission
 
 The source of truth is `discourse/community/manifest.json`. The manifest
 enforces:
 
 - `login_required=true`;
-- `allow_new_registrations=true` only so invitation redemption works;
-- `enable_signup_cta=false`;
-- `invite_only=true`;
-- `must_approve_users=true`;
-- `enable_local_logins=true` for the native invitation path;
-- outgoing email disabled until a real mailer is configured and tested.
+- `allow_new_registrations=true` and `enable_signup_cta=true`;
+- `invite_only=false` and `must_approve_users=false`;
+- `enable_local_logins=false` so Google is the only signup/login path;
+- `enable_google_oauth2_logins=true`, checked by the owned manifest and
+  bootstrap drift command;
+- `auth_skip_create_confirm=false` so only a completed OAuth handoff can create
+  the account;
+- outgoing email disabled; Google verification replaces email activation.
 
 The first required signup field is the exact 18+ self-attestation. The next 15
-fields are Thảo's community onboarding questions. Do not collect identity-
+fields are Thảo's community onboarding questions. Do not collect identity
 document images. Apply changes with `--check` first and follow
 [community operations](docs/community-operations.md).
 
-## Bà Mối boundary
+## Bà Mối launch contract
 
-Bà Mối is not available to pilot members yet. Keep all three controls in place:
+Bà Mối is a first-day feature. The live release requires all three controls:
 
-1. `BA_MOI_ENABLED=false` in the service environment;
-2. `BA_MOI_ALLOWED_GROUP_IDS` empty in the Discourse installer configuration;
-3. the theme's Bà Mối username unset so no member CTA appears.
+1. `BA_MOI_ENABLED=true` in the service environment;
+2. `BA_MOI_ALLOWED_GROUP_IDS` includes the live `trust_level_0` group id;
+3. the theme's Bà Mối username is the installed persona account.
 
-With the service switch off, tool, webhook, and retry endpoints return HTTP 503
-before loading database or bot credentials. The underlying service can still be
-verified locally with `npm run test:beta`.
+Sensitive delete, reveal, block and end operations require a fresh, short-lived,
+single-use service token bound to the member, Discourse thread, action, target
+and triggering post. The service executes it only from a later member post. The
+anonymous relay checks a rolling window so contact details split across several
+messages are held before mutual reveal, then deletes that temporary tail on
+reveal, end, block or member deletion. Setting `BA_MOI_ENABLED=false` still stops
+tool, webhook and retry ingress with HTTP 503.
 
-Before enabling Bà Mối, complete the safety gates in the launch plan: fresh
-server-bound confirmation for sensitive actions, rolling cross-message contact
-protection, outbox failure-injection coverage, live provider acceptance, an
-incident owner, and updated processor disclosures.
+The complete service journey is verified locally with `npm run test:beta` and
+must also pass with two fresh non-staff accounts on the exact deployed release.
 
 ## Data and secrets
 
@@ -171,5 +178,5 @@ vercel link --yes --team minh-nguyens-projects-3a747261 --project that-space-dem
 The original public demo was recovered from a Vercel deployment on 2026-09-27,
 verified against Vercel file digests, and imported into Git. See
 [the session log](docs/SESSION_LOG.md). Historical plans and verification files
-describe earlier states; the 2026-10-08 controlled plan is authoritative for
-this release.
+describe earlier states; the 2026-10-11 public self-service plan is
+authoritative for this release.

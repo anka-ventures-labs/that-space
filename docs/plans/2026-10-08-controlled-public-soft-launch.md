@@ -1,6 +1,7 @@
 # Controlled public soft launch
 
-Status: implementation checkpoint, 2026-10-08
+Status: superseded on 2026-10-11 by
+[public self-service soft launch](2026-10-11-public-self-service-launch.md)
 
 ## Product decision
 

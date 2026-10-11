@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { getCard, getMemberByDiscourseId, getProfile, recordConsent } from '@/lib/db/repo'
 import { redactCardForCurrentPool } from '@/lib/service/cards'
+import { CONFIRMATION_TTL_MS } from '@/lib/service/confirmation'
 import { CONSENT_TEXT, CONSENT_VERSION } from '@/lib/service/copy'
-import { PROFILE, createHarness, onboard, testUser, type Harness } from '../../helpers/service'
+import { PROFILE, confirmedCall, createHarness, onboard, testUser, type Harness } from '../../helpers/service'
 
 let h: Harness
 beforeAll(async () => {
@@ -154,9 +155,38 @@ describe('deletion', () => {
     const user = testUser('bich')
     await onboard(h, user)
     expect((await h.call('consent', user, { action: 'delete' })).body.error).toBe('confirm_required')
-    expect((await h.call('consent', user, { action: 'delete', confirm: true })).body).toMatchObject({ ok: true, deleted: true })
+    expect((await confirmedCall(h, 'consent', user, { action: 'delete' })).body).toMatchObject({ ok: true, deleted: true })
     expect(await getMemberByDiscourseId(h.db, user.user_id)).toBeNull()
     // Talking to Bà Mối again starts over.
     expect((await h.call('status', user)).body).toMatchObject({ opted_in: false, card: 'none' })
+  })
+
+  it('binds a fresh confirmation to the member thread and expiry window', async () => {
+    const user = testUser('mai')
+    await onboard(h, user)
+    const challenged = await h.call('consent', user, { action: 'delete' })
+    const token = challenged.body.confirmation_token as string
+    expect(token).toEqual(expect.any(String))
+
+    const wrongThread = await h.call('consent', user, { action: 'delete', confirmation_token: token }, {
+      auth: {
+        user_id: user.user_id,
+        username: user.username,
+        topic_id: user.topic_id + 1,
+        post_id: user.post_id + 1,
+        private_message: true,
+        participants: `${user.username}, ba_moi`,
+      },
+    })
+    expect(wrongThread.body.error).toBe('confirm_required')
+    expect(await getMemberByDiscourseId(h.db, user.user_id)).not.toBeNull()
+
+    const originalNow = h.now
+    h.setNow(new Date(originalNow.getTime() + CONFIRMATION_TTL_MS + 1))
+    expect((await h.call('consent', user, { action: 'delete', confirmation_token: token })).body.error).toBe('confirm_required')
+    expect(await getMemberByDiscourseId(h.db, user.user_id)).not.toBeNull()
+    h.setNow(originalNow)
+
+    expect((await confirmedCall(h, 'consent', user, { action: 'delete' })).body.deleted).toBe(true)
   })
 })

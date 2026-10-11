@@ -41,7 +41,10 @@ describe('the Discourse AI tool script', () => {
     expect(calls).toHaveLength(1)
     expect(calls[0].url).toBe(`${SERVICE}/status`)
     expect(calls[0].headers.Authorization).toBe(`Bearer ${SECRET}`)
-    expect(calls[0].body.auth).toEqual({ user_id: 101, username: 'lan', topic_id: 4001, private_message: true, participants: 'lan, ba_moi' })
+    expect(calls[0].body.auth).toEqual({
+      user_id: 101, username: 'lan', topic_id: 4001, post_id: 9,
+      private_message: true, participants: 'lan, ba_moi',
+    })
     // A model's attempt at identity lands in args, where the service strips it.
     expect(calls[0].body.args).toEqual({ user_id: 999, username: 'victim' })
   })

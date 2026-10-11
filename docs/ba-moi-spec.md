@@ -1,6 +1,7 @@
 # Bà Mối spec
 
-Status: draft v3, 2026-09-27. v3 makes the design Discourse-native, replacing
+Status: implemented v3, updated 2026-10-11. v3 makes the design
+Discourse-native, replacing
 the v2 plan for a separate Bà Mối web app. Matchmaking is anonymous by design
 and follows the flow and rules of Moon's Nhân Duyên (`moon-ai-vn/moon2-app`,
 `lib/nhan-duyen`). Minh built Moon entirely, so we reuse its code as well as
@@ -10,7 +11,8 @@ its design.
 community and Bà Mối. Full Tử Vi charts/readings, reading history and PDFs are
 out of scope. Keep the current tuổi/day-pillar compatibility; full-chart
 romantic scoring remains a future Moon-reuse step, not a completion gate for
-this phase. See the [current execution plan](plans/2026-10-01-whole-app.md).
+this phase. See the
+[current launch plan](plans/2026-10-11-public-self-service-launch.md).
 
 ## The product in one paragraph
 
@@ -32,8 +34,8 @@ matchmaking logic and thin glue are ours.
 
 - **Discourse (self-hosted, official Docker install) is the whole member
   experience:**
-  - Invite-only membership with email and password login. Google login can
-    be added at the end.
+  - Public self-service membership for any adult aged 18 or older, using
+    Google OAuth. Local password signup/login and staff approval are disabled.
   - The forum.
   - Members' profile pages with a portfolio of their work.
   - Events for retreats and workshops.
@@ -99,10 +101,10 @@ matchmaking logic and thin glue are ours.
 
 ## Member journey
 
-1. **Join.** Thảo shares a Discourse invite link. Her friend creates an
-   account with email and password and answers Thảo's signup questions (her
-   15-question set, as Discourse user fields). With no outgoing email in the
-   beta, an admin activates the account with one click.
+1. **Join.** Any adult opens the public signup link, completes Google OAuth,
+   confirms they are at least 18 and answers the 15 community signup questions.
+   The account becomes active without an invitation or staff approval; local
+   password signup and login are disabled.
 
    She then opens a direct message with Bà Mối, who asks for consent, which is
    versioned. The consent text says that in the beta, admins can read her
@@ -266,15 +268,14 @@ her scores recomputed.
 - Syncing edits and deletes in the relay
 - Full Tử Vi charts/readings, reading history, PDFs and full-chart scoring
 - Payments
-- Outgoing email (recruitment is by invite link)
+- Outgoing notification email (signup identity is verified by Google)
 - Hosting in Vietnam (planned: the AWS Hanoi Local Zone)
 - Watching the pool for a search and notifying her when someone new fits
 
 ## Done means
 
-1. A friend with an invite link creates an account with email and password,
-   is activated by an admin, answers the signup questions, and can message Bà
-   Mối.
+1. An adult creates an account through Google, completes all 16 required signup
+   fields without staff action, and can message Bà Mối.
 2. The interview finishes in under 5 minutes on a phone, and the card she
    confirms passes the leak check.
 3. Tests prove no discovery or search result ever breaks a hard filter, in

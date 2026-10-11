@@ -72,18 +72,22 @@ describe("Landing Page Smoke Test", () => {
   it("renders the Vietnamese tagline", () => {
     render(<HomePage />);
     expect(
-      screen.getByText("Một không gian riêng tư để kết nối, chia sẻ và tìm người đồng hành."),
+      screen.getByText(
+        "Một cộng đồng riêng tư để người trưởng thành kết nối có chủ đích — bắt đầu bằng cuộc trò chuyện với Bà Mối.",
+      ),
     ).toBeInTheDocument();
   });
 
   it("renders the three capability sections", () => {
     render(<HomePage />);
     expect(
-      screen.getByRole("heading", { name: "Cộng đồng riêng tư", level: 3 }),
+      screen.getByRole("heading", { name: "Bà Mối đồng hành", level: 3 }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Dành cho người từ 18 tuổi", level: 3 })).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Thử nghiệm có kiểm soát", level: 3 }),
+      screen.getByRole("heading", { name: "Bạn giữ quyền quyết định", level: 3 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Cộng đồng thật", level: 3 }),
     ).toBeInTheDocument();
   });
 

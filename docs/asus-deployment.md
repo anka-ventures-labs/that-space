@@ -239,13 +239,13 @@ source. Discourse backups are under
 `/var/discourse/shared/that-space/backups/default`; uploads are under
 `/var/discourse/shared/that-space/uploads`. Configure daily backups, copy them
 off the ASUS, and prove a restore into an isolated instance before inviting
-members. A backup that has not been restored is not sufficient recovery
+members or opening public registration. A backup that has not been restored is not sufficient recovery
 evidence.
 
-Before invitations, verify private guest denial, the required 18+ attestation,
-staff-assisted activation and recovery, upload access through the Funnel,
-restart recovery, backup/restore, phone layout, Vietnamese moderation behavior,
-and that Bà Mối is unavailable to members. The
+Before public registration, verify private guest denial, the required 18+
+attestation, a real Google OAuth signup without staff action, staff-assisted
+recovery, upload access through the Funnel, restart recovery, backup/restore,
+phone layout, Vietnamese moderation behavior and the complete Bà Mối journey. The
 repository's GitHub acceptance checks validate the pinned build; they do not
 replace these live checks.
 
@@ -368,14 +368,14 @@ A real phone UI pause message was acknowledged. Event layout also passed at
 two API-created fixtures were promoted to TL1, matching the invited-member
 default; neither is staff and no site quota was relaxed.
 
-That rendered checkpoint is historical: the initial public pilot now requires
-16 signup fields (the 18+ attestation plus those 15 questions) and must hide the
-Bà Mối CTA until the separate safety gate is complete.
+That rendered checkpoint is historical. The public release requires 16 signup
+fields (the 18+ attestation plus those 15 questions), Google self-registration
+and the visible Bà Mối CTA.
 
 Cold rotational-disk I/O caused worker timeouts and temporary 502/503 responses.
 The native supervisor recovered without manual restart or speculative tuning.
 Warm signed-in pages, posting and AI succeeded, with no Docker restart or
-observed OOM. Before invitations/after cold starts, check a signed-in page and
+observed OOM. Before public promotion and after cold starts, check a signed-in page and
 native posting as well as `/srv/status`; health alone missed the stalled worker.
 This records recovery, not a permanent storage-performance fix. Taylor MinIO
 and Funnel 443 remain intact.

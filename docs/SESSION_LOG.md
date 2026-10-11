@@ -1,5 +1,42 @@
 # Session log
 
+## 2026-10-11: public self-service launch assembly
+
+Replaced the superseded invite-only pilot contract with a public, Google-only
+self-service launch for every adult, regardless of gender. The landing page now
+leads with the full Bà Mối journey; direct registration is published only when
+both community and public-registration flags are true. Added truthful privacy,
+terms and logged-out support routes. The owned Discourse manifest, deployment
+example, bootstrap drift check and native acceptance fixtures require open
+registration, no staff approval, no local passwords, a completed Google OAuth
+handoff, the exact 18+ attestation and all 15 private onboarding fields. Community
+content remains login-gated and onboarding answers do not enter matchmaking.
+
+Hardened consequential Bà Mối actions after primary assembly review
+`19cad086-d106-4e19-851d-86518764636a` found three launch blockers. Delete,
+reveal, block and end now use a DB-backed, HMAC-bound challenge that is single
+use, expires after ten minutes and can execute only from a later human Discourse
+post in the same topic. Added cross-member/topic/action/resource, tamper, skew,
+expiry and replay tests. The pre-reveal relay now evaluates a persisted
+256-character per-sender tail to catch contact details split across posts and
+deletes both tails immediately on mutual reveal, end or block. Google OAuth is
+now part of the manifest/bootstrap contract and enabled in the deployment
+example. Paused-registration copy and the no-email support fallback no longer
+promise unavailable signup or bounce guests into a login redirect loop.
+
+Focused blocker regression passed 68 tests. The final complete local gate passed
+30 test files / 221 tests, TypeScript, lint, production build, zero production npm
+vulnerabilities, Ruby and JSON validation, and `git diff --check`. Supabase's
+linked dry run lists exactly the two additive migrations for relay contact
+windows and one-time confirmation challenges. Primary review delivery was read
+and acknowledged; route decision `25d110f3-1f73-4b0e-8ef0-26bb0b5376b9` was
+closed. Targeted follow-up review `30994266-c816-4352-8992-33eac6e6ddc2`
+(route `8598af11-fcd7-4c7c-b6dc-249d0bc32589`) returned **SHIP** with all five
+retained findings resolved and no repair regression. Its delivery was read and
+acknowledged and the route was closed. Production migration, exact-head CI,
+forum drift application, Google signup acceptance and local-prebuilt Vercel
+promotion remain the ordered live-only release steps.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,

@@ -6,7 +6,7 @@
  */
 
 export const ERROR_MESSAGES = {
-  service_disabled: 'Bà Mối chưa được mở trong đợt thử nghiệm này.',
+  service_disabled: 'Bà Mối đang tạm thời không khả dụng. Bạn thử lại sau nhé.',
   unauthorized: 'Bà Mối chưa xác thực được yêu cầu này.',
   not_found_tool: 'Bà Mối không có chức năng này.',
   invalid_request: 'Yêu cầu gửi lên chưa đúng định dạng.',
