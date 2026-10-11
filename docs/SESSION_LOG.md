@@ -48,6 +48,18 @@ manifest; production remains fail-closed and still requires its real secret
 values before apply. This is a deterministic fixture correction, not a CI rerun
 of unchanged code or a relaxation of the Google-only launch contract.
 
+Replacement run `38143944777` proved that correction: 24/25 native requests and
+4/5 browser examples passed. The request failure showed a logged-out OAuth-created
+member still had the preceding valid Google handoff in the Redis-backed server
+session, so the supposed password-only probe reused that identity and logged the
+same member back in. Clear the OAuth fixture before submitting the password
+request; this isolates the intended disabled-local-login boundary. The only
+browser failure was `net::ERR_NAME_NOT_RESOLVED` for the job's own
+`http://localhost:31337/latest` after four real browser examples had passed. It
+is a hosted runner/transient local-resolution error, not an application response;
+the new code revision provides its permitted single fresh run while correcting
+the independent request fixture.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,

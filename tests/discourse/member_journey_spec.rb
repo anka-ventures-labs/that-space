@@ -86,6 +86,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     delete "/session/#{member.username}.json", xhr: true
     expect(response.status).to eq(200)
     expect(session[:current_user_id]).to be_nil
+    # Account creation deliberately leaves the verified OAuth handoff in the
+    # Redis-backed server session. Clear that valid identity proof so this
+    # request isolates the disabled password path instead of transparently
+    # reusing the preceding Google authentication.
+    server_session.delete(:authentication)
     post "/session.json", params: { login: member.email, password: "a sufficiently strong acceptance password" }
 
     expect(response.status).not_to eq(200)
