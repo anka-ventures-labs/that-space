@@ -37,6 +37,17 @@ acknowledged and the route was closed. Production migration, exact-head CI,
 forum drift application, Google signup acceptance and local-prebuilt Vercel
 promotion remain the ordered live-only release steps.
 
+Exact-head CI run `38143565514` passed Service checks at `7dd631f` but the
+pinned Discourse job failed before all community fixtures: native validation
+correctly refused `enable_google_oauth2_logins=true` because the disposable test
+site had no OAuth client id or secret when the shared bootstrap helper ran. The
+member-journey fixture set credentials only later, so request and browser suites
+that call the shared helper all failed from the same cause. Updated only the
+test helper to seed inert fixture credentials before applying the production
+manifest; production remains fail-closed and still requires its real secret
+values before apply. This is a deterministic fixture correction, not a CI rerun
+of unchanged code or a relaxation of the Google-only launch contract.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,

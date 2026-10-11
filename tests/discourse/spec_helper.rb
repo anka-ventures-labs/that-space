@@ -26,6 +26,13 @@ module ThatSpaceCommunitySpecSupport
   end
 
   def apply_that_space_community!
+    # Enabling Google OAuth is intentionally part of the owned manifest. The
+    # pinned Discourse setting rejects that value unless both credentials are
+    # already present, just as production should. Acceptance uses inert fixture
+    # credentials so every suite can apply the manifest before exercising its
+    # own behavior.
+    SiteSetting.google_oauth2_client_id = "that-space-acceptance-client"
+    SiteSetting.google_oauth2_client_secret = "that-space-acceptance-secret"
     that_space_bootstrap.apply!
   end
 
