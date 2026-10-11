@@ -80,20 +80,13 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(User.find_by_email("acceptance-member@example.com")).to be_nil
   end
 
-  it "refuses password login so an unverified identity cannot reach member content" do
-    member = create_google_member
+  it "refuses a valid password login while Google is the only identity path" do
+    password_member = Fabricate(:user, email: "password-member@example.com")
 
-    delete "/session/#{member.username}.json", xhr: true
-    expect(response.status).to eq(200)
     expect(session[:current_user_id]).to be_nil
-    # Account creation deliberately leaves the verified OAuth handoff in the
-    # Redis-backed server session. Clear that valid identity proof so this
-    # request isolates the disabled password path instead of transparently
-    # reusing the preceding Google authentication.
-    server_session.delete(:authentication)
-    post "/session.json", params: { login: member.email, password: "a sufficiently strong acceptance password" }
+    post "/session.json", params: { login: password_member.email, password: "myawesomepassword" }
 
-    expect(response.status).not_to eq(200)
+    expect(response.status).to eq(403)
     expect(session[:current_user_id]).to be_nil
   end
 

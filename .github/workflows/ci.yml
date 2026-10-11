@@ -49,6 +49,8 @@ jobs:
       CHEAP_SOURCE_MAPS: "1"
       NODE_OPTIONS: --max-old-space-size=4096
       CAPYBARA_DEFAULT_MAX_WAIT_TIME: "20"
+      # Keep Chromium and the Rack server on the same loopback family in CI.
+      CAPYBARA_SERVER_HOST: "127.0.0.1"
       PLAYWRIGHT_BROWSERS_PATH: /home/discourse/.cache/ms-playwright
       DBUS_SESSION_BUS_ADDRESS: unix:path=/dev/null
       THAT_SPACE_REPO: ${{ github.workspace }}

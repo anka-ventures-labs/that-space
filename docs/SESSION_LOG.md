@@ -60,6 +60,19 @@ is a hosted runner/transient local-resolution error, not an application response
 the new code revision provides its permitted single fresh run while correcting
 the independent request fixture.
 
+Run `38144468193` showed both issues were deterministic. Clearing the OAuth
+server payload did not make the password assertion valid because the request
+spec still carried the prior member's authenticated browser cookie; request
+session rehydration made the postcondition ambiguous. Replaced that setup with
+a fresh fabricated member whose known valid local password is submitted from an
+anonymous session, matching pinned Discourse's own controller coverage; the
+required result is now an exact 403 with no session. The repeated guest-browser
+failure came from Chromium's CI-only `localhost` resolver targeting IPv6 while
+the test Rack server used the other loopback family. Set the community job's
+existing Capybara server host to `127.0.0.1`; this changes only disposable
+hosted acceptance routing and preserves the real anonymous login-required
+assertion.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,
