@@ -87,6 +87,60 @@ well as anonymous posting/review denial. Removed the redundant guest browser
 example and ineffective loopback override; signed-in browser coverage continues
 to compile and render the real desktop, mobile, portfolio and Bà Mối composer.
 
+The final harness revision is `8dda840c071c5fffa945645ca5daa612c3c3e4a3`.
+Exact-head run `38145835706` passed both required jobs: Service checks and
+Discourse community acceptance. Before changing live state, a fresh native
+Discourse archive with uploads was copied off-host and validated at 8,802,914
+bytes with SHA-256
+`9638643e9ef8408db8788730c3a454899131fbabde944085c1b743db45b01e72`;
+the Supabase pre-launch dump is 373,489 bytes with SHA-256
+`dd50412660173ca0d2d7525e9246f9364bef348785d0ea90b4b20c8136624cb8`.
+Applied both additive production migrations. Every public table retains RLS,
+anon/authenticated retain zero table grants, and the two new tables started
+empty.
+
+Google identity is now owned by the dedicated project
+`that-space-auth-20261005`, not Atum's project-level consent boundary. Its app
+name is `Thật Space`, user type is External, publishing status is In production,
+and the dedicated web client uses only the exact Discourse callback
+`https://ubuntu-asus.tail349cbf.ts.net:8443/auth/google_oauth2/callback`.
+The generated replacement is stored in Infisical **That Space / prod** and the
+live launcher; no value is recorded here. A client secret exposed during the
+initial launcher attempt was revoked, its local credential JSON was removed,
+and production no longer references the Atum-project client. The remaining
+Atum client record is unused and its exported secret is disabled; it was not
+deleted as part of this release.
+
+Recreated only the `that-space` container with launcher output quarantined and
+discarded. Local and public `/srv/status` return `ok`. Community and
+presentation apply/check both pass with zero drift. Live nonsecret readback
+confirms `invite_only=false`, `must_approve_users=false`, Google-only login,
+new registration/signup CTA enabled, email disabled, Vietnamese locale and the
+dedicated client ID. Registered members can send private messages. Bà Mối is
+enabled with a bound model, registered-member access, all 12 tools, bot user
+`Ba_Moi_bot`, and a matching theme CTA. Final AI installer check reports no
+drift. The post-cutover probe proves both bot keys remain single-user scoped,
+the relay webhook targets the canonical service, and an unauthenticated tool
+call returns 401. A guest `/latest` request redirects to Google through the
+dedicated client and exact callback.
+
+Enabled production `BA_MOI_ENABLED`, `PUBLIC_COMMUNITY_LINK_ENABLED` and
+`COMMUNITY_PUBLIC_REGISTRATION_ENABLED`. Built the exact green head from a
+private clean archive with `vercel build --prod`; the output has three Node 24
+function bundles, zero native binaries and zero environment files, so the Mac
+artifact is Linux-runtime safe. Uploaded only that prebuilt output, verified
+the actual functions in `sin1`, and staged deployment
+`dpl_DmkUUcW8PaGB4SBAnHUHPKYQa6VQ`. Before promotion, the protected deployment
+passed the public copy/CTA and legal-page checks, tool/cron/webhook 401 checks,
+and a trusted existing-fixture database status call. Promoted that exact
+deployment to `https://that-space-demo.vercel.app`; prior rollback deployment
+is `dpl_ENbPZPxbsomoaYwAq9jYvWpvAPPr`. Canonical smoke repeats the public-page
+and authorization checks. A real-browser readback shows the public 18+,
+all-gender, no-invite/no-approval copy and the Bà Mối centerpiece with zero
+console errors. Temporary credential/build files were removed; the validated
+database and native backups remain in ignored mode-600 storage. PR #1 remains
+open and unmerged.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,
