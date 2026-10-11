@@ -73,6 +73,20 @@ existing Capybara server host to `127.0.0.1`; this changes only disposable
 hosted acceptance routing and preserves the real anonymous login-required
 assertion.
 
+Run `38145133767` narrowed both remaining failures to the acceptance harness.
+The password example tried to read Rack's request session before making any
+request, so no session object existed; the exact post-request 403 and empty
+session remain the meaningful disabled-password assertions. The anonymous
+Chromium visit still reported a navigation error with an IPv4 literal while all
+four signed-in pages passed. Pinned Discourse source explains the difference:
+with a private site, local login disabled and exactly one authenticator, a guest
+HTML request redirects directly to `/auth/google_oauth2`; Chromium then follows
+that external identity-provider handoff, which the isolated browser job cannot
+resolve. The native request suite now asserts that exact production redirect as
+well as anonymous posting/review denial. Removed the redundant guest browser
+example and ineffective loopback override; signed-in browser coverage continues
+to compile and render the real desktop, mobile, portfolio and Bà Mối composer.
+
 ## 2026-10-01: assembled community build for real Discourse acceptance
 
 Hosted run `36863243364` at `3049130` passed **31 service files / 302 tests,

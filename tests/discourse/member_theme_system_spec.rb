@@ -43,13 +43,6 @@ RSpec.describe "Thật Space member theme", type: :system do
     retain_theme_screenshot("that-space-desktop")
   end
 
-  it "keeps member navigation and content outside the guest session" do
-    visit "/latest"
-    expect(page).not_to have_css(".that-space-member-nav")
-    expect(page).not_to have_css(".that-space-member-welcome")
-    expect(page).to have_css(".login-welcome, .login-modal, .login-required, .login-page")
-  end
-
   it "opens a private-message composer addressed to the configured Bà Mối account" do
     bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
     that_space_theme.update_setting("ba_moi_username", bot.username)

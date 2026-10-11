@@ -83,7 +83,6 @@ RSpec.describe "Thật Space member acceptance", type: :request do
   it "refuses a valid password login while Google is the only identity path" do
     password_member = Fabricate(:user, email: "password-member@example.com")
 
-    expect(session[:current_user_id]).to be_nil
     post "/session.json", params: { login: password_member.email, password: "myawesomepassword" }
 
     expect(response.status).to eq(403)
@@ -198,8 +197,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(first_post.reload).not_to be_hidden
   end
 
-  it "rejects anonymous posting and review-queue access through HTTP" do
+  it "sends guests to Google and rejects anonymous posting and review-queue access" do
     category = configured_category("introduction")
+
+    get "/latest"
+    expect(response).to redirect_to("/auth/google_oauth2")
 
     post "/posts.json", params: { category: category.id, title: "Guest topic", raw: "Guest body" }
     expect(response.status).to eq(403)
