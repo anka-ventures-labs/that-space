@@ -17,8 +17,9 @@ directory, attaches it to Horizon and configures its settings.
 | `ba_moi_username` | empty | The actual Discourse username for the Bà Mối bot. The sidebar link and first-step aside are omitted until this is a safe username and the signed-in member can send private messages. |
 | `introduction_category_id` | `0` | Category for "Viết lời giới thiệu". Set by the bootstrap to Giới thiệu. |
 
-Message and topic creation are delegated to core Discourse
-(`composer.openNewMessage`, `composer.openNewTopic`, the `new-message` route).
+Topic creation uses core's composer (`composer.openNewTopic`). Bà Mối opens
+the member's one direct chat with the bot through core chat's direct-message
+upsert (`lib/ba-moi.js`), so core Discourse Chat provides the conversation UI.
 The component does not construct a bot profile URL.
 
 The first-step card renders only for a signed-in member on the home feed while

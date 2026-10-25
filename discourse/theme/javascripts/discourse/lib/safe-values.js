@@ -1,5 +1,3 @@
-export const BA_MOI_MESSAGE_TITLE = "Trò chuyện cùng Bà Mối";
-
 // Theme settings are admin-editable; only a plain username is rendered.
 const USERNAME_PATTERN = /^[a-z0-9][a-z0-9_.-]{0,59}$/i;
 

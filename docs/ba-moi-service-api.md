@@ -26,8 +26,11 @@ credentials.
 - Unknown keys in `args`, such as a model-invented `user_id`, are stripped.
 - `topic_id` is remembered as her thread with Bà Mối only when
   `private_message` is true and the two participants are exactly her username
-  and the configured Bà Mối bot. Notifications go to that thread. If she has none,
-  Bà Mối opens a new private message titled "Bà Mối có tin cho bạn".
+  and the configured Bà Mối bot. With `BA_MOI_NOTICE_TRANSPORT=pm` (default),
+  notifications go to that thread; if she has none, Bà Mối opens a new private
+  message titled "Bà Mối có tin cho bạn". With `BA_MOI_NOTICE_TRANSPORT=chat`,
+  every notification goes to her direct chat with Bà Mối, opened (or reused)
+  through Discourse's direct-message upsert as the persona bot.
 
 **Status codes:**
 - 503: the service launch switch is off (`error: "service_disabled"`).

@@ -5,7 +5,8 @@ import { action } from "@ember/object";
 import { service } from "@ember/service";
 import Category from "discourse/models/category";
 import { settings } from "virtual:theme";
-import { BA_MOI_MESSAGE_TITLE, safeUsername } from "../lib/safe-values";
+import { openBaMoiChat } from "../lib/ba-moi";
+import { safeUsername } from "../lib/safe-values";
 
 const HOME_ROUTES = ["discovery.latest", "discovery.index"];
 const INTRO_TITLE = "Xin chào, mình là ";
@@ -66,7 +67,7 @@ export default class FirstStep extends Component {
 
   get canMessageBaMoi() {
     return Boolean(
-      this.baMoiUsername && this.currentUser?.can_send_private_messages
+      this.baMoiUsername && this.currentUser?.can_direct_message
     );
   }
 
@@ -82,10 +83,7 @@ export default class FirstStep extends Component {
   @action
   messageBaMoi() {
     if (this.canMessageBaMoi) {
-      this.composer.openNewMessage({
-        recipients: this.baMoiUsername,
-        title: BA_MOI_MESSAGE_TITLE,
-      });
+      openBaMoiChat(this.baMoiUsername);
     }
   }
 

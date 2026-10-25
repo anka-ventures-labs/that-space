@@ -99,7 +99,14 @@ module ThatSpace
         "top_menu" => "latest",
         "enable_user_tips" => false,
         "discourse_narrative_bot_enabled" => false,
-        "chat_enabled" => false,
+        # Chat is for one-to-one conversations only (Bà Mối today, match
+        # chats next): no public channels, no group chats, uploads allowed.
+        "chat_enabled" => true,
+        "enable_public_channels" => false,
+        "chat_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
+        "direct_message_enabled_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
+        "chat_max_direct_message_users" => 1,
+        "chat_allow_uploads" => true,
         "tagging_enabled" => false,
         "allow_uncategorized_topics" => false,
         "sidebar_show_upcoming_events" => false,

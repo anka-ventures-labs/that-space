@@ -1644,3 +1644,17 @@ Superseded the private-message chat skin above at Minh's direction: Bà Mối
 moves to native Discourse Chat (streaming replies, replying indicator, uploads,
 unread badges) in a stacked change. The skin's theme files and tests were
 removed from this branch; PR #5 stays the member happy path.
+
+# 2026-10-25 — Bà Mối moves to native Discourse Chat (phase 1)
+
+Minh wanted Bà Mối to feel like a real chat (typing, delivery state, photos).
+Source checks on the pinned Discourse showed the original reason for private
+messages is gone: chat emits `chat_message_*` webhooks, Discourse AI agents
+can answer chat direct messages with streaming and the replying indicator, and
+tools get `channel_id`. Branch `feat/ba-moi-chat` (stacked on PR #5): chat
+enabled for one-to-one direct messages only, agent `allow_chat_direct_messages`,
+chat-style and text-only notes in the prompt, theme entry points open the
+member's direct chat, and a `BA_MOI_NOTICE_TRANSPORT` switch (default `pm`)
+sends Bà Mối's notices to that chat through the existing outbox. Match chats,
+post-reveal attachments and "seen" receipts are phase 2. Plan and rollout
+order: `docs/plans/2026-10-25-ba-moi-chat.md`.

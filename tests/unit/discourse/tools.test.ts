@@ -98,13 +98,13 @@ describe('tools.json matches the service contract', () => {
     }
   })
 
-  it('builds admin API payloads that bind the secret and stay in private messages', () => {
+  it('builds admin API payloads that bind the secret and stay in her private conversations', () => {
     const payload = toolPayload(definitions[0], 'script', 7).ai_tool
     expect(payload).toMatchObject({ tool_name: 'ba_moi_status', secret_contracts: [{ alias: TOOL_SECRET_ALIAS }], secret_bindings: [{ alias: TOOL_SECRET_ALIAS, ai_secret_id: 7 }] })
     const agent = agentPayload({ systemPrompt: 'x', toolIds: [3, 4], allowedGroupIds: [41], llmId: 2 }).ai_agent
     expect(agent).toMatchObject({
       name: AGENT_NAME, tools: [['custom-3', false, false], ['custom-4', false, false]], allow_personal_messages: true,
-      allow_topic_mentions: false, allow_chat_direct_messages: false, allow_chat_channel_mentions: false, default_llm_id: 2,
+      allow_topic_mentions: false, allow_chat_direct_messages: true, allow_chat_channel_mentions: false, default_llm_id: 2,
     })
     expect(agentPayload({ systemPrompt: 'x', toolIds: [], allowedGroupIds: [] }).ai_agent).not.toHaveProperty('default_llm_id')
   })

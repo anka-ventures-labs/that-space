@@ -60,7 +60,10 @@ RSpec.describe "Thật Space community extensions", type: :request do
       ],
     )
     expect(SiteSetting.top_menu).to eq("latest")
-    expect(SiteSetting.chat_enabled).to eq(false)
+    expect(SiteSetting.chat_enabled).to eq(true)
+    expect(SiteSetting.enable_public_channels).to eq(false)
+    expect(SiteSetting.chat_max_direct_message_users).to eq(1)
+    expect(SiteSetting.chat_allow_uploads).to eq(true)
     expect(SiteSetting.discourse_narrative_bot_enabled).to eq(false)
     expect(SiteSetting.enable_welcome_banner(theme_id: Theme.horizon_theme.id)).to eq(false)
     expect(SiteSetting.tagging_enabled).to eq(false)

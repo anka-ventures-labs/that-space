@@ -16,7 +16,7 @@ import { CONSENT_VERSION, PERSONA_THREAD_TITLE, matchOpened, relayedMessage, rel
 import type { ServiceDeps } from './deps'
 
 export type Outbound =
-  /** A notice from Bà Mối in the member's own thread with her (opened if she has none). */
+  /** A notice from Bà Mối in the member's conversation with her: her direct chat, or her private thread (opened if she has none). */
   | { kind: 'persona_notice'; memberId: string; raw: string; matchId?: string }
   /** Opens the member's relay thread for a match: a private message from Thư Duyên. */
   | { kind: 'relay_topic'; matchId: string; memberId: string; title: string; raw: string }
@@ -40,6 +40,12 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
     }
     const member = await getMember(db, item.memberId)
     if (!member?.discourseUsername) return // deleted since, or a sample: nothing to notify
+    if (config.noticeTransport === 'chat') {
+      // Upserted each time: Discourse returns the existing one-to-one chat.
+      const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
+      await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
+      return
+    }
     if (member.personaTopicId) {
       await discourse.createPost({ asUsername: config.personaUsername, topicId: member.personaTopicId, raw })
       return
