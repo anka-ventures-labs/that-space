@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Paper kit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn-ink{position:relative}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#F5F0E8 50%,#8A6450 50%)}
+</style>
+</helmet>
+<div class="ts grain" style="width: 1280px; height: 1500px; box-sizing: border-box; padding: 64px; background-color: #F5F0E8; display: flex; flex-direction: column; gap: 48px">
+  <div style="display: flex; align-items: center; gap: 24px">
+    <img src="/logo.jpg" alt="Thật Space logo" style="width: 96px; height: 96px; display: block; border-radius: 4px; box-shadow: 0 1px 0 #E2D4BC, 0 12px 24px -14px rgba(63,42,31,.6)">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 class="serif" style="margin: 0; font-size: 56px; font-weight: 400; line-height: 1">Paper kit</h1>
+      <p style="margin: 0; font-size: 16px; color: #6E4D3C">Logo and its three brand colors kept; every other tone is a fold, shade or tint of them.</p>
+    </div>
+  </div>
+
+  <!-- palette -->
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Palette — brand + paper folds</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+      <div style="display: flex; flex-direction: column; box-shadow: 0 2px 0 #E2D4BC, 0 16px 24px -20px rgba(63,42,31,.6)">
+        <div style="height: 120px; background: linear-gradient(135deg, #5C3D2E 50%, #4E3326 50%)"></div>
+        <div style="padding: 14px 16px; background: #FBF8F2; display: flex; justify-content: space-between"><strong>Ink · primary</strong><span>#5C3D2E</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; box-shadow: 0 2px 0 #E2D4BC, 0 16px 24px -20px rgba(63,42,31,.6)">
+        <div style="height: 120px; background: linear-gradient(135deg, #C4A882 50%, #A88B66 50%)"></div>
+        <div style="padding: 14px 16px; background: #FBF8F2; display: flex; justify-content: space-between"><strong>Kraft · secondary</strong><span>#C4A882</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; box-shadow: 0 2px 0 #E2D4BC, 0 16px 24px -20px rgba(63,42,31,.6)">
+        <div style="height: 120px; background: linear-gradient(135deg, #F5F0E8 50%, #EFE7DA 50%)"></div>
+        <div style="padding: 14px 16px; background: #FBF8F2; display: flex; justify-content: space-between"><strong>Washi · cream</strong><span>#F5F0E8</span></div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px">
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #3F2A1F"></span>#3F2A1F deep fold</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #7A5442"></span>#7A5442</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #8A6450"></span>#8A6450 accent text</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #A88B66"></span>#A88B66</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #D2BE9C"></span>#D2BE9C</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #E2D4BC"></span>#E2D4BC crease</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #EFE7DA"></span>#EFE7DA</div>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px"><span style="height: 48px; background: #FBF8F2; box-shadow: inset 0 0 0 1px #E2D4BC"></span>#FBF8F2 sheet</div>
+    </div>
+  </section>
+
+  <!-- type -->
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+    <div class="grain" style="padding: 28px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Display · Fraunces, SOFT 50</span>
+      <span class="serif" style="font-size: 64px; line-height: 1; font-weight: 400">Hoa sen <em style="color: #8A6450">giấy</em></span>
+      <span class="serif" style="font-size: 22px">Lá Số Tử Vi · Tìm Duyên · Cộng Đồng</span>
+    </div>
+    <div class="grain" style="padding: 28px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Text · Be Vietnam Pro 400/500/600</span>
+      <span style="font-size: 18px; line-height: 1.65">Nơi chị em chia sẻ, lắng nghe và đồng hành cùng nhau. Built for full Vietnamese diacritics — ắ ằ ẳ ẵ ặ ở ỡ ợ.</span>
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase">Eyebrow label</span>
+    </div>
+  </section>
+
+  <!-- parts -->
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Parts</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: start">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div class="grain" style="position: relative; height: 150px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 20px 30px -24px rgba(63,42,31,.6)">
+          <span style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; background: linear-gradient(225deg, #F5F0E8 50%, #D2BE9C 50%)"></span>
+        </div>
+        <span style="font-size: 14px"><strong>Sheet</strong> — dog-ear grows on hover; 2px crease + soft drop.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+          <span class="btn-ink" style="padding: 16px 26px; background: #5C3D2E; color: #F5F0E8; font-weight: 600; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F">Join the Community</span>
+          <span style="padding: 14px 24px; border: 2px solid #5C3D2E; font-weight: 600; border-radius: 2px; box-shadow: 0 3px 0 #C4A882; background: #FBF8F2">Get Your Reading</span>
+        </div>
+        <span style="font-size: 14px"><strong>Buttons</strong> — ink with folded corner; outline on a kraft ledge. 2px radius: paper is sharp.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; gap: 16px; align-items: center">
+          <span class="serif" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #DCCAAE 50%, #C4A882 50%)">MC</span>
+          <span style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); background: repeating-conic-gradient(from 22.5deg, #C4A882 0deg 45deg, #B39672 45deg 90deg)"><span class="serif" style="font-size: 26px; font-weight: 600; color: #3F2A1F">92</span></span>
+        </div>
+        <span style="font-size: 14px"><strong>Folded avatar &amp; seal</strong> — diagonal two-tone square; octagon seal with faceted conic fold.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; gap: 12px; align-items: flex-end">
+          <svg width="120" height="80" viewBox="0 0 120 80" aria-hidden="true"><polygon points="52,44 74,2 66,46" fill="#A88B66"></polygon><polygon points="8,26 42,44 34,50" fill="#8A6450"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#C4A882"></polygon><polygon points="34,50 54,62 60,40" fill="#B39672"></polygon><polygon points="44,46 26,4 64,44" fill="#DCCAAE"></polygon><polygon points="74,48 104,14 82,52" fill="#A88B66"></polygon><polygon points="104,14 116,22 106,20" fill="#5C3D2E"></polygon></svg>
+          <span style="position: relative; display: block; width: 46px; height: 90px">
+            <span style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #D6C2A0; clip-path: polygon(50% 0, 0 58%, 50% 100%)"></span>
+            <span style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #BFA27A; clip-path: polygon(50% 0, 100% 58%, 50% 100%)"></span>
+          </span>
+        </div>
+        <span style="font-size: 14px"><strong>Crane &amp; petal</strong> — every illustration is flat facets: one light side, one shade side per fold.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- motion -->
+  <section class="grain" style="padding: 28px 32px; background-color: #5C3D2E; color: #F5F0E8; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+    <div style="display: flex; flex-direction: column; gap: 8px"><span class="serif" style="font-size: 24px">Lift, don’t glow</span><span style="font-size: 15px; line-height: 1.6; color: #E2D4BC">Hover raises paper 2–10px and deepens its shadow. No blur, no gradients-as-light.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 8px"><span class="serif" style="font-size: 24px">Unfold to reveal</span><span style="font-size: 15px; line-height: 1.6; color: #E2D4BC">Modals, readings and steps open with a rotateX hinge from the top edge, ease (.2,.8,.2,1).</span></div>
+    <div style="display: flex; flex-direction: column; gap: 8px"><span class="serif" style="font-size: 24px">Light follows you</span><span style="font-size: 15px; line-height: 1.6; color: #E2D4BC">On the hero, the lotus faces the cursor and the facets facing it brighten. Reduced-motion users get no idle sway.</span></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
