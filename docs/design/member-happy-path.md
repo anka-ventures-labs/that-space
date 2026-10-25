@@ -52,16 +52,10 @@ of it told them what to do first.
   first post (including a message to Bà Mối) retires it. No extra request.
 - **Viết lời giới thiệu** opens the composer in Giới thiệu, prefilled with a
   three-line template.
-- **Bà Mối** (sidebar and the card's quiet secondary link) opens the member's
-  one conversation with her. The first click starts it with "Chào Bà Mối 🌸"
-  and Bà Mối answers; later clicks return to the same thread. Hidden until
-  `ba_moi_username` is set.
-- **The Bà Mối thread is a chat**, not a forum thread: her messages on the left
-  with her avatar, the member's on the right in brand brown, no post menu,
-  topic map, timeline or footer buttons, and one pinned "Nhắn cho Bà Mối…" box
-  (Enter sends, Shift+Enter adds a line). It is still a Discourse private
-  message underneath, so the Bà Mối service, Discourse AI tools and moderation
-  are unchanged.
+- **Bà Mối** (sidebar and the card's quiet secondary link) opens a private
+  message to the configured bot, titled "Trò chuyện cùng Bà Mối". Both are
+  hidden until `ba_moi_username` is set. This entry is interim: Bà Mối moves to
+  Discourse Chat in the stacked `feat/ba-moi-chat` change.
 - Staff additionally see Kiểm duyệt and Quản trị; core hides both from members.
 - "Về Thật Space" and "Nội quy" sit in the sidebar's "Thêm" drawer.
 

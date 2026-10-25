@@ -107,9 +107,7 @@ matchmaking logic and thin glue are ours.
    The account becomes active without an invitation or staff approval; local
    password signup and login are disabled.
 
-   She then taps Bà Mối in the sidebar. That opens her single private-message
-   thread with Bà Mối, presented as a chat (starting it with a greeting the
-   first time). Bà Mối asks for consent, which is
+   She then opens a direct message with Bà Mối, who asks for consent, which is
    versioned. The consent text says that in the beta, admins can read her
    messages with Bà Mối and her relayed chats, and that deleting removes her
    matchmaking data but not those messages. Then Bà Mối asks for 18+ age, birth

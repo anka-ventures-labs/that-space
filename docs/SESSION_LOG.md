@@ -1639,3 +1639,8 @@ thread renders as a chat: bubbles, no forum chrome, one pinned input where Enter
 sends via an ordinary reply. Backend, Discourse AI tools and the relay are
 unchanged. Browser acceptance covers first open, bot reply, Enter-to-send, no
 second thread on reopen, and a mobile render.
+
+Superseded the private-message chat skin above at Minh's direction: Bà Mối
+moves to native Discourse Chat (streaming replies, replying indicator, uploads,
+unread badges) in a stacked change. The skin's theme files and tests were
+removed from this branch; PR #5 stays the member happy path.
