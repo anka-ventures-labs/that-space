@@ -1666,3 +1666,16 @@ and asserted on the composer and the one member↔bot channel instead. Also:
 vi overrides for the chat placeholder and empty-state title (they rendered in
 English), chat search off, and the private-message inbox link renamed "Hộp thư"
 so it no longer duplicates chat's "Tin nhắn" section.
+
+Codex review `0831f1f1-f5ca-4c7b-8b10-51ae3c03ffc1` (route `9d5b5f0a`) of
+`adc57b1` returned do-not-ship. All three findings were accepted and fixed:
+(1, high) in chat, Discourse AI gives tools `channel_id`/`message_id` rather than
+topic/post ids, so delete, block, end and reveal could never confirm. The tool
+script now forwards both, and confirmations bind to the negated channel id and
+message id, with a chat-context test; (2) acceptance now uses a real Discourse
+AI agent bot user (negative id) and its own API key against the chat
+endpoints. A live read showed the production `Ba_Moi_bot` is in the
+trust_level_0–4 groups, so `direct_message_enabled_groups` including
+trust_level_0 covers it. Refused chats (member turned chat off) now fall back to
+the private thread; (3) the sidebar click interception only handles plain
+primary clicks and registers once.

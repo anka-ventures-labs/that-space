@@ -30,7 +30,14 @@ credentials.
   notifications go to that thread; if she has none, Bà Mối opens a new private
   message titled "Bà Mối có tin cho bạn". With `BA_MOI_NOTICE_TRANSPORT=chat`,
   every notification goes to her direct chat with Bà Mối, opened (or reused)
-  through Discourse's direct-message upsert as the persona bot.
+  through Discourse's direct-message upsert as the persona bot. If Discourse
+  refuses that chat (4xx, for example she turned chat off), the notice goes to
+  her private thread instead; outages stay queued for retry.
+- Confirmations bind to the conversation and triggering message: `topic_id`
+  and `post_id` in a private message, or `channel_id` and `message_id` in
+  chat. Chat channels are stored negated, so a chat never shares a key with a
+  topic. A token is consumable only from a later member message in the same
+  conversation.
 
 **Status codes:**
 - 503: the service launch switch is off (`error: "service_disabled"`).

@@ -34,6 +34,8 @@ function invoke(params) {
     post_id: context.post_id,
     private_message: context.private_message,
     participants: context.participants,
+    channel_id: context.channel_id,
+    message_id: context.message_id,
   };
   var response;
   try {

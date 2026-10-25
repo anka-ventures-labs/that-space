@@ -11,6 +11,7 @@ import {
   setRelayTopicDiscourseId, setRelayedPostId, type PendingPost,
 } from '@/lib/db/repo'
 import type { Db } from '@/lib/db/db'
+import { DiscourseError } from '@/lib/discourse/client'
 import { redactAliasForCurrentPool } from './cards'
 import { CONSENT_VERSION, PERSONA_THREAD_TITLE, matchOpened, relayedMessage, relayIntro, relayTitle, revealAsked, revealed } from './copy'
 import type { ServiceDeps } from './deps'
@@ -42,9 +43,15 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
     if (!member?.discourseUsername) return // deleted since, or a sample: nothing to notify
     if (config.noticeTransport === 'chat') {
       // Upserted each time: Discourse returns the existing one-to-one chat.
-      const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
-      await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
-      return
+      // A member who turned chat off is refused (4xx); she still gets the
+      // notice in her private thread. Outages (no status, 5xx) stay queued.
+      try {
+        const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
+        await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
+        return
+      } catch (error) {
+        if (!(error instanceof DiscourseError) || error.status === null || error.status >= 500 || error.status === 429) throw error
+      }
     }
     if (member.personaTopicId) {
       await discourse.createPost({ asUsername: config.personaUsername, topicId: member.personaTopicId, raw })

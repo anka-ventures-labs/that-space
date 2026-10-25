@@ -34,6 +34,7 @@ export function createFakeDiscourse() {
   let nextChannelId = 700
   const channels = new Map<string, number>()
   let failures = 0
+  const chatRefused = new Set<string>()
   const maybeFail = () => {
     if (failures > 0) {
       failures--
@@ -55,6 +56,7 @@ export function createFakeDiscourse() {
     },
     async openDirectChat({ asUsername, targetUsername }) {
       maybeFail()
+      if (chatRefused.has(targetUsername)) throw new DiscourseError('Discourse 403: chat disabled', 403)
       const key = `${asUsername}|${targetUsername}`
       if (!channels.has(key)) channels.set(key, ++nextChannelId)
       return { channelId: channels.get(key)! }
@@ -71,6 +73,10 @@ export function createFakeDiscourse() {
     calls,
     failNext(n: number) {
       failures = n
+    },
+    /** Make Discourse refuse a direct chat with this member, as when she turned chat off. */
+    refuseChatWith(username: string) {
+      chatRefused.add(username)
     },
     /** Topics started for a member, and every post in a topic. */
     pmsTo: (username: string) => calls.filter((c) => c.type === 'pm' && c.recipients?.includes(username)),

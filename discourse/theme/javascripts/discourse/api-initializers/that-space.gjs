@@ -50,17 +50,31 @@ export default apiInitializer((api) => {
     };
   });
 
-  document.addEventListener(
-    "click",
-    (event) => {
-      const link = event.target.closest?.('a[data-link-name="ba-moi"]');
-      if (!link || event.metaKey || event.ctrlKey || event.shiftKey) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      openBaMoiChat(baMoi);
-    },
-    true
-  );
+  // Only plain primary clicks (and Enter, which fires one) open the chat;
+  // modified or middle clicks keep normal link behaviour. Registered once
+  // per page even if the initializer runs again.
+  if (!document.documentElement.dataset.baMoiChatLink) {
+    document.documentElement.dataset.baMoiChatLink = "1";
+    document.addEventListener(
+      "click",
+      (event) => {
+        const link = event.target.closest?.('a[data-link-name="ba-moi"]');
+        if (
+          !link ||
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        openBaMoiChat(baMoi);
+      },
+      true
+    );
+  }
 });

@@ -95,6 +95,32 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(presentation.check!.drift).to be_empty
   end
 
+  it "lets a real Discourse AI bot user open a member's direct chat and post into it with its own key" do
+    agent = AiAgent.create!(name: "Bà Mối acceptance", description: "Bà Mối", system_prompt: "Bà Mối", allow_chat_direct_messages: true)
+    bot = agent.create_user!
+    Group.refresh_automatic_groups!
+    expect(bot.id).to be < 0
+    key = ApiKey.create!(user_id: bot.id, created_by_id: Discourse.system_user.id)
+    headers = { "Api-Key" => key.key, "Api-Username" => bot.username }
+
+    post "/chat/api/direct-message-channels.json", params: { target_usernames: [member.username], upsert: true }, headers: headers, as: :json
+    expect(response.status).to eq(200), response.body
+    channel_id = response.parsed_body.dig("channel", "id")
+    expect(Chat::Channel.find(channel_id).chatable.users).to contain_exactly(member, bot)
+
+    post "/chat/#{channel_id}.json", params: { message: "Bà có tin vui cho bạn" }, headers: headers, as: :json
+    expect(response.status).to eq(200), response.body
+    expect(Chat::Message.find(response.parsed_body["message_id"])).to have_attributes(user_id: bot.id, chat_channel_id: channel_id)
+
+    post "/chat/api/direct-message-channels.json", params: { target_usernames: [member.username], upsert: true }, headers: headers, as: :json
+    expect(response.parsed_body.dig("channel", "id")).to eq(channel_id)
+
+    # A member who turned chat off is refused, so the service falls back to her private thread.
+    other_member.user_option.update!(chat_enabled: false)
+    post "/chat/api/direct-message-channels.json", params: { target_usernames: [other_member.username], upsert: true }, headers: headers, as: :json
+    expect(response.status).to be_between(400, 499)
+  end
+
   it "refuses an admin-customised sidebar before changing anything" do
     section = SidebarSection.find_by!(section_type: "community")
     custom = SidebarUrl.create!(name: "Admin pick", value: "/c/thong-bao", icon: "star", segment: "primary", external: false)

@@ -189,4 +189,15 @@ describe('Bà Mối notices in chat', () => {
     await h.cron()
     expect(h.discourse.chatTo('lan').map((c) => c.raw)).toEqual(['Tin chờ gửi'])
   })
+
+  it('falls back to her private thread when Discourse refuses a chat with her', async () => {
+    const lan = testUser('lan')
+    await onboard(h, lan)
+    const member = await getMemberByDiscourseId(h.db, lan.user_id)
+    h.discourse.clear()
+    h.discourse.refuseChatWith('lan')
+    expect(await send(h.deps, 'notice-refused', { kind: 'persona_notice', memberId: member!.id, raw: 'Bà có tin vui' })).toBe('sent')
+    expect(h.discourse.chatTo('lan')).toEqual([])
+    expect(h.discourse.postsIn(lan.topic_id)).toEqual(['Bà có tin vui'])
+  })
 })

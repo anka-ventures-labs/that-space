@@ -8,9 +8,9 @@ export interface ToolContext {
   deps: ServiceDeps
   /** Resolved from the tool context's Discourse identity, never from args. */
   member: Member
-  /** Current Discourse topic, bound into sensitive-action confirmations. */
+  /** Current conversation, bound into sensitive-action confirmations: a topic id, or a negated chat channel id. */
   topicId: number | null
-  /** Human post that triggered this agent turn; changes only after a new reply. */
+  /** Human post or chat message that triggered this agent turn; changes only after a new member message. */
   postId: number | null
   now: Date
   requestId: string

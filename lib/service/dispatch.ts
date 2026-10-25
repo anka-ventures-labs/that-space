@@ -37,6 +37,9 @@ const EnvelopeSchema = z.object({
     private_message: z.boolean().nullish(),
     /** The private message's usernames, comma-separated (Discourse AI's context.participants). */
     participants: z.string().max(2000).nullish(),
+    /** In Discourse Chat: the direct chat and the member message that triggered this turn. */
+    channel_id: z.number().int().positive().nullish(),
+    message_id: z.number().int().positive().nullish(),
   }),
   args: z.record(z.string(), z.unknown()).nullish(),
 })
@@ -58,6 +61,17 @@ export function personaThread(auth: { username: string; topic_id?: number | null
   const caller = auth.username.toLowerCase()
   const bot = personaUsername.toLowerCase()
   return people.length === 2 && caller !== bot && people.includes(caller) && people.includes(bot) ? auth.topic_id : null
+}
+
+/**
+ * The conversation and triggering message that bind confirmations. A private
+ * message uses its topic and post; a chat uses its channel and message, with
+ * the channel negated so a chat can never share a key with a topic.
+ */
+export function conversationOf(auth: { topic_id?: number | null; post_id?: number | null; channel_id?: number | null; message_id?: number | null }): { topicId: number | null; postId: number | null } {
+  if (auth.topic_id) return { topicId: auth.topic_id, postId: auth.post_id ?? null }
+  if (auth.channel_id) return { topicId: -auth.channel_id, postId: auth.message_id ?? null }
+  return { topicId: null, postId: null }
 }
 
 function failure(error: ErrorCode, extra: Record<string, unknown> = {}) {
@@ -102,7 +116,7 @@ export async function handleToolRequest(name: string, request: Request, deps: Se
     })
     memberId = member.id
     const result = await tool.run({
-      deps, member, topicId: auth.topic_id ?? null, postId: auth.post_id ?? null, now: deps.now(), requestId,
+      deps, member, ...conversationOf(auth), now: deps.now(), requestId,
     }, args.data as never)
     return respond(200, result)
   } catch (error) {

@@ -31,6 +31,11 @@ messages because chat seemed to lack webhooks. That is no longer true:
 | Theme | The Bà Mối sidebar link and the first-step aside open the member's direct chat with the bot (created on first use, reused after). |
 | Service | `BA_MOI_NOTICE_TRANSPORT=chat` sends Bà Mối's own notices (signals, matches) to that chat through the outbox (same retry and lease guarantees). Default stays `pm`. |
 
+Safety-critical actions (delete, block, end, reveal) still need a confirmation
+from a later member message. In chat that binds to the direct chat's
+`channel_id` and `message_id`, which the tool script now forwards. If a member
+has turned chat off, Bà Mối's notices fall back to her private thread.
+
 What members get from core chat: streaming replies, the replying indicator,
 Enter to send, photo/file upload within limits, unread badges, notifications
 and a full-page chat on desktop and phone.
@@ -79,7 +84,12 @@ but keeps their data.
 - Vitest: client chat calls (request shape, own bot key, empty responses),
   chat notice delivery (one channel, no private message), retry after an
   outage, installer payload and drift.
-- Discourse acceptance: chat settings applied; the sidebar link opens a
+- Vitest: chat-context confirmation (same message refused, other chat refused,
+  same-numbered topic refused, later message accepted) and the private-thread
+  fallback when chat is refused.
+- Discourse acceptance: a real Discourse AI agent bot user (negative id) opens
+  a member's direct chat and posts into it with its own API key, reuses it, and
+  is refused for a member with chat off; chat settings applied; the sidebar link opens a
   one-to-one chat with the configured bot; a member message and a bot message
   render; reopening from the first-step card returns to the same chat; mobile
   renders the composer.
