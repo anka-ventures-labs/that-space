@@ -33,8 +33,8 @@ messages because chat seemed to lack webhooks. That is no longer true:
 
 Safety-critical actions (delete, block, end, reveal) still need a confirmation
 from a later member message. In chat that binds to the direct chat's
-`channel_id` and `message_id`, which the tool script now forwards. If a member
-has turned chat off, Bà Mối's notices fall back to her private thread.
+`channel_id` and `message_id`, which the tool script now forwards. If Discourse
+refuses the chat, Bà Mối's notices fall back to the member's private thread.
 
 What members get from core chat: streaming replies, the replying indicator,
 Enter to send, photo/file upload within limits, unread badges, notifications
@@ -46,6 +46,9 @@ Not in phase 1:
 - Bà Mối cannot see photos (DeepSeek V4.1 Flash is text-only). She says so
   and asks the member to describe the photo in words.
 - Match chats stay private messages relayed by Thư Duyên.
+- A member who turns chat off in her preferences cannot talk to Bà Mối, and
+  her notices sit in a chat she has hidden. Discourse does not refuse the bot.
+  Phase 2 can check the preference or hide that toggle.
 
 ### Rollout order (live)
 
@@ -86,10 +89,10 @@ but keeps their data.
   outage, installer payload and drift.
 - Vitest: chat-context confirmation (same message refused, other chat refused,
   same-numbered topic refused, later message accepted) and the private-thread
-  fallback when chat is refused.
+  fallback when Discourse refuses the chat.
 - Discourse acceptance: a real Discourse AI agent bot user (negative id) opens
-  a member's direct chat and posts into it with its own API key, reuses it, and
-  is refused for a member with chat off; chat settings applied; the sidebar link opens a
+  a member's direct chat and posts into it with its own API key, and reuses it.
+  It is not refused for a member who turned chat off; chat settings applied; the sidebar link opens a
   one-to-one chat with the configured bot; a member message and a bot message
   render; reopening from the first-step card returns to the same chat; mobile
   renders the composer.

@@ -1679,3 +1679,8 @@ trust_level_0–4 groups, so `direct_message_enabled_groups` including
 trust_level_0 covers it. Refused chats (member turned chat off) now fall back to
 the private thread; (3) the sidebar click interception only handles plain
 primary clicks and registers once.
+
+CI on `9270642` proved the real Discourse AI bot path (negative-id bot user,
+own key) opens, posts into and reuses a member's direct chat. It also showed
+Discourse does not refuse the bot for a member who turned chat off. The test
+and docs now state that limitation instead of the assumed fallback.

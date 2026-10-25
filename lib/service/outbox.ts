@@ -43,8 +43,9 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
     if (!member?.discourseUsername) return // deleted since, or a sample: nothing to notify
     if (config.noticeTransport === 'chat') {
       // Upserted each time: Discourse returns the existing one-to-one chat.
-      // A member who turned chat off is refused (4xx); she still gets the
-      // notice in her private thread. Outages (no status, 5xx) stay queued.
+      // If Discourse refuses the chat (4xx other than rate limiting), the
+      // notice goes to her private thread instead; a bad bot key fails there
+      // too and stays queued. Outages (no status, 5xx, 429) stay queued.
       try {
         const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
         await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
