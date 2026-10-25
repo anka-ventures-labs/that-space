@@ -45,7 +45,10 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
       // Any failure stays queued for retry and then dead-letters visibly; it
       // never silently switches transport.
       const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
-      await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
+      // Into her current conversation thread, so Bà Mối remembers the notice
+      // when the member answers it; top level only before any conversation.
+      const threadId = await discourse.latestChatThreadId({ asUsername: config.personaUsername, channelId })
+      await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw, threadId })
       return
     }
     if (member.personaTopicId) {

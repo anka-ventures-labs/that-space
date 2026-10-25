@@ -1,7 +1,7 @@
 import { apiInitializer } from "discourse/lib/api";
 import { settings } from "virtual:theme";
 import FirstStep from "../components/first-step";
-import { openBaMoiChat } from "../lib/ba-moi";
+import { openBaMoiChat, redirectToBaMoiThread } from "../lib/ba-moi";
 import { safeUsername } from "../lib/safe-values";
 
 export default apiInitializer((api) => {
@@ -48,6 +48,13 @@ export default apiInitializer((api) => {
         return Boolean(this.currentUser?.can_direct_message);
       }
     };
+  });
+
+  api.onPageChange((url) => {
+    const match = url.match(/^\/chat\/c\/[^/]+\/(\d+)\/?(?:\?.*)?$/);
+    if (match) {
+      redirectToBaMoiThread(Number(match[1]), baMoi);
+    }
   });
 
   // Only plain primary clicks (and Enter, which fires one) open the chat;

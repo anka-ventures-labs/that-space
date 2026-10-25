@@ -18,6 +18,7 @@ export interface DiscourseCall {
   /** For chat messages: the direct chat's channel and the member it is with. */
   channelId?: number
   chatWith?: string
+  threadId?: number | null
   recipients?: string[]
   title?: string
   /** 0 for chat messages, which belong to no topic. */
@@ -35,6 +36,7 @@ export function createFakeDiscourse() {
   const channels = new Map<string, number>()
   let failures = 0
   const chatRefused = new Set<string>()
+  const latestThreads = new Map<number, number>()
   const maybeFail = () => {
     if (failures > 0) {
       failures--
@@ -61,10 +63,14 @@ export function createFakeDiscourse() {
       if (!channels.has(key)) channels.set(key, ++nextChannelId)
       return { channelId: channels.get(key)! }
     },
-    async createChatMessage({ asUsername, channelId, raw }) {
+    async latestChatThreadId({ channelId }) {
+      maybeFail()
+      return latestThreads.get(channelId) ?? null
+    },
+    async createChatMessage({ asUsername, channelId, raw, threadId }) {
       maybeFail()
       const chatWith = [...channels].find(([, id]) => id === channelId)?.[0].split('|')[1]
-      calls.push({ type: 'chat' as const, asUsername, channelId, chatWith, raw, topicId: 0, postId: ++nextPostId })
+      calls.push({ type: 'chat' as const, asUsername, channelId, chatWith, threadId: threadId ?? null, raw, topicId: 0, postId: ++nextPostId })
       return { messageId: nextPostId }
     },
   }
@@ -77,6 +83,12 @@ export function createFakeDiscourse() {
     /** Make Discourse refuse a direct chat with this member, as when she turned chat off. */
     refuseChatWith(username: string) {
       chatRefused.add(username)
+    },
+    /** Give a member's direct chat with `asUsername` a current conversation thread. */
+    setLatestThread(asUsername: string, username: string, threadId: number) {
+      const key = `${asUsername}|${username}`
+      if (!channels.has(key)) channels.set(key, ++nextChannelId)
+      latestThreads.set(channels.get(key)!, threadId)
     },
     /** Topics started for a member, and every post in a topic. */
     pmsTo: (username: string) => calls.filter((c) => c.type === 'pm' && c.recipients?.includes(username)),

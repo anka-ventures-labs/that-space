@@ -73,45 +73,70 @@ RSpec.describe "Thật Space member theme", type: :system do
     within(".sidebar-wrapper") { expect(page).to have_link("Quản trị") }
   end
 
-  it "opens one ongoing chat with Bà Mối in native Discourse Chat" do
+  def ba_moi_bot!
     bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
     that_space_theme.update_setting("ba_moi_username", bot.username)
-    sign_in(member)
-    visit "/"
-    expect(page).to have_button("Trò chuyện riêng với Bà Mối")
-
-    within(".sidebar-wrapper") { click_link("Bà Mối") }
-    # Desktop opens the chat drawer beside the feed; phones open full screen.
-    expect(page).to have_css(".chat-composer__input")
-    expect(page).to have_no_css("#reply-control.open")
-    expect(page).to have_content("Bắt đầu trò chuyện với")
-    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
-    channel = Chat::DirectMessageUser.find_by!(user_id: member.id).direct_message.direct_message_channel
-    expect(channel.chatable.users).to contain_exactly(member, bot)
-
-    find(".chat-composer__input").fill_in(with: "Chào Bà Mối, mình muốn tìm một mối quan hệ lâu dài")
-    find(".chat-composer__input").send_keys(:enter)
-    expect(page).to have_css(".chat-message-container", text: "mối quan hệ lâu dài")
-
-    ChatSDK::Message.create(raw: "Chào bạn 🌸 Bà đây. Bạn kể Bà nghe thêm nhé?", channel_id: channel.id, guardian: Guardian.new(bot))
-    expect(page).to have_css(".chat-message-container", text: "Bà đây")
-    retain_theme_screenshot("that-space-ba-moi-chat")
-
-    visit "/"
-    find(".that-space-first-step__ba-moi").click
-    expect(page).to have_css(".chat-message-container", text: "Bà đây")
-    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
+    bot
   end
 
-  it "gives phones the same chat with Bà Mối", mobile: true do
-    bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
-    that_space_theme.update_setting("ba_moi_username", bot.username)
+  def ba_moi_channel(member, bot)
+    Chat::CreateDirectMessageChannel.call(guardian: member.guardian, params: { target_usernames: [bot.username], upsert: true }).channel
+  end
+
+  # Discourse AI answers a top-level direct-chat message in a forced thread on it.
+  def ai_style_reply(channel, bot, to:, raw:)
+    ChatSDK::Message.create(raw: raw, channel_id: channel.id, guardian: bot.guardian, in_reply_to_id: to.id, force_thread: true, enforce_membership: false)
+  end
+
+  it "opens the member's current Bà Mối conversation thread and keeps new messages in it" do
+    bot = ba_moi_bot!
+    channel = ba_moi_channel(member, bot)
+    opening = ChatSDK::Message.create(raw: "Chào Bà Mối 🌸", channel_id: channel.id, guardian: member.guardian)
+    ai_style_reply(channel, bot, to: opening, raw: "Chào bạn 🌸 Bà đây. Bạn đang tìm kiếm điều gì?")
+    thread_id = opening.reload.thread_id
+    expect(thread_id).to be_present
+
+    sign_in(member)
+    visit "/"
+    within(".sidebar-wrapper") { click_link("Bà Mối") }
+    expect(page).to have_css(".chat-thread", text: "Bà đây")
+    expect(page).to have_no_css("#reply-control.open")
+
+    find(".chat-thread .chat-composer__input").fill_in(with: "Mình muốn tìm một mối quan hệ lâu dài")
+    find(".chat-thread .chat-composer__input").send_keys(:enter)
+    expect(page).to have_css(".chat-thread", text: "mối quan hệ lâu dài")
+    expect(Chat::Message.where(chat_channel_id: channel.id, user_id: member.id).last.thread_id).to eq(thread_id)
+    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
+    retain_theme_screenshot("that-space-ba-moi-chat")
+  end
+
+  it "starts the first conversation with a greeting and moves into it when Bà Mối answers" do
+    bot = ba_moi_bot!
     sign_in(member)
     visit "/"
     find(".that-space-first-step__ba-moi").click
 
-    expect(page).to have_current_path(%r{/chat/c/})
-    expect(page).to have_css(".chat-composer__input", visible: true)
+    expect(page).to have_css(".chat-composer__input")
+    greeting = nil
+    try_until_success { greeting = Chat::Message.find_by!(user_id: member.id, message: "Chào Bà Mối 🌸") }
+    channel = Chat::Channel.find(greeting.chat_channel_id)
+    expect(channel.chatable.users).to contain_exactly(member, bot)
+
+    ai_style_reply(channel, bot, to: greeting, raw: "Chào bạn 🌸 Bà rất vui được gặp bạn.")
+    expect(page).to have_css(".chat-thread", text: "Bà rất vui")
+  end
+
+  it "gives phones the same Bà Mối conversation", mobile: true do
+    bot = ba_moi_bot!
+    channel = ba_moi_channel(member, bot)
+    opening = ChatSDK::Message.create(raw: "Chào Bà Mối 🌸", channel_id: channel.id, guardian: member.guardian)
+    ai_style_reply(channel, bot, to: opening, raw: "Chào bạn 🌸 Trước khi bắt đầu, Bà cần bạn đọc và đồng ý vài điều nhé.")
+    sign_in(member)
+    visit "/"
+    find(".that-space-first-step__ba-moi").click
+
+    expect(page).to have_css(".chat-thread", text: "Bà cần bạn đọc")
+    expect(page).to have_css(".chat-thread .chat-composer__input", visible: true)
     retain_theme_screenshot("that-space-ba-moi-chat-mobile")
   end
 

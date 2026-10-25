@@ -178,6 +178,20 @@ describe('Bà Mối notices in chat', () => {
     expect(h.discourse.pmsTo('lan')).toEqual([])
   })
 
+  it("posts into her current conversation thread so Bà Mối remembers the notice", async () => {
+    const lan = testUser('lan')
+    await onboard(h, lan)
+    const member = await getMemberByDiscourseId(h.db, lan.user_id)
+    h.discourse.clear()
+    await send(h.deps, 'notice-top', { kind: 'persona_notice', memberId: member!.id, raw: 'Trước khi có cuộc trò chuyện' })
+    h.discourse.setLatestThread('ba_moi', 'lan', 44)
+    await send(h.deps, 'notice-thread', { kind: 'persona_notice', memberId: member!.id, raw: 'Trong cuộc trò chuyện' })
+    expect(h.discourse.chatTo('lan').map((c) => [c.raw, c.threadId])).toEqual([
+      ['Trước khi có cuộc trò chuyện', null],
+      ['Trong cuộc trò chuyện', 44],
+    ])
+  })
+
   it('keeps a chat notice queued through an outage and delivers it on retry', async () => {
     const lan = testUser('lan')
     await onboard(h, lan)

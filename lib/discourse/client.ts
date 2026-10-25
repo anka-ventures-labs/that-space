@@ -13,8 +13,10 @@ export interface DiscourseClient {
   createPost(input: { asUsername: string; topicId: number; raw: string }): Promise<{ postId: number }>
   /** Opens (or returns the existing) one-to-one chat between `asUsername` and `targetUsername`. */
   openDirectChat(input: { asUsername: string; targetUsername: string }): Promise<{ channelId: number }>
-  /** Posts a chat message as `asUsername` in a channel it belongs to. */
-  createChatMessage(input: { asUsername: string; channelId: number; raw: string }): Promise<{ messageId: number }>
+  /** The newest thread in a direct chat, if any: where Discourse AI keeps the conversation. */
+  latestChatThreadId(input: { asUsername: string; channelId: number }): Promise<number | null>
+  /** Posts a chat message as `asUsername` in a channel it belongs to, optionally inside a thread. */
+  createChatMessage(input: { asUsername: string; channelId: number; raw: string; threadId?: number | null }): Promise<{ messageId: number }>
 }
 
 export class DiscourseError extends Error {
@@ -35,20 +37,20 @@ export function createDiscourseClient(options: {
   const timeoutMs = options.timeoutMs ?? 5000
   const baseUrl = options.baseUrl.replace(/\/+$/, '')
 
-  async function request<T>(asUsername: string, path: string, body: Record<string, unknown>): Promise<T> {
+  async function request<T>(asUsername: string, path: string, body?: Record<string, unknown>): Promise<T> {
     const apiKey = Object.hasOwn(options.apiKeys, asUsername) ? options.apiKeys[asUsername] : undefined
     if (!apiKey) throw new DiscourseError(`No API key for ${asUsername}`, null)
     let response: Response
     try {
       response = await fetchImpl(`${baseUrl}${path}`, {
-        method: 'POST',
+        method: body === undefined ? 'GET' : 'POST',
         headers: {
           'Api-Key': apiKey,
           'Api-Username': asUsername,
-          'Content-Type': 'application/json',
+          ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
           Accept: 'application/json',
         },
-        body: JSON.stringify(body),
+        body: body === undefined ? undefined : JSON.stringify(body),
         signal: AbortSignal.timeout(timeoutMs),
       })
     } catch (error) {
@@ -83,8 +85,17 @@ export function createDiscourseClient(options: {
       if (!Number.isInteger(channelId)) throw new DiscourseError('Discourse returned no chat channel', null)
       return { channelId: channelId as number }
     },
-    async createChatMessage({ asUsername, channelId, raw }) {
-      const result = await request<{ message_id?: number }>(asUsername, `/chat/${channelId}.json`, { message: raw })
+    async latestChatThreadId({ asUsername, channelId }) {
+      const result = await request<{ messages?: Array<{ id: number; thread_id?: number | null }> }>(
+        asUsername, `/chat/api/channels/${channelId}/messages.json?page_size=20&direction=past`,
+      )
+      const threads = (result.messages ?? []).filter((m) => Number.isInteger(m.thread_id)).sort((a, b) => b.id - a.id)
+      return threads[0]?.thread_id ?? null
+    },
+    async createChatMessage({ asUsername, channelId, raw, threadId }) {
+      const result = await request<{ message_id?: number }>(asUsername, `/chat/${channelId}.json`, {
+        message: raw, ...(threadId ? { thread_id: threadId } : {}),
+      })
       if (!Number.isInteger(result.message_id)) throw new DiscourseError('Discourse returned no chat message', null)
       return { messageId: result.message_id as number }
     },
