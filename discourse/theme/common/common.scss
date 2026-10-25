@@ -48,199 +48,118 @@
   unicode-range:u+0100-02ba,u+02bd-02c5,u+02c7-02cc,u+02ce-02d7,u+02dd-02ff,u+0304,u+0308,u+0329,u+1d00-1dbf,u+1e00-1e9f,u+1ef2-1eff,u+2020,u+20a0-20ab,u+20ad-20c0,u+2113,u+2c60-2c7f,u+a720-a7ff;
 }
 
+// Brand layer on core Horizon. Horizon owns layout, cards and spacing; this
+// file only adds typography, the first-step card and removes member noise.
+// Rationale: docs/design/member-happy-path.md
 :root {
-  --that-space-brown: #5c3d2e;
-  --that-space-sand: #c4a882;
-  --that-space-cream: #f5f0e8;
+  --that-space-brown: #7a4e36;
   --that-space-ink: #33231c;
-  --that-space-muted: #705f54;
-  --that-space-wash: #eadfce;
-  --d-button-primary-text-color: #fff;
-  --d-button-primary-text-color--hover: #fff;
-  --d-button-primary-bg-color: var(--that-space-brown);
-  --d-button-primary-bg-color--hover: #432a1f;
-  --d-button-primary-icon-color: #fff;
-  --d-button-primary-icon-color--hover: #fff;
+  --that-space-muted: #6b5a4f;
+  --that-space-wash: #f1e9dd;
+  --that-space-sand: #c4a882;
 }
 
 body {
-  background: var(--that-space-cream);
-  color: var(--that-space-ink);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 h1,
 h2,
-h3,
-h4,
-h5,
-h6,
 .topic-title,
-.category-title-link {
+.fancy-title,
+.category-title-link,
+.that-space-first-step h2 {
   font-family: "Playfair Display", Georgia, serif;
 }
 
-.d-header {
-  background: var(--that-space-cream);
-  border-bottom: 1px solid color-mix(in srgb, var(--that-space-sand) 45%, transparent);
-  box-shadow: none;
+// One way to switch palette is enough; members keep the brand palette.
+.user-color-palette-selector {
+  display: none;
 }
 
-.that-space-member-nav {
-  align-items: center;
-  background: var(--that-space-cream);
-  border-bottom: 1px solid color-mix(in srgb, var(--that-space-sand) 35%, transparent);
+// Members cannot act on server notices such as disabled outgoing email.
+.that-space-member {
+  .alert-emails-disabled {
+    display: none;
+  }
+}
+
+// The feed is one list (top_menu=latest), so the lone list tab is noise.
+// Core styles it by id, so match the id to win.
+.list-controls #navigation-bar {
+  display: none;
+}
+
+// Categories live in the sidebar; the home feed needs no filter above it.
+// Category pages keep their breadcrumb so subcategories stay reachable.
+.navigation-topics .list-controls .category-breadcrumb {
+  display: none;
+}
+
+// Bà Mối is added by the theme API, so it would land last; keep it second.
+.sidebar-section-content:has(> [data-list-item-name="ba-moi"]) {
   display: flex;
-  gap: 1.25rem;
-  margin: 0 auto;
-  max-width: 1110px;
-  min-height: 4.25rem;
-  padding: 0.55rem 1.25rem;
+  flex-direction: column;
+
+  > [data-list-item-name="everything"] {
+    order: -2;
+  }
+
+  > [data-list-item-name="ba-moi"] {
+    order: -1;
+  }
 }
 
-.that-space-member-nav__brand {
-  align-items: center;
-  color: var(--that-space-brown);
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  gap: 0.55rem;
-  text-decoration: none;
-}
-
-.that-space-member-nav__brand img {
-  border-radius: 50%;
-  display: block;
-  height: 2rem;
-  object-fit: cover;
-  width: 2rem;
-}
-
-.that-space-member-nav__links {
-  align-items: center;
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-}
-
-.that-space-member-nav__links a {
-  border-radius: 999px;
-  color: var(--that-space-brown);
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.45rem 0.55rem;
-  text-decoration: none;
-}
-
-.that-space-member-nav__links a:hover,
-.that-space-member-nav__links a:focus-visible {
+.that-space-first-step {
   background: var(--that-space-wash);
-  color: var(--that-space-brown);
+  border: 1px solid color-mix(in srgb, var(--that-space-sand) 50%, transparent);
+  border-radius: var(--d-border-radius-large, 20px);
+  color: var(--that-space-ink);
+  display: block;
+  margin: 0 0 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
 }
 
-.that-space-member-nav__ba-moi,
-.that-space-member-welcome__actions button {
-  background: var(--that-space-brown);
-  border: 1px solid var(--that-space-brown);
-  border-radius: 999px;
-  color: #fff;
-  cursor: pointer;
-  font: 600 0.9rem/1.25 Inter, system-ui, sans-serif;
-  padding: 0.6rem 0.9rem;
-  white-space: nowrap;
-}
-
-.that-space-member-nav__ba-moi:hover,
-.that-space-member-nav__ba-moi:focus-visible,
-.that-space-member-welcome__actions button:hover,
-.that-space-member-welcome__actions button:focus-visible {
-  background: #432a1f;
-  border-color: #432a1f;
-  color: #fff;
-}
-
-.that-space-member-welcome {
-  background: linear-gradient(120deg, #f8f4ed 0%, #ebdfce 100%);
-  border: 1px solid color-mix(in srgb, var(--that-space-sand) 55%, transparent);
-  border-radius: 1.25rem;
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.65fr);
-  margin: 1rem 0 1.5rem;
-  overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3.25rem);
-  position: relative;
-}
-
-.that-space-member-welcome::after {
-  background: radial-gradient(circle, rgb(196 168 130 / 48%) 0 0.12rem, transparent 0.16rem);
-  background-size: 1.1rem 1.1rem;
-  content: "";
-  inset: 0 0 0 auto;
-  opacity: 0.55;
-  pointer-events: none;
-  position: absolute;
-  width: 30%;
-}
-
-.that-space-member-welcome__copy,
-.that-space-member-welcome__actions {
-  position: relative;
-  z-index: 1;
-}
-
-.that-space-member-welcome__eyebrow {
+.that-space-first-step__eyebrow {
   color: var(--that-space-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-  margin: 0 0 0.65rem;
+  font-size: var(--font-down-1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
 }
 
-.that-space-member-welcome h1 {
-  color: var(--that-space-brown);
-  font-size: clamp(1.85rem, 4vw, 3rem);
-  line-height: 1.12;
+.that-space-first-step h2 {
+  color: var(--that-space-ink);
+  font-size: clamp(1.4rem, 3vw, 1.85rem);
+  line-height: 1.25;
   margin: 0;
-  max-width: 16ch;
 }
 
-.that-space-member-welcome__copy > p:last-child {
+.that-space-first-step__copy {
   color: var(--that-space-muted);
-  line-height: 1.65;
+  font-size: var(--font-up-1);
+  line-height: 1.6;
+  margin: 0.75rem 0 1.25rem;
+  max-width: 52ch;
+}
+
+.that-space-first-step__action.btn {
+  font-size: var(--font-up-1);
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.that-space-first-step__aside {
+  color: var(--that-space-muted);
   margin: 1rem 0 0;
-  max-width: 58ch;
 }
 
-.that-space-member-welcome__actions {
-  align-content: center;
-  display: grid;
-  gap: 0.7rem;
-  justify-items: start;
-}
-
-.that-space-member-welcome__actions a,
-.that-space-member-welcome__actions button {
-  box-sizing: border-box;
-  min-height: 2.7rem;
-}
-
-.that-space-member-welcome__actions a {
-  border: 1px solid color-mix(in srgb, var(--that-space-brown) 55%, transparent);
-  border-radius: 999px;
+.that-space-first-step__ba-moi.btn-link {
   color: var(--that-space-brown);
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 0.65rem 1rem;
-  text-decoration: none;
-}
-
-.that-space-member-welcome__actions a:hover,
-.that-space-member-welcome__actions a:focus-visible {
-  background: rgb(255 255 255 / 42%);
-  color: var(--that-space-brown);
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 a:focus-visible,

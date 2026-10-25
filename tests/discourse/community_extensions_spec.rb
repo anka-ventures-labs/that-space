@@ -21,20 +21,95 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(Theme.order(:id).pluck(:id)).to eq(ids)
     expect(presentation.check!.drift).to be_empty
 
-    presentation.theme.update_setting("gallery_path", "/wrong-gallery")
-    expect(presentation.check!.drift).to include("Thật Space setting gallery_path")
-    expect(presentation.theme.get_setting("gallery_path")).to eq("/wrong-gallery")
+    introduction_id = configured_category("introduction").id
+    presentation.theme.update_setting("introduction_category_id", 0)
+    expect(presentation.check!.drift).to include("Thật Space Brand setting introduction_category_id")
+    expect(presentation.theme.get_setting("introduction_category_id")).to eq(0)
     presentation.apply!
-    expect(presentation.theme.get_setting("gallery_path")).to eq(configured_category("exhibition").url)
+    expect(presentation.theme.get_setting("introduction_category_id")).to eq(introduction_id)
+  end
+
+  it "serves members core Horizon with the brand palette and components attached" do
+    horizon = Theme.horizon_theme
+    expect(SiteSetting.default_theme_id).to eq(horizon.id)
+    expect(presentation.theme).to be_component
+    expect(horizon.child_theme_ids).to include(presentation.theme.id)
+    expect(horizon.color_scheme.name).to eq(ThatSpace::PresentationBootstrap::PALETTE_NAME)
+    expect(horizon.dark_color_scheme_id).to be_nil
+    expect(horizon.color_scheme.colors.find { |color| color.name == "tertiary" }.hex.downcase).to eq("7a4e36")
+
+    horizon.update!(dark_color_scheme_id: ColorScheme.where.not(id: horizon.color_scheme_id).first.id)
+    expect(presentation.check!.drift).to include("Horizon palette")
+    presentation.apply!
+    expect(horizon.reload.dark_color_scheme_id).to be_nil
+  end
+
+  it "replaces the busy default sidebar with the member destinations and quiets onboarding" do
+    section = SidebarSection.find_by!(section_type: "community")
+    links = section.sidebar_urls.order("sidebar_section_links.position").pluck(:name, :value)
+    expect(links).to eq(
+      [
+        ["Bảng tin", "/latest"],
+        ["Sự kiện", "/upcoming-events"],
+        ["Triển lãm", configured_category("exhibition").url],
+        ["Tin nhắn", "/my/messages"],
+        ["Kiểm duyệt", "/review"],
+        ["Quản trị", "/admin"],
+        ["Về Thật Space", "/about"],
+        ["Nội quy", "/faq"],
+      ],
+    )
+    expect(SiteSetting.top_menu).to eq("latest")
+    expect(SiteSetting.chat_enabled).to eq(false)
+    expect(SiteSetting.discourse_narrative_bot_enabled).to eq(false)
+    expect(SiteSetting.enable_welcome_banner(theme_id: Theme.horizon_theme.id)).to eq(false)
+    expect(SiteSetting.tagging_enabled).to eq(false)
+    ThatSpace::PresentationBootstrap::VI_LABELS.each do |key, value|
+      expect(TranslationOverride.find_by!(locale: "vi", translation_key: key).value).to eq(value)
+    end
+
+    section.sidebar_urls.first.update!(name: "Topics")
+    expect(presentation.check!.drift).to include("community sidebar links")
+    presentation.apply!
+    expect(section.reload.sidebar_urls.order("sidebar_section_links.position").first.name).to eq("Bảng tin")
+  end
+
+  it "checks a site still on the legacy theme without writing, then cuts over and keeps the rollback theme" do
+    legacy = Theme.create!(name: "Thật Space", user_id: Discourse.system_user.id)
+    PluginStore.set(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::LEGACY_THEME_KEY, { "id" => legacy.id })
+    SiteSetting.default_theme_id = legacy.id
+    SiteSetting.top_menu = "latest|hot|categories"
+
+    drift = presentation.check!.drift
+    expect(drift).to include("default member theme", "site setting top_menu")
+    expect(SiteSetting.default_theme_id).to eq(legacy.id)
+    expect(SiteSetting.top_menu).to eq("latest|hot|categories")
+
+    presentation.apply!
+    expect(SiteSetting.default_theme_id).to eq(Theme.horizon_theme.id)
+    expect(presentation.legacy_theme).to eq(legacy)
+    expect(presentation.check!.drift).to be_empty
+  end
+
+  it "refuses an admin-customised sidebar before changing anything" do
+    section = SidebarSection.find_by!(section_type: "community")
+    custom = SidebarUrl.create!(name: "Admin pick", value: "/c/thong-bao", icon: "star", segment: "primary", external: false)
+    SidebarSectionLink.create!(user_id: Discourse.system_user.id, linkable: custom, sidebar_section: section, position: 99)
+    PluginStore.remove(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::SIDEBAR_KEY)
+    SiteSetting.top_menu = "latest|new"
+
+    expect { presentation.apply! }.to raise_error(ThatSpace::PresentationBootstrap::Error, /refusing takeover/)
+    expect(SiteSetting.top_menu).to eq("latest|new")
+    expect(section.reload.sidebar_urls).to include(custom)
   end
 
   it "refuses to take over an unrelated same-named theme" do
     existing_id = presentation.theme.id
-    PluginStore.remove(ThatSpace::PresentationBootstrap::STORE, "theme")
+    PluginStore.remove(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::BRAND_KEY)
     count = Theme.count
     expect { presentation.apply! }.to raise_error(ThatSpace::PresentationBootstrap::Error, /refusing takeover/)
     expect(Theme.count).to eq(count)
-    expect(Theme.find_by(name: "Thật Space").id).to eq(existing_id)
+    expect(Theme.find_by(name: "Thật Space Brand").id).to eq(existing_id)
   end
 
   it "allows an approved member to update her bio and feature her own artwork topic" do

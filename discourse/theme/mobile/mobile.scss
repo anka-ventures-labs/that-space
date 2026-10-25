@@ -1,41 +1,4 @@
-@media screen and (max-width: 680px) {
-  .that-space-member-nav {
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 0.5rem 0.75rem;
-    padding: 0.7rem 1rem;
-  }
-
-  .that-space-member-nav__brand {
-    font-size: 1.05rem;
-  }
-
-  .that-space-member-nav__links {
-    flex-basis: 100%;
-    gap: 0.1rem 0.4rem;
-    order: 3;
-  }
-
-  .that-space-member-nav__links a {
-    font-size: 0.84rem;
-    padding: 0.4rem 0.35rem;
-  }
-
-  .that-space-member-nav__ba-moi {
-    margin-left: auto;
-  }
-
-  .that-space-member-welcome {
-    border-radius: 0.9rem;
-    display: block;
-    padding: 1.5rem;
-  }
-
-  .that-space-member-welcome::after {
-    width: 44%;
-  }
-
-  .that-space-member-welcome__actions {
-    margin-top: 1.4rem;
-  }
+// Full-width primary action on phones: the obvious next step is thumb-sized.
+.that-space-first-step__action.btn {
+  width: 100%;
 }

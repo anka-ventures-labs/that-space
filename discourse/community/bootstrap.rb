@@ -14,6 +14,11 @@ module ThatSpace
   class CommunityBootstrap
     MANIFEST_ID = "that-space-community"
     MANIFEST_TYPE = "that-space-community"
+    # Signup asks only what membership needs; the rest waits on the profile.
+    ASKED = {
+      "signup" => { requirement: "on_signup", show_on_signup: true },
+      "later" => { requirement: "optional", show_on_signup: false }
+    }.freeze
     OWNER_FIELD_PREFIX = "that_space.community"
     MANIFEST_PATH_ENV = "THAT_SPACE_COMMUNITY_MANIFEST"
 
@@ -147,24 +152,26 @@ module ThatSpace
         unless %w[dropdown multiselect].include?(field.fetch("type")) && field.fetch("options").all? { |option| option.is_a?(String) && !option.empty? }
           raise Error, "User field #{field.fetch("key")} must have a supported type and non-empty options"
         end
+        unless ASKED.key?(field.fetch("asked", "signup"))
+          raise Error, "User field #{field.fetch("key")} must be asked at signup or later"
+        end
       end
 
       privacy = @manifest.fetch("user_field_defaults")
       expected_privacy = {
         "editable" => true,
-        "requirement" => "on_signup",
-        "show_on_signup" => true,
         "show_on_profile" => false,
         "show_on_user_card" => false,
         "searchable" => false
       }
       unless privacy == expected_privacy
-        raise Error, "User field defaults must require editable signup fields that are private and not searchable"
+        raise Error, "User field defaults must keep fields editable, private and not searchable"
       end
 
       automation = @manifest.fetch("automation")
       role_field = @manifest.fetch("user_fields").find { |field| field.fetch("key") == automation.fetch("field_key") }
       raise Error, "Automation field #{automation.fetch("field_key")} is missing" unless role_field
+      raise Error, "The Q1 role field must be asked at signup" unless role_field.fetch("asked", "signup") == "signup"
       groups = @manifest.fetch("groups").to_h { |group| [group.fetch("key"), group] }
       mapping = automation.fetch("mapping")
       unless mapping.keys.sort == role_field.fetch("options").sort
@@ -314,7 +321,7 @@ module ThatSpace
         position: position,
         external_type: MANIFEST_TYPE,
         external_name: definition.fetch("key")
-      }.merge(@manifest.fetch("user_field_defaults").transform_keys(&:to_sym))
+      }.merge(ASKED.fetch(definition.fetch("asked", "signup"))).merge(@manifest.fetch("user_field_defaults").transform_keys(&:to_sym))
     end
 
     def apply_user_field_attributes(field, definition, position)

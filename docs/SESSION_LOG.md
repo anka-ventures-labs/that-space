@@ -1534,3 +1534,113 @@ community, the lotus blooms, and a fresh incognito signup reaches Google with
 the exact port-8443 callback. Rollback deployment
 `dpl_DmkUUcW8PaGB4SBAnHUHPKYQa6VQ` remains Ready. Full nonsecret evidence is in
 `docs/verification/vercel-prebuilt-f1a844f-production.json`.
+
+# 2026-10-25 — Member happy path on Discourse Horizon
+
+Minh reviewed the live community and found the post-signup screen clunky for
+non-technical members: duplicate logo/navigation, chat links, filters, four
+tabs, a hero repeating the nav, a staff email notice and untranslated labels,
+after a 16-question signup. Decision: stay on Discourse and rebuild the member
+layout around one clear path instead of switching platforms.
+
+Members now get core Horizon (pinned revision `c237680`, 2026.10.0-latest) with
+an owned `Thật Space Brand` component and "Thật Space Horizon" palette. The old
+full theme and our second navigation bar are gone from the member path; the old
+theme stays installed as the rollback target. The bootstrap reconciles the
+community sidebar to Bảng tin / Sự kiện / Triển lãm / Tin nhắn (+ staff-only
+Kiểm duyệt / Quản trị), the theme adds Bà Mối as the second link, and site
+settings remove tabs, welcome banner, user tips, the tutorial bot, chat, tags,
+uncategorized and the events plugin's English link. Home shows one first-step
+card ("Viết lời giới thiệu", opening a prefilled Giới thiệu post) until the
+member has posted, with Bà Mối as the quiet secondary action. "Chủ đề mới" is
+relabelled "Viết bài". Signup now requires only the 18+ attestation and Q1;
+the other 14 questions are optional profile fields (`asked: "later"`).
+
+Skipped: Discourse forks or a headless Next.js member UI (more cost than the
+problem needs), and switching platforms (Flarum 2 still RC; others would mean
+rebuilding the Google-only, privacy and Bà Mối integration). Known risks:
+Discourse discourages components on Horizon, so browser acceptance guards our
+component plus Portfolio/Thumbnails; existing members keep their old sidebar
+categories; Bà Mối opens a new PM each time; outgoing email remains disabled.
+Thảo has not reviewed the reduced signup yet.
+
+Local verification: Ruby/JSON/YAML syntax, gjs template parsing with
+content-tag, 31 files / 224 Vitest tests, typecheck and lint pass. The
+Discourse request/browser acceptance (Horizon, palette, sidebar, first-step
+journey, signup contract) runs only in GitHub CI. Production apply has not
+happened. Design: `docs/design/member-happy-path.md`.
+
+First CI run on `bc2f2eb` failed: `enable_welcome_banner` is themeable in this
+Discourse revision and must be set per theme, and unanswered optional fields
+are stored as nil keys. Codex review `25348bda-faac-4443-8f62-c76a904d2194`
+(route `f51d5c8d`) returned do-not-ship with four findings, all accepted:
+the sidebar rewrite could delete admin-added links (now refused unless the
+section holds only core links or is bootstrap-owned, checked before any write);
+visible changes ran before fallible imports (imports/configuration now run
+first); the first-step "introduced" flag was shared across accounts on one
+browser (now keyed by user id); and tests lacked a legacy-site migration,
+custom-sidebar refusal and Q1-only enforcement case (added).
+
+Second CI run (`9f21cae`): request acceptance 28/29 (`top_menu` cannot contain
+`unread` under unified new; test fixture corrected). Browser acceptance stalled
+after the first-step card stayed visible for a member who had posted: core
+serializes `post_count`/`topic_count` only to staff, and a topic's first post
+counts as a topic. The card now asks `/user_actions.json` for one topic or reply.
+
+Third CI run (`a077da8`): request acceptance 29/29; browser 4/6. Screenshots
+confirm Horizon, the brand palette, the reduced sidebar, the "Viết bài" button
+and the first-step card on desktop and full-width on mobile. Remaining: the lone
+"Gần đây" tab stayed visible (the page-class selector did not match Horizon) and
+the activity-stream lookup returned nothing in system tests. The card now uses
+core's serialized `currentUser.any_posts` (no request, no browser storage; this
+also retires the per-account storage finding) and the tab rule applies to all
+list controls. The "Chưa phân loại" entry in one screenshot comes from
+Discourse's `create_post` spec helper enabling uncategorized topics.
+
+Fourth CI run (`3be4953`): request 29/29, browser 5/6. Only the lone tab
+remained: core styles `#navigation-bar` by id, which outranks a class rule. The
+rule now targets the id, and the home-only category breadcrumb is hidden via
+core's `navigation-topics` body class.
+
+Fifth CI run (`0a10f5a`): both required checks pass (request 29/29, browser
+6/6). Minh then reported the composer mode switcher still read "Create topic":
+core vi lacks `composer_actions.create_topic.label` and siblings. The bootstrap
+now owns a small `VI_LABELS` set of vi overrides (missing composer labels, "Đăng
+bài" submit, plain placeholder instead of Markdown/BBCode, "bài" instead of
+"tút"), asserted in request and browser acceptance. Also confirmed for Minh:
+the ASUS community is public through Tailscale Funnel (public DNS resolves to
+Funnel relays; guests are redirected to Google sign-in), and none of this
+branch is applied there yet.
+
+# 2026-10-25 — Bà Mối model switched to DeepSeek V4.1 Flash
+
+At Minh's request Bà Mối's agent now uses OpenRouter
+`deepseek/deepseek-v4.1-flash` (supports tool calling). Added Discourse AI model
+2 bound to the existing native secret 2 (the key was not re-entered), passed the
+native LLM test, set the private operator `BA_MOI_LLM_ID=2` and ran the installer:
+check showed only `default_llm_id` drift; apply then check reported no drift.
+Model 1 (Sonnet) stays for the moderation classifier and as the rollback target.
+A live QA private message as `ts_qa_nam` got a correct, in-voice reply about
+18 seconds later that used the status tool (paused profile, box open); the QA
+topic was then soft-deleted.
+
+Incident: the Discourse admin LLM listing returns the provider key in clear,
+and one diagnostic readout printed it into the session's tool output (not into
+Git, docs or any external service). Recommended rotation of the OpenRouter key
+in OpenRouter/Infisical and the Discourse native secret. Later calls redacted it.
+
+# 2026-10-25 — Bà Mối as a chat
+
+Minh found the Bà Mối entry felt like writing a forum post (message editor
+with title and toolbar) and that every click started a new thread although the
+service keeps one thread per member. The theme now opens the member's existing
+two-person thread with the bot (or starts it with "Chào Bà Mối 🌸"), and that
+thread renders as a chat: bubbles, no forum chrome, one pinned input where Enter
+sends via an ordinary reply. Backend, Discourse AI tools and the relay are
+unchanged. Browser acceptance covers first open, bot reply, Enter-to-send, no
+second thread on reopen, and a mobile render.
+
+Superseded the private-message chat skin above at Minh's direction: Bà Mối
+moves to native Discourse Chat (streaming replies, replying indicator, uploads,
+unread badges) in a stacked change. The skin's theme files and tests were
+removed from this branch; PR #5 stays the member happy path.
