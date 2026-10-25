@@ -200,7 +200,12 @@ module ThatSpace
       "js.composer.composer_actions.reply_to_topic.desc" => "Trả lời cả bài, không nhắm vào bình luận nào",
       # Core chat strings that vi leaves in English.
       "js.chat.placeholder_users" => "Nhắn cho %{commaSeparatedNames}…",
-      "js.chat.channel.empty_state.direct_message_title" => "Bắt đầu trò chuyện với %{name}"
+      "js.chat.channel.empty_state.direct_message_title" => "Bắt đầu trò chuyện với %{name}",
+      "js.chat.heading" => "Trò chuyện",
+      "js.chat.title_capitalized" => "Trò chuyện",
+      "js.chat.thread.label" => "Cuộc trò chuyện",
+      "js.chat.placeholder_thread" => "Nhắn tin…",
+      "js.chat.see_in" => "Xem trong"
     }.freeze
 
     def reconcile_vi_labels(apply:)

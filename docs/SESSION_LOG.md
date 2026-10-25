@@ -1730,3 +1730,7 @@ Option A chosen by Minh (ASUS stays until Thảo approves a move to AWS). Branch
 thread and redirects full-page top-level visits into it; the service posts
 notices into that thread. Browser acceptance simulates Discourse AI's forced
 thread reply for existing, first-contact and mobile cases.
+
+PR #8 merged (`8896548`). Its screenshots showed the thread conversation working
+on desktop and mobile, with core chat labels still in English ("Thread", "Chat
+in thread", "See in", "Chat"); vi overrides added in `fix/chat-vi-labels`.

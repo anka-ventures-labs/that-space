@@ -137,6 +137,8 @@ RSpec.describe "Thật Space member theme", type: :system do
 
     expect(page).to have_css(".chat-thread", text: "Bà cần bạn đọc")
     expect(page).to have_css(".chat-thread .chat-composer__input", visible: true)
+    expect(find(".chat-thread .chat-composer__input")["placeholder"]).to eq("Nhắn tin…")
+    expect(page).to have_no_text("Chat in thread")
     retain_theme_screenshot("that-space-ba-moi-chat-mobile")
   end
 
