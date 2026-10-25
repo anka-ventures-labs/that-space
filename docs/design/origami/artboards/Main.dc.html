@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Landing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.hero{--rx:0deg;--ry:0deg;--tx:0px;--ty:0px;--stem:0deg;--lx:0;--ly:-0.4;--open:0;--px:0;--py:0}
+.petal{position:absolute;left:50%;top:50%;transform-origin:50% 100%;transform-style:preserve-3d}
+.half{position:absolute;top:0;left:0;right:0;bottom:0}
+.half-l{clip-path:polygon(50% 0,0 58%,50% 100%)}
+.half-r{clip-path:polygon(50% 0,100% 58%,50% 100%)}
+.leaf-t{clip-path:polygon(0 50%,62% 0,100% 50%)}
+.leaf-b{clip-path:polygon(0 50%,100% 50%,62% 100%)}
+.btn{position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(1px)}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:14px;height:14px;background:linear-gradient(225deg,#F5F0E8 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+.fold-card{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}
+.fold-card:hover{transform:translateY(-10px) rotate(-.5deg);box-shadow:0 2px 0 #E2D4BC,0 34px 40px -26px rgba(63,42,31,.55)}
+.fold-card .ear{transition:width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1)}
+.fold-card:hover .ear{width:76px;height:76px}
+.fold-card .go{transition:letter-spacing .4s,gap .4s}
+.fold-card:hover .go{gap:14px}
+.note{transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.note:hover{transform:rotate(0deg) translateY(-6px) !important}
+.crane{animation:drift 9s ease-in-out infinite}
+.crane.d2{animation-duration:12s;animation-delay:-4s}
+.crane.d3{animation-duration:10s;animation-delay:-7s}
+.step{transition:flex-grow .6s cubic-bezier(.2,.8,.2,1),background .4s}
+@keyframes drift{0%,100%{translate:0 0;rotate:-3deg}50%{translate:10px -16px;rotate:3deg}}
+@media (prefers-reduced-motion:reduce){.crane{animation:none}.step{transition:none}}
+</style>
+</helmet>
+<div class="ts grain" style="background-color: #F5F0E8; min-height: 100vh; overflow: hidden">
+
+  <!-- NAV -->
+  <header style="position: relative; z-index: 5; border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+        <img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)">
+      </a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Profile</a>
+        <a href="Forum.dc.html" class="btn btn-ink" style="margin-left: 10px; padding: 12px 22px; background: #5C3D2E; color: #F5F0E8; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 2px; box-shadow: 0 2px 0 #3F2A1F">Join</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" ref="{{ setHero }}" onPointerMove="{{ onMove }}" onPointerLeave="{{ onLeave }}" style="position: relative; min-height: 760px; padding: 32px 24px 72px">
+    <!-- crease pattern: unfolded paper -->
+    <div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; transform: translate(calc(var(--px) * -10px), calc(var(--py) * -8px))">
+      <div style="position: absolute; top: -10%; left: -10%; width: 70%; height: 120%; background: #EFE7DA; clip-path: polygon(0 0, 100% 0, 40% 100%, 0 100%)"></div>
+      <div style="position: absolute; top: 0; right: 0; width: 45%; height: 100%; background: #F8F4EC; clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%)"></div>
+      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, transparent 49.9%, rgba(196,168,130,.35) 50%, transparent 50.12%)"></div>
+      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent 49.9%, rgba(196,168,130,.25) 50%, transparent 50.12%)"></div>
+    </div>
+
+    <div style="position: relative; max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
+      <!-- copy -->
+      <div style="flex: 1 1 420px; min-width: 0; padding: 40px 0; display: flex; flex-direction: column; gap: 28px; transform: translate(calc(var(--px) * 6px), calc(var(--py) * 4px))">
+        <p style="margin: 0; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; background: #FBF8F2; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 1px 0 #E2D4BC, 0 8px 16px -12px rgba(63,42,31,.5); clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C3D2E" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 12l8 9 8-9z"></path><path d="M12 3v18M4 12h16"></path></svg>
+          Không gian thật · for Vietnamese women
+        </p>
+        <h1 class="serif" style="margin: 0; font-size: clamp(44px, 6vw, 80px); line-height: 1.02; font-weight: 400; letter-spacing: -0.02em; color: #5C3D2E">A private space for women to <em style="font-style: italic; color: #8A6450">connect, grow,</em> and discover.</h1>
+        <p style="margin: 0; max-width: 460px; font-size: 18px; line-height: 1.6; color: #6E4D3C">Where Vietnamese wisdom meets modern sisterhood.</p>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap">
+          <a href="Forum.dc.html" class="btn btn-ink" style="padding: 18px 30px; background: #5C3D2E; color: #F5F0E8; font-weight: 600; font-size: 16px; text-decoration: none; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F, 0 16px 24px -16px rgba(63,42,31,.8)">Join the Community</a>
+          <a href="TuVi.dc.html" class="btn" style="padding: 16px 28px; background: #FBF8F2; color: #5C3D2E; font-weight: 600; font-size: 16px; text-decoration: none; border: 2px solid #5C3D2E; border-radius: 2px; box-shadow: 0 3px 0 #C4A882">Get Your Reading</a>
+        </div>
+        <p style="margin: 8px 0 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #7A5A48">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A5A48" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l5 16 2.5-6.5L19 10z"></path></svg>
+          Move your cursor — the lotus turns to find you. Tap it to {{ bloomVerb }}.
+        </p>
+      </div>
+
+      <!-- origami lotus stage -->
+      <div ref="{{ setStage }}" style="flex: 1 1 520px; min-width: 0; position: relative; height: 640px; perspective: 1300px">
+        <!-- paper moon -->
+        <div aria-hidden="true" style="position: absolute; left: 50%; top: 44px; width: 440px; height: 440px; margin-left: -220px; border-radius: 50%; background: linear-gradient(135deg, #E9DCC7 50%, #DFCFB5 50%); box-shadow: 0 30px 60px -40px rgba(63,42,31,.5); transform: translate(calc(var(--px) * -22px), calc(var(--py) * -16px))"></div>
+        <!-- cranes -->
+        <div aria-hidden="true" style="position: absolute; left: 6%; top: 40px; transform: translate(calc(var(--px) * 40px), calc(var(--py) * 30px))">
+          <svg class="crane" width="96" height="64" viewBox="0 0 120 80"><polygon points="52,44 74,2 66,46" fill="#A88B66"></polygon><polygon points="8,26 42,44 34,50" fill="#8A6450"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#C4A882"></polygon><polygon points="34,50 54,62 60,40" fill="#B39672"></polygon><polygon points="44,46 26,4 64,44" fill="#DCCAAE"></polygon><polygon points="74,48 104,14 82,52" fill="#A88B66"></polygon><polygon points="104,14 116,22 106,20" fill="#5C3D2E"></polygon></svg>
+        </div>
+        <div aria-hidden="true" style="position: absolute; right: 4%; top: 150px; transform: translate(calc(var(--px) * 56px), calc(var(--py) * 40px)) scale(-.7, .7)">
+          <svg class="crane d2" width="96" height="64" viewBox="0 0 120 80"><polygon points="52,44 74,2 66,46" fill="#8A6450"></polygon><polygon points="8,26 42,44 34,50" fill="#5C3D2E"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#8A6450"></polygon><polygon points="34,50 54,62 60,40" fill="#6E4D3C"></polygon><polygon points="44,46 26,4 64,44" fill="#A88B66"></polygon><polygon points="74,48 104,14 82,52" fill="#6E4D3C"></polygon><polygon points="104,14 116,22 106,20" fill="#3F2A1F"></polygon></svg>
+        </div>
+        <div aria-hidden="true" style="position: absolute; right: 18%; bottom: 40px; transform: translate(calc(var(--px) * 24px), calc(var(--py) * 18px)) scale(.5)">
+          <svg class="crane d3" width="96" height="64" viewBox="0 0 120 80"><polygon points="52,44 74,2 66,46" fill="#A88B66"></polygon><polygon points="8,26 42,44 34,50" fill="#8A6450"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#C4A882"></polygon><polygon points="34,50 54,62 60,40" fill="#B39672"></polygon><polygon points="44,46 26,4 64,44" fill="#DCCAAE"></polygon><polygon points="74,48 104,14 82,52" fill="#A88B66"></polygon><polygon points="104,14 116,22 106,20" fill="#5C3D2E"></polygon></svg>
+        </div>
+
+        <!-- stem + leaves (rotate with the head) -->
+        <div aria-hidden="true" style="position: absolute; left: 50%; top: 262px; width: 14px; height: 400px; margin-left: -7px; transform-origin: 50% 100%; transform: rotate(var(--stem)); background: linear-gradient(90deg, #7A5442 50%, #4E3326 50%)">
+          <div style="position: absolute; top: 170px; left: 7px; width: 170px; height: 64px; transform-origin: 0 50%; transform: rotate(-24deg)">
+            <div class="half leaf-t" style="background: #6E4D3C"></div>
+            <div class="half leaf-b" style="background: #4E3326"></div>
+          </div>
+          <div style="position: absolute; top: 230px; right: 7px; width: 150px; height: 56px; transform-origin: 100% 50%; transform: rotate(28deg) scaleX(-1); transform-box: border-box">
+            <div style="position: absolute; top: 0; left: 0; width: 150px; height: 56px; transform: scaleX(-1)">
+              <div class="half leaf-t" style="background: #8A6450"></div>
+              <div class="half leaf-b" style="background: #5C3D2E"></div>
+            </div>
+          </div>
+        </div>
+        <!-- paper base shadow -->
+        <div aria-hidden="true" style="position: absolute; left: 50%; bottom: 0; width: 280px; height: 18px; margin-left: -140px; border-radius: 50%; background: rgba(63,42,31,.16)"></div>
+
+        <!-- flower head -->
+        <button type="button" onClick="{{ onBloom }}" aria-label="{{ bloomLabel }}" style="position: absolute; left: 50%; top: 50px; width: 420px; height: 420px; margin-left: -210px; padding: 0; border: 0; background: transparent; cursor: pointer; transform-style: preserve-3d; transform: translate(var(--tx), var(--ty)) rotateX(var(--rx)) rotateY(var(--ry))">
+          <sc-for list="{{ petals }}" as="p" hint-placeholder-count="29">
+            <span class="petal" style="width: {{p.w}}px; height: {{p.l}}px; margin-left: -{{p.hw}}px; margin-top: -{{p.l}}px; transform: rotate({{p.rot}}deg) translateZ({{p.z}}px) rotateX(calc(-1deg * ({{p.cup}} - var(--open) * {{p.openBy}})))">
+              <span class="half half-l" style="background: {{p.a}}; filter: brightness(calc(1 + var(--lx) * {{p.cl}} + var(--ly) * {{p.sl}}))"></span>
+              <span class="half half-r" style="background: {{p.b}}; filter: brightness(calc(1 + var(--lx) * {{p.cr}} + var(--ly) * {{p.sr}}))"></span>
+            </span>
+          </sc-for>
+          <!-- seed pod -->
+          <span style="position: absolute; left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px; transform: translateZ(42px); clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); background: repeating-conic-gradient(from 22.5deg, #5C3D2E 0deg 45deg, #7A5442 45deg 90deg)">
+            <span style="position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; background: #F5F0E8; transform: rotate(45deg)"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section style="position: relative; padding: 112px 24px; background: #5C3D2E">
+    <div aria-hidden="true" style="position: absolute; top: -1px; left: 0; right: 0; height: 40px; background: #F5F0E8; clip-path: polygon(0 0, 100% 0, 100% 20%, 75% 100%, 50% 20%, 25% 100%, 0 20%)"></div>
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px">
+        <h2 class="serif" style="margin: 0; max-width: 620px; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.05; font-weight: 400; color: #F5F0E8">Everything you need to <em style="color: #C4A882">flourish</em></h2>
+        <p style="margin: 0; max-width: 380px; font-size: 17px; line-height: 1.6; color: #E2D4BC">Three pillars of connection, wisdom, and belonging — crafted for the modern Vietnamese woman.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px">
+        <a href="Forum.dc.html" class="fold-card grain" style="position: relative; display: flex; flex-direction: column; gap: 18px; padding: 40px 36px 36px; background-color: #FBF8F2; text-decoration: none; color: #5C3D2E; box-shadow: 0 2px 0 #E2D4BC, 0 20px 30px -24px rgba(0,0,0,.6)">
+          <span class="ear" aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; background: linear-gradient(225deg, #5C3D2E 50%, #DCCAAE 50%)"></span>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="#5C3D2E" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M6 10h30v20H18l-8 7v-7H6z"></path><path d="M6 10l15 10 15-10"></path><path d="M24 34h8l8 8v-8h10V18h-8"></path></svg>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">01 · Diễn đàn</span>
+          <h3 class="serif" style="margin: 0; font-size: 30px; font-weight: 500">Forum</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #6E4D3C">Connect with sisters who understand your journey. Share stories, seek wisdom, and find your tribe in our warm community spaces.</p>
+          <span class="go" style="margin-top: auto; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px">Explore <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg></span>
+        </a>
+        <a href="TuVi.dc.html" class="fold-card grain" style="position: relative; display: flex; flex-direction: column; gap: 18px; padding: 40px 36px 36px; background-color: #FBF8F2; text-decoration: none; color: #5C3D2E; box-shadow: 0 2px 0 #E2D4BC, 0 20px 30px -24px rgba(0,0,0,.6)">
+          <span class="ear" aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; background: linear-gradient(225deg, #5C3D2E 50%, #DCCAAE 50%)"></span>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="#5C3D2E" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M28 4l6 18 18 6-18 6-6 18-6-18-18-6 18-6z"></path><path d="M28 4v48M4 28h48"></path><path d="M14 14l28 28M42 14 14 42" stroke-dasharray="2 4"></path></svg>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">02 · Lá số</span>
+          <h3 class="serif" style="margin: 0; font-size: 30px; font-weight: 500">Tử Vi Horoscope</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #6E4D3C">Receive deeply personal Tử Vi readings rooted in ancient Vietnamese astrology. Discover insights into love, career, and spiritual path.</p>
+          <span class="go" style="margin-top: auto; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px">Explore <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg></span>
+        </a>
+        <a href="Matchmaking.dc.html" class="fold-card grain" style="position: relative; display: flex; flex-direction: column; gap: 18px; padding: 40px 36px 36px; background-color: #FBF8F2; text-decoration: none; color: #5C3D2E; box-shadow: 0 2px 0 #E2D4BC, 0 20px 30px -24px rgba(0,0,0,.6)">
+          <span class="ear" aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; background: linear-gradient(225deg, #5C3D2E 50%, #DCCAAE 50%)"></span>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="#5C3D2E" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M28 50 6 26l6-14 16 8 16-8 6 14z"></path><path d="M28 20v30M6 26h44M12 12l16 38 16-38"></path></svg>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">03 · Tìm duyên</span>
+          <h3 class="serif" style="margin: 0; font-size: 30px; font-weight: 500">Matchmaking</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #6E4D3C">Find your spiritual companion through our compatibility system. We blend Tử Vi wisdom with modern connection to help you discover meaningful bonds.</p>
+          <span class="go" style="margin-top: auto; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px">Explore <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT UNFOLDS: accordion paper strip -->
+  <section style="padding: 112px 24px">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px">
+      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 640px">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">How it unfolds</span>
+        <h2 class="serif" style="margin: 0; font-size: clamp(34px, 4vw, 54px); line-height: 1.08; font-weight: 400">One sheet of paper, four folds.</h2>
+        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #6E4D3C">Hover or tap each fold to open it.</p>
+      </div>
+      <div style="display: flex; height: 380px; overflow-x: auto; box-shadow: 0 30px 50px -36px rgba(63,42,31,.6)">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <button type="button" class="step grain" onClick="{{ s.pick }}" onMouseEnter="{{ s.pick }}" aria-expanded="{{ s.expanded }}" style="flex: {{s.flex}} 1 0; min-width: 96px; position: relative; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 32px 28px; border: 0; text-align: left; cursor: pointer; font: inherit; color: {{s.ink}}; background-color: {{s.bg}}; background-image: {{s.fold}}, url(/textures/paper-grain.png)">
+            <span class="serif" style="font-size: 64px; line-height: 1; font-weight: 300">{{ s.n }}</span>
+            <sc-if value="{{ s.active }}" hint-placeholder-val="{{ false }}">
+              <span style="display: flex; flex-direction: column; gap: 10px; max-width: 420px">
+                <span class="serif" style="font-size: 30px; font-weight: 500">{{ s.title }}</span>
+                <span style="font-size: 16px; line-height: 1.6; opacity: .88">{{ s.body }}</span>
+              </span>
+            </sc-if>
+            <sc-if value="{{ s.inactive }}" hint-placeholder-val="{{ true }}">
+              <span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 14px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase">{{ s.short }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section style="padding: 40px 24px 120px">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px">
+      <h2 class="serif" style="margin: 0; text-align: center; font-size: clamp(34px, 4vw, 54px); font-weight: 400">Voices from our sisters</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px 32px; align-items: start">
+        <figure class="note grain" style="margin: 0; position: relative; padding: 44px 32px 32px; background-color: #FBF8F2; transform: rotate(-2deg); box-shadow: 0 2px 0 #E2D4BC, 0 24px 32px -24px rgba(63,42,31,.55)">
+          <span aria-hidden="true" style="position: absolute; top: -12px; left: 50%; width: 110px; height: 28px; margin-left: -55px; background: rgba(196,168,130,.6); transform: rotate(3deg)"></span>
+          <blockquote class="serif" style="margin: 0; font-size: 20px; line-height: 1.5; font-style: italic">“Thật Space gave me a place to truly be myself. The women here understand depths of life I never thought I could talk about openly.”</blockquote>
+          <figcaption style="margin-top: 24px; display: flex; align-items: center; gap: 14px">
+            <span aria-hidden="true" class="serif" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #DCCAAE 50%, #C4A882 50%); font-size: 20px">H</span>
+            <span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Nguyễn Thanh Hà</strong><span style="font-size: 13px; color: #7A5A48">Hà Nội</span></span>
+          </figcaption>
+        </figure>
+        <figure class="note grain" style="margin: 0; position: relative; padding: 44px 32px 32px; background-color: #FBF8F2; transform: rotate(1.5deg) translateY(28px); box-shadow: 0 2px 0 #E2D4BC, 0 24px 32px -24px rgba(63,42,31,.55)">
+          <span aria-hidden="true" style="position: absolute; top: -12px; left: 50%; width: 110px; height: 28px; margin-left: -55px; background: rgba(196,168,130,.6); transform: rotate(-4deg)"></span>
+          <blockquote class="serif" style="margin: 0; font-size: 20px; line-height: 1.5; font-style: italic">“My Tử Vi reading was so accurate it brought me to tears. This platform honours our Vietnamese roots while making me feel seen and supported.”</blockquote>
+          <figcaption style="margin-top: 24px; display: flex; align-items: center; gap: 14px">
+            <span aria-hidden="true" class="serif" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #DCCAAE 50%, #C4A882 50%); font-size: 20px">C</span>
+            <span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Trần Minh Châu</strong><span style="font-size: 13px; color: #7A5A48">TP. Hồ Chí Minh</span></span>
+          </figcaption>
+        </figure>
+        <figure class="note grain" style="margin: 0; position: relative; padding: 44px 32px 32px; background-color: #FBF8F2; transform: rotate(-1deg); box-shadow: 0 2px 0 #E2D4BC, 0 24px 32px -24px rgba(63,42,31,.55)">
+          <span aria-hidden="true" style="position: absolute; top: -12px; left: 50%; width: 110px; height: 28px; margin-left: -55px; background: rgba(196,168,130,.6); transform: rotate(2deg)"></span>
+          <blockquote class="serif" style="margin: 0; font-size: 20px; line-height: 1.5; font-style: italic">“I found my closest friend through Thật Space. We matched on so many spiritual levels — it felt written in the stars.”</blockquote>
+          <figcaption style="margin-top: 24px; display: flex; align-items: center; gap: 14px">
+            <span aria-hidden="true" class="serif" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #DCCAAE 50%, #C4A882 50%); font-size: 20px">L</span>
+            <span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Lê Phương Linh</strong><span style="font-size: 13px; color: #7A5A48">Đà Nẵng</span></span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding: 0 24px 120px">
+    <div class="grain" style="position: relative; max-width: 1240px; margin: 0 auto; padding: 96px 32px; background-color: #C4A882; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 24px; overflow: hidden; box-shadow: 0 34px 50px -36px rgba(63,42,31,.7)">
+      <div aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: rgba(255,255,255,.12); clip-path: polygon(0 0, 100% 0, 0 100%)"></div>
+      <div aria-hidden="true" style="position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; background: rgba(63,42,31,.1); clip-path: polygon(100% 0, 100% 100%, 0 100%)"></div>
+      <svg class="crane" width="120" height="80" viewBox="0 0 120 80" aria-hidden="true" style="position: relative"><polygon points="52,44 74,2 66,46" fill="#3F2A1F"></polygon><polygon points="8,26 42,44 34,50" fill="#5C3D2E"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#F5F0E8"></polygon><polygon points="34,50 54,62 60,40" fill="#E2D4BC"></polygon><polygon points="44,46 26,4 64,44" fill="#5C3D2E"></polygon><polygon points="74,48 104,14 82,52" fill="#F5F0E8"></polygon><polygon points="104,14 116,22 106,20" fill="#3F2A1F"></polygon></svg>
+      <h2 class="serif" style="position: relative; margin: 0; font-size: clamp(36px, 4.6vw, 64px); line-height: 1.05; font-weight: 400; color: #3F2A1F">Ready to find your space?</h2>
+      <p style="position: relative; margin: 0; max-width: 540px; font-size: 17px; line-height: 1.6; color: #3F2A1F">Join thousands of Vietnamese women who have discovered deeper connection, ancient wisdom, and meaningful friendship in Thật Space.</p>
+      <a href="Forum.dc.html" class="btn btn-ink" style="position: relative; margin-top: 8px; padding: 20px 36px; background: #5C3D2E; color: #F5F0E8; font-weight: 600; font-size: 17px; text-decoration: none; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F, 0 18px 26px -16px rgba(63,42,31,.9)">Join the Community — It’s Free</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background: #3F2A1F; color: #E2D4BC; padding: 56px 24px">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px">
+      <div style="display: flex; align-items: center; gap: 16px">
+        <img src="/logo.jpg" alt="Thật Space" style="width: 56px; height: 56px; display: block; border-radius: 3px">
+        <p class="serif" style="margin: 0; max-width: 340px; font-size: 18px; line-height: 1.4; color: #F5F0E8">A private space for women to connect, grow, and discover.</p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <a href="Forum.dc.html" style="padding: 12px; color: #E2D4BC; text-decoration: none; font-size: 15px">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px; color: #E2D4BC; text-decoration: none; font-size: 15px">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px; color: #E2D4BC; text-decoration: none; font-size: 15px">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px; color: #E2D4BC; text-decoration: none; font-size: 15px">Profile</a>
+      </div>
+      <p style="margin: 0; width: 100%; padding-top: 24px; border-top: 1px dashed rgba(226,212,188,.3); font-size: 13px; color: #C4A882">© 2026 Thật Space. All rights reserved.</p>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"followStrength":{"editor":"range","default":1,"min":0,"max":1.6,"step":0.1,"section":"Lotus"},"idleSway":{"editor":"boolean","default":true,"section":"Lotus"},"$preview":{"width":1440,"height":4000}}'>
+class Component extends DCLogic {
+  setHero = (el) => { this.hero = el; };
+  setStage = (el) => { this.stage = el; };
+
+  componentDidMount() {
+    this.cur = { rx: 4, ry: 0, tx: 0, ty: 0, lx: 0, ly: -0.4, px: 0, py: 0, open: 0 };
+    this.tgt = Object.assign({}, this.cur);
+    this.openTarget = 0;
+    this.lastMove = 0;
+    this.reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tick = (now) => {
+      const idle = now - this.lastMove > 2200;
+      if (idle && this.props.idleSway !== false && !this.reduce) {
+        const s = Math.sin(now / 1900), c = Math.sin(now / 2600);
+        Object.assign(this.tgt, { ry: s * 12, rx: 4 + c * 5, tx: s * 6, ty: 0, lx: s * 0.6, ly: -0.5 + c * 0.2, px: s * 0.2, py: c * 0.15 });
+      } else if (idle) {
+        Object.assign(this.tgt, { ry: 0, rx: 4, tx: 0, ty: 0, lx: 0, ly: -0.4, px: 0, py: 0 });
+      }
+      this.tgt.open = this.openTarget;
+      const k = this.reduce ? 0.3 : 0.075;
+      for (const key in this.cur) this.cur[key] += (this.tgt[key] - this.cur[key]) * (key === 'open' ? 0.05 : k);
+      const el = this.hero;
+      if (el) {
+        const c = this.cur;
+        el.style.setProperty('--rx', c.rx.toFixed(2) + 'deg');
+        el.style.setProperty('--ry', c.ry.toFixed(2) + 'deg');
+        el.style.setProperty('--tx', c.tx.toFixed(2) + 'px');
+        el.style.setProperty('--ty', c.ty.toFixed(2) + 'px');
+        el.style.setProperty('--stem', (Math.atan2(c.tx, 400) * 57.3).toFixed(2) + 'deg');
+        el.style.setProperty('--lx', c.lx.toFixed(3));
+        el.style.setProperty('--ly', c.ly.toFixed(3));
+        el.style.setProperty('--px', c.px.toFixed(3));
+        el.style.setProperty('--py', c.py.toFixed(3));
+        el.style.setProperty('--open', c.open.toFixed(3));
+      }
+      this.raf = window.requestAnimationFrame(tick);
+    };
+    this.raf = window.requestAnimationFrame(tick);
+  }
+
+  componentWillUnmount() {
+    if (this.raf) window.cancelAnimationFrame(this.raf);
+  }
+
+  onMove = (e) => {
+    if (!this.stage || !this.hero) return;
+    const f = this.props.followStrength ?? 1;
+    const r = this.stage.getBoundingClientRect();
+    const h = this.hero.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * 0.4;
+    const clamp = (v) => Math.max(-1, Math.min(1, v));
+    const dx = clamp((e.clientX - cx) / Math.max(320, h.width * 0.5));
+    const dy = clamp((e.clientY - cy) / Math.max(260, h.height * 0.6));
+    Object.assign(this.tgt, {
+      ry: dx * 40 * f, rx: -dy * 32 * f, tx: dx * 22 * f, ty: dy * 12 * f,
+      lx: dx, ly: dy,
+      px: clamp((e.clientX - (h.left + h.width / 2)) / (h.width / 2)),
+      py: clamp((e.clientY - (h.top + h.height / 2)) / (h.height / 2))
+    });
+    this.lastMove = performance.now();
+  };
+
+  onLeave = () => { this.lastMove = 0; };
+
+  onBloom = () => {
+    this.openTarget = this.openTarget ? 0 : 1;
+    this.setState({ bloomed: !!this.openTarget });
+  };
+
+  buildPetals() {
+    const layers = [
+      { n: 8, w: 120, l: 180, cup: 16, openBy: 12, off: 0, z: 0, a: '#B39672', b: '#937552' },
+      { n: 8, w: 106, l: 152, cup: 36, openBy: 22, off: 22.5, z: 6, a: '#D6C2A0', b: '#BFA27A' },
+      { n: 8, w: 86, l: 120, cup: 56, openBy: 30, off: 0, z: 12, a: '#F3EBDD', b: '#DDCDB2' },
+      { n: 5, w: 64, l: 86, cup: 72, openBy: 36, off: 36, z: 20, a: '#FBF8F2', b: '#E8DCC6' }
+    ];
+    const k = 0.16, rad = Math.PI / 180, out = [];
+    const r3 = (v) => Math.round(v * 1000) / 1000;
+    layers.forEach((L) => {
+      for (let i = 0; i < L.n; i++) {
+        const rot = L.off + (360 / L.n) * i;
+        const left = (rot - 55) * rad, right = (rot + 55) * rad;
+        out.push({
+          w: L.w, hw: L.w / 2, l: L.l, rot: r3(rot), z: L.z, cup: L.cup, openBy: L.openBy, a: L.a, b: L.b,
+          cl: r3(k * Math.sin(left)), sl: r3(-k * Math.cos(left)),
+          cr: r3(k * Math.sin(right)), sr: r3(-k * Math.cos(right))
+        });
+      }
+    });
+    return out;
+  }
+
+  renderVals() {
+    if (!this.petals) this.petals = this.buildPetals();
+    const active = (this.state && this.state.step) || 0;
+    const bloomed = !!(this.state && this.state.bloomed);
+    const data = [
+      { n: '01', short: 'Join', title: 'Join the circle', body: 'Create a private profile. Only members see what you share — Thật Space is a closed room, not a feed.' },
+      { n: '02', short: 'Tử Vi', title: 'Read your chart', body: 'Enter your birth date, hour and place to draw your lá số — the 12 palaces of your Tử Vi chart.' },
+      { n: '03', short: 'Forum', title: 'Share & listen', body: 'Bring a question, a story or a worry to the forum. Chị em answer with care.' },
+      { n: '04', short: 'Tìm duyên', title: 'Meet kindred souls', body: 'See compatibility readings with other members and start a conversation when it feels right.' }
+    ];
+    const tones = [
+      { bg: '#FBF8F2', ink: '#5C3D2E' },
+      { bg: '#E2D4BC', ink: '#3F2A1F' },
+      { bg: '#C4A882', ink: '#3F2A1F' },
+      { bg: '#5C3D2E', ink: '#F5F0E8' }
+    ];
+    const steps = data.map((d, i) => Object.assign({}, d, tones[i], {
+      active: i === active,
+      inactive: i !== active,
+      expanded: i === active ? 'true' : 'false',
+      flex: i === active ? 5 : 1,
+      fold: i % 2 === 0
+        ? 'linear-gradient(90deg, rgba(255,255,255,.18), rgba(63,42,31,.10))'
+        : 'linear-gradient(90deg, rgba(63,42,31,.14), rgba(255,255,255,.10))',
+      pick: () => { if ((this.state && this.state.step) !== i) this.setState({ step: i }); }
+    }));
+    return {
+      petals: this.petals,
+      steps,
+      setHero: this.setHero,
+      setStage: this.setStage,
+      onMove: this.onMove,
+      onLeave: this.onLeave,
+      onBloom: this.onBloom,
+      bloomVerb: bloomed ? 'close' : 'bloom',
+      bloomLabel: bloomed ? 'Close the paper lotus' : 'Bloom the paper lotus'
+    };
+  }
+}
+</script>
+</body>
+</html>

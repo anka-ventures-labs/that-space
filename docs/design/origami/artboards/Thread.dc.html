@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Thread</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn-ink{position:relative}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#FBF8F2 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+</style>
+</helmet>
+<div class="ts grain" style="background-color: #F5F0E8; min-height: 100vh">
+  <header style="border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html"><img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)"></a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" aria-current="page" style="padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; background: linear-gradient(transparent 70%, #E2D4BC 70%)">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Profile</a>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width: 880px; margin: 0 auto; padding: 40px 24px 96px; display: flex; flex-direction: column; gap: 40px">
+    <nav aria-label="breadcrumb" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 14px; color: #7A5A48">
+      <a href="Forum.dc.html" style="font-weight: 600">Forum</a>
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" fill="none" stroke="#A88B66" stroke-width="1.5"></path></svg>
+      <span>Relationships</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" fill="none" stroke="#A88B66" stroke-width="1.5"></path></svg>
+      <span style="color: #5C3D2E">Có ai cũng cảm thấy cô đơn…</span>
+    </nav>
+
+    <!-- original post: a letter folded in thirds -->
+    <article class="grain" style="position: relative; padding: 48px 52px 36px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 30px 44px -30px rgba(63,42,31,.55)">
+      <div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(63,42,31,0) 32.8%, rgba(63,42,31,.07) 33.3%, rgba(255,255,255,.5) 33.6%, rgba(63,42,31,0) 36%, rgba(63,42,31,0) 66%, rgba(63,42,31,.07) 66.6%, rgba(255,255,255,.5) 66.9%, rgba(63,42,31,0) 69%)"></div>
+      <div style="position: relative; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+          <span aria-hidden="true" class="serif" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #E2D4BC 50%, #D2BE9C 50%)">C</span>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-weight: 600">Trần Minh Châu</span>
+            <span style="font-size: 13px; color: #7A5A48">Thành viên · 1 ngày trước</span>
+          </div>
+          <span style="margin-left: auto; padding: 6px 12px; font-size: 13px; font-weight: 600; background: #E5D6C2">Relationships</span>
+        </div>
+        <h1 class="serif" style="margin: 0; font-size: clamp(32px, 4vw, 46px); line-height: 1.12; font-weight: 400">Có ai cũng cảm thấy cô đơn trong đám đông không?</h1>
+        <p style="margin: 0; font-size: 18px; line-height: 1.75; color: #4E3326">Mình có rất nhiều bạn bè, luôn được mời đến các buổi tụ tập, nhưng thỉnh thoảng mình vẫn cảm thấy rất cô đơn dù đang ngồi giữa mọi người. Cảm giác này thật kỳ lạ và khó diễn đạt — như kiểu bạn ở đó nhưng không thực sự hiện diện. Mình không chắc đây là vấn đề của mình hay đây là điều mà nhiều người cảm nhận nhưng không dám nói. Mình muốn hỏi chị em ở đây để hiểu hơn về bản thân mình.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 20px; border-top: 1px dashed #D2BE9C">
+          <button type="button" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid #D2BE9C; background: #F5F0E8; font: inherit; font-size: 14px; font-weight: 500; color: #5C3D2E; cursor: pointer; border-radius: 2px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M12 20 3.5 11.5 7 5l5 3 5-3 3.5 6.5z"></path><path d="M12 8v12"></path></svg>Thích</button>
+          <button type="button" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid #D2BE9C; background: #F5F0E8; font: inherit; font-size: 14px; font-weight: 500; color: #5C3D2E; cursor: pointer; border-radius: 2px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H10l-5 4v-4H4z"></path></svg>Trả lời</button>
+          <button type="button" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid #D2BE9C; background: #F5F0E8; font: inherit; font-size: 14px; font-weight: 500; color: #5C3D2E; cursor: pointer; border-radius: 2px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 21 3l-6 18-3-8z"></path><path d="m12 13 9-10"></path></svg>Chia sẻ</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- replies on a thread of string -->
+    <section aria-labelledby="replies-h" style="display: flex; flex-direction: column; gap: 24px">
+      <h2 id="replies-h" class="serif" style="margin: 0; font-size: 26px; font-weight: 500">4 phản hồi <span style="font-size: 16px; color: #7A5A48">(63 tổng)</span></h2>
+      <div style="position: relative; display: flex; flex-direction: column; gap: 20px; padding-left: 36px">
+        <span aria-hidden="true" style="position: absolute; left: 11px; top: 0; bottom: 0; border-left: 2px dashed #C4A882"></span>
+        <sc-for list="{{ replies }}" as="r" hint-placeholder-count="4">
+          <div class="grain" data-testid="reply-card" style="position: relative; padding: 24px 28px; background-color: {{r.bg}}; transform: rotate({{r.tilt}}deg); box-shadow: 0 2px 0 #E2D4BC, 0 16px 24px -20px rgba(63,42,31,.5)">
+            <span aria-hidden="true" style="position: absolute; left: -32px; top: 28px; width: 16px; height: 16px; background: #C4A882; transform: rotate(45deg)"></span>
+            <span aria-hidden="true" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; background: linear-gradient(315deg, #F5F0E8 50%, #D2BE9C 50%)"></span>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px">
+              <span aria-hidden="true" class="serif" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: linear-gradient(135deg, #E2D4BC 50%, #D2BE9C 50%)">{{ r.initial }}</span>
+              <span style="font-weight: 600; font-size: 15px">{{ r.author }}</span>
+              <span style="font-size: 13px; color: #7A5A48">· {{ r.time }}</span>
+            </div>
+            <p style="margin: 0; font-size: 16px; line-height: 1.7; color: #4E3326">{{ r.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- reply box: lined paper -->
+    <section class="grain" style="padding: 32px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 22px 32px -26px rgba(63,42,31,.5); display: flex; flex-direction: column; gap: 16px">
+      <label for="reply" class="serif" style="font-size: 22px; font-weight: 500">Viết phản hồi</label>
+      <textarea id="reply" rows="5" placeholder="Chia sẻ suy nghĩ của bạn…" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 4px 6px; font: inherit; font-size: 16px; line-height: 32px; color: #5C3D2E; border: 0; border-top: 1px solid #E2D4BC; background: repeating-linear-gradient(transparent 0 31px, #E2D4BC 31px 32px); outline-color: #8A6450"></textarea>
+      <div style="display: flex; justify-content: flex-end">
+        <button type="button" class="btn-ink" style="min-height: 48px; padding: 0 26px; border: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; background: #5C3D2E; color: #F5F0E8; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F">Đăng phản hồi</button>
+      </div>
+    </section>
+
+    <a href="Forum.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; text-decoration: none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 12H5m6-6-6 6 6 6"></path></svg>Quay lại Forum</a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const replies = [
+      ['Nguyễn Thị Mai', '23 giờ trước', 'Mình hoàn toàn hiểu cảm giác này! Đó không phải là điều gì sai với bạn đâu. Nhiều khi sự kết nối bề mặt không đủ để lấp đầy cái cô đơn sâu bên trong. Mình đọc sách về điều này và thấy rất nhiều người cùng trải qua.'],
+      ['Phan Thị Lan', '20 giờ trước', 'Cảm ơn bạn đã dũng cảm chia sẻ điều này. Mình cũng từng trải qua và tìm ra rằng mình cần những cuộc trò chuyện chiều sâu hơn là những buổi tụ tập đông người. Bạn thử tìm những người bạn cùng sở thích sâu sắc hơn xem sao.'],
+      ['Võ Thanh Thảo', '15 giờ trước', 'Cảm giác này có tên gọi là ‘existential loneliness’ và rất nhiều người trải qua nó. Đây không phải lỗi của bạn — đôi khi chúng ta cần không gian để nhìn vào bên trong, và Thật Space chính là nơi tốt để làm điều đó.'],
+      ['Bùi Minh Hạnh', '10 giờ trước', 'Thread này chạm đến lòng mình quá! Mình đã nghĩ chỉ có mình mới như vậy. Biết được rằng nhiều chị em cùng cảm nhận cũng khiến mình thấy bớt cô đơn hơn một chút rồi.']
+    ];
+    const bgs = ['#FBF8F2', '#F3EBDD', '#FBF8F2', '#F3EBDD'];
+    const tilts = [-0.4, 0.3, -0.2, 0.4];
+    return {
+      replies: replies.map((r, i) => ({ author: r[0], time: r[1], body: r[2], initial: r[0].split(' ').pop()[0], bg: bgs[i], tilt: tilts[i] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

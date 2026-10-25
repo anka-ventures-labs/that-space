@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Tử Vi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn{position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#FBF8F2 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+.field{width:100%;box-sizing:border-box;min-height:48px;padding:0 14px;font:inherit;font-size:15px;color:#5C3D2E;background:#F5F0E8;border:0;border-bottom:2px solid #C4A882;border-radius:0;outline-color:#8A6450}
+.unfold{animation:unfold .9s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 0}
+.unfold-row{animation:unfold .7s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 0}
+.palace{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.palace:hover{transform:translateY(-3px)}
+@keyframes unfold{from{opacity:0;transform:perspective(900px) rotateX(-80deg)}to{opacity:1;transform:perspective(900px) rotateX(0)}}
+@media (prefers-reduced-motion:reduce){.unfold,.unfold-row{animation:none}}
+</style>
+</helmet>
+<div class="ts grain" style="background-color: #F5F0E8; min-height: 100vh">
+  <header style="border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html"><img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)"></a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Forum</a>
+        <a href="TuVi.dc.html" aria-current="page" style="padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; background: linear-gradient(transparent 70%, #E2D4BC 70%)">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Profile</a>
+        <a href="Main.dc.html" class="btn btn-ink" style="margin-left: 10px; padding: 12px 22px; background: #5C3D2E; color: #F5F0E8; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 2px; box-shadow: 0 2px 0 #3F2A1F">Join</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- dark header: night sky of folded stars -->
+  <section class="grain" style="position: relative; overflow: hidden; padding: 72px 24px 96px; background-color: #3F2A1F; color: #F5F0E8">
+    <svg aria-hidden="true" width="100%" height="100%" style="position: absolute; top: 0; left: 0; opacity: .9" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMid slice">
+      <g fill="#C4A882"><polygon points="1180,60 1188,84 1212,92 1188,100 1180,124 1172,100 1148,92 1172,84"></polygon><polygon points="1180,60 1188,84 1180,92" fill="#A88B66"></polygon><polygon points="1180,92 1212,92 1188,100" fill="#A88B66"></polygon><polygon points="1180,92 1180,124 1172,100" fill="#A88B66"></polygon><polygon points="1180,92 1148,92 1172,84" fill="#A88B66"></polygon></g>
+      <g fill="#E2D4BC"><polygon points="1300,190 1305,204 1319,209 1305,214 1300,228 1295,214 1281,209 1295,204"></polygon></g>
+      <g fill="#8A6450"><polygon points="1050,220 1054,231 1065,235 1054,239 1050,250 1046,239 1035,235 1046,231"></polygon></g>
+      <g fill="#C4A882"><polygon points="90,280 94,291 105,295 94,299 90,310 86,299 75,295 86,291"></polygon></g>
+      <circle cx="1360" cy="96" r="44" fill="#E2D4BC"></circle><circle cx="1380" cy="86" r="44" fill="#3F2A1F"></circle>
+    </svg>
+    <div style="position: relative; max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; max-width: 1240px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #C4A882">Chiêm tinh Việt</span>
+      <h1 class="serif" style="margin: 0; font-size: clamp(42px, 5vw, 72px); line-height: 1.02; font-weight: 400">Tử Vi — <em style="color: #C4A882">Lá Số Tử Vi</em></h1>
+      <p style="margin: 0; max-width: 680px; font-size: 18px; line-height: 1.65; color: #E2D4BC">Tử Vi là hệ thống chiêm tinh học cổ đại của người Việt, được xây dựng dựa trên ngày giờ sinh để lập lá số 12 cung mệnh — tiết lộ tính cách, duyên số và những giai đoạn quan trọng trong cuộc đời bạn.</p>
+    </div>
+  </section>
+
+  <section style="padding: 0 24px 96px">
+    <div style="max-width: 1240px; margin: -48px auto 0; position: relative; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+      <!-- form card -->
+      <form class="grain" style="flex: 1 1 320px; max-width: 400px; padding: 36px 32px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 30px 44px -30px rgba(63,42,31,.6); display: flex; flex-direction: column; gap: 22px">
+        <h2 class="serif" style="margin: 0; font-size: 26px; font-weight: 500">Nhập thông tin của bạn</h2>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="tuvi-name" style="font-size: 13px; font-weight: 600">Họ và tên <span style="font-weight: 400; color: #7A5A48">· Name</span></label>
+          <input id="tuvi-name" class="field" type="text" placeholder="e.g. Nguyễn Thị Mai" value="Nguyễn Thị Mai">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="tuvi-dob" style="font-size: 13px; font-weight: 600">Ngày sinh <span style="font-weight: 400; color: #7A5A48">· Date of birth</span></label>
+          <input id="tuvi-dob" class="field" type="date">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="tuvi-tob" style="font-size: 13px; font-weight: 600">Giờ sinh <span style="font-weight: 400; color: #7A5A48">· Time of birth</span></label>
+          <input id="tuvi-tob" class="field" type="time">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="tuvi-pob" style="font-size: 13px; font-weight: 600">Nơi sinh <span style="font-weight: 400; color: #7A5A48">· Place of birth</span></label>
+          <input id="tuvi-pob" class="field" type="text" placeholder="e.g. Hà Nội">
+        </div>
+        <button type="button" class="btn btn-ink" onClick="{{ onGenerate }}" style="margin-top: 6px; min-height: 54px; border: 0; cursor: pointer; font: inherit; font-size: 16px; font-weight: 600; background: #5C3D2E; color: #F5F0E8; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F; display: flex; align-items: center; justify-content: center; gap: 10px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"></path></svg>
+          {{ generateLabel }}
+        </button>
+      </form>
+
+      <!-- chart -->
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <sc-if value="{{ folded }}" hint-placeholder-val="{{ false }}">
+          <div class="grain" style="position: relative; min-height: 620px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 48px; text-align: center; background-color: #EFE7DA; box-shadow: 0 2px 0 #E2D4BC, 0 30px 44px -30px rgba(63,42,31,.5)">
+            <div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent 49.8%, rgba(63,42,31,.12) 50%, transparent 50.2%), linear-gradient(-45deg, transparent 49.8%, rgba(63,42,31,.12) 50%, transparent 50.2%), linear-gradient(90deg, transparent 49.85%, rgba(63,42,31,.1) 50%, transparent 50.15%), linear-gradient(0deg, transparent 49.85%, rgba(63,42,31,.1) 50%, transparent 50.15%)"></div>
+            <p class="serif" style="position: relative; margin: 0; font-size: 30px">Lá số của bạn đang gấp lại</p>
+            <p style="position: relative; margin: 0; max-width: 380px; font-size: 16px; line-height: 1.6; color: #6E4D3C">Fill in your birth details and press Generate — your 12-palace chart unfolds here.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+          <div class="unfold" style="display: flex; flex-direction: column; gap: 20px">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+              <h2 class="serif" style="margin: 0; font-size: 30px; font-weight: 500">Your Reading</h2>
+              <p style="margin: 0; font-size: 14px; color: #7A5A48">Nguyễn Thị Mai · 1996 · Hà Nội — tap a highlighted palace</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(118px, auto)); gap: 8px">
+              <sc-for list="{{ palaces }}" as="p" hint-placeholder-count="12">
+                <sc-if value="{{ p.live }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" class="palace grain" onClick="{{ p.pick }}" aria-pressed="{{ p.pressed }}" style="grid-row: {{p.row}}; grid-column: {{p.col}}; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 14px; border: 0; cursor: pointer; font: inherit; text-align: left; color: {{p.ink}}; background-color: {{p.bg}}; box-shadow: 0 2px 0 {{p.edge}}, 0 12px 18px -14px rgba(63,42,31,.6)">
+                    <span style="font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .8">{{ p.branch }}</span>
+                    <span class="serif" style="font-size: 20px; font-weight: 500">{{ p.name }}</span>
+                    <span style="font-size: 12px; font-weight: 600">{{ p.topic }}</span>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ p.quiet }}" hint-placeholder-val="{{ true }}">
+                  <div style="grid-row: {{p.row}}; grid-column: {{p.col}}; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; padding: 14px; background: #F3EBDD; box-shadow: inset 0 0 0 1px #E2D4BC">
+                    <span style="font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #7A5A48">{{ p.branch }}</span>
+                    <span class="serif" style="font-size: 18px; color: #6E4D3C">{{ p.name }}</span>
+                    <span style="font-size: 12px; color: #7A5A48">Full report</span>
+                  </div>
+                </sc-if>
+              </sc-for>
+              <!-- center: the open reading -->
+              <div class="grain" style="grid-row: 2 / 4; grid-column: 2 / 4; position: relative; padding: 26px 28px; background-color: #5C3D2E; color: #F5F0E8; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+                <svg aria-hidden="true" width="120" height="120" viewBox="0 0 48 48" style="position: absolute; right: -24px; bottom: -24px; opacity: .25"><polygon points="24,4 30,18 44,24 30,30 24,44 18,30 4,24 18,18" fill="#C4A882"></polygon></svg>
+                <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #C4A882">Cung {{ sel.name }} · {{ sel.topic }}</span>
+                <sc-for list="{{ sel.lines }}" as="line" hint-placeholder-count="3">
+                  <p class="unfold-row" style="position: relative; margin: 0; font-size: 15px; line-height: 1.6; color: #F5F0E8">{{ line }}</p>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+              <button type="button" class="btn" style="min-height: 50px; padding: 0 24px; border: 2px solid #5C3D2E; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; background: #FBF8F2; color: #5C3D2E; border-radius: 2px; box-shadow: 0 3px 0 #C4A882; display: inline-flex; align-items: center; gap: 10px">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"></path></svg>Download PDF Report</button>
+              <p style="margin: 0; font-size: 13px; color: #7A5A48">Chức năng tải xuống PDF sẽ có trong phiên bản chính thức</p>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startOpen":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":2700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const open = s.open === undefined ? (this.props.startOpen ?? true) : s.open;
+    const selKey = s.sel || 'Phu Thê';
+    const readings = {
+      'Phu Thê': { topic: 'Love & Relationships', lines: [
+        'Sao Hồng Loan chiếu mệnh mang đến nguồn năng lượng tình cảm rực rỡ trong năm nay, giúp bạn thu hút những kết nối tâm hồn sâu sắc và chân thực.',
+        'Với những người độc thân, một mối tình đẹp đang chờ đợi vào khoảng tháng 7–9 — hãy mở lòng đón nhận cơ hội bất ngờ.',
+        'Với những người đã có đôi, tình cảm sẽ thêm gắn kết và ổn định, đây là thời điểm lý tưởng để cùng nhau xây dựng nền móng lâu dài cho tương lai.'] },
+      'Quan Lộc': { topic: 'Career & Purpose', lines: [
+        'Sao Thiên Phúc và Lộc Tồn cùng hội tụ, báo hiệu một năm thịnh vượng về mặt nghề nghiệp và sự phát triển cá nhân đáng kể.',
+        'Bạn có khả năng được thăng tiến hoặc tìm được cơ hội mới phù hợp với đam mê thực sự của mình — hãy dũng cảm bước ra khỏi vùng an toàn.',
+        'Đây là thời điểm người ta sẵn sàng lắng nghe và công nhận những ý tưởng sáng tạo của bạn, vì vậy hãy mạnh dạn chia sẻ tầm nhìn của mình.'] },
+      'Phúc Đức': { topic: 'Spiritual Outlook', lines: [
+        'Mệnh bạn thuộc Hỏa cục, nhưng năm nay được sao Thiên Lương bổ trợ, giúp tâm trí thêm bình thản, sáng suốt và kết nối sâu sắc hơn với trực giác nội tâm.',
+        'Đây là thời điểm vàng để thiền định, học hỏi tâm linh hoặc bắt đầu hành trình chữa lành nội tâm — những thực hành nhỏ mỗi ngày sẽ tạo ra sự thay đổi lớn.',
+        'Những giấc mơ của bạn trong năm nay sẽ mang nhiều thông điệp ý nghĩa; hãy ghi chép lại và lắng nghe tiếng nói của vũ trụ dành riêng cho bạn.'] }
+    };
+    const names = ['Mệnh', 'Phụ Mẫu', 'Phúc Đức', 'Điền Trạch', 'Quan Lộc', 'Nô Bộc', 'Thiên Di', 'Tật Ách', 'Tài Bạch', 'Tử Tức', 'Phu Thê', 'Huynh Đệ'];
+    const branches = ['Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn'];
+    const pos = [[1,1],[1,2],[1,3],[1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1],[3,1],[2,1]];
+    const palaces = names.map((n, i) => {
+      const live = !!readings[n];
+      const on = n === selKey;
+      return {
+        name: n, branch: branches[i], row: pos[i][0], col: pos[i][1],
+        live, quiet: !live,
+        topic: live ? readings[n].topic : '',
+        pressed: on ? 'true' : 'false',
+        bg: on ? '#C4A882' : '#FBF8F2',
+        ink: on ? '#3F2A1F' : '#5C3D2E',
+        edge: on ? '#A88B66' : '#E2D4BC',
+        pick: () => this.setState({ sel: n })
+      };
+    });
+    return {
+      open, folded: !open,
+      palaces,
+      sel: { name: selKey, topic: readings[selKey].topic, lines: readings[selKey].lines },
+      generateLabel: open ? 'Fold & regenerate' : 'Generate Reading',
+      onGenerate: () => {
+        if (open) { this.setState({ open: false }); setTimeout(() => this.setState({ open: true }), 450); }
+        else this.setState({ open: true });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
