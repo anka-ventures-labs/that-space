@@ -33,7 +33,8 @@ function invoke(params) {
     topic_id: context.topic_id,
     post_id: context.post_id,
     private_message: context.private_message,
-    participants: context.participants,
+    // A comma-separated string in private messages, an array of usernames in chat.
+    participants: Array.isArray(context.participants) ? context.participants.join(", ") : context.participants,
     channel_id: context.channel_id,
     message_id: context.message_id,
   };

@@ -1691,3 +1691,36 @@ fallback as able to hide operational faults. With CI showing Discourse never
 refuses the chat-off case it was meant for, the fallback was removed: chat
 notices retry and then dead-letter visibly. Envelope ids are now also
 required to be safe integers.
+
+# 2026-10-25 — Live rollout of PRs #5 and #6
+
+Minh approved going live without a backup (no real members). Merged #5
+(`ea6de42`) and #6 (`5fe1666`). On the ASUS, moved the old source to
+`source-pre-5fe1666-20261025` and extracted `5fe1666` into `source`; no
+container rebuild was needed (core, plugins and component pins unchanged).
+The community and presentation bootstraps were checked, applied and rechecked
+with no drift. The first presentation apply failed inside the brand theme import
+with no partial cutover (imports run first); the immediate rerun succeeded.
+Horizon (−2) is now the default, with the Thật Space Horizon palette and the
+brand, Topic List Thumbnails and User Portfolio components. The brand component's
+`ba_moi_username` was set to `Ba_Moi_bot` (−1201). The AI installer then applied
+the chat-DM permission, prompt and tool scripts, with no drift afterwards.
+
+Host: the 3.2 GiB ASUS was swapping (1.2–1.7 GiB). Theme compilation and the
+runner sessions caused about two minutes of 502/503 while the web process
+restarted, "can't alloc thread" job errors, and repeated Sidekiq heartbeat
+restarts. No OOM kill was recorded.
+
+Live QA as `ts_qa_nam` in direct chat 3 found two issues:
+1. In chat, Discourse AI sends tool `participants` as a list, so the service
+   returned 400 and Bà Mối said she could not open her records. Fixed in the
+   tool script, applied live through the installer, and also made tolerant in
+   the service (`fix/ba-moi-chat-live`). The retest used the status tool
+   correctly (paused profile, Duyên box).
+2. Discourse AI's design for AI direct chats: each top-level member message
+   becomes its own forced thread, the reply goes in that thread, and the AI's
+   context is only that thread. Within a thread, multi-turn context works. Not
+   yet a flat chat; options are being presented to Minh.
+
+The Vercel service is unchanged and `BA_MOI_NOTICE_TRANSPORT` stays `pm`
+until the threading decision.
