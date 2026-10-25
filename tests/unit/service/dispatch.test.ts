@@ -91,6 +91,16 @@ describe('tool auth and envelope', () => {
     }
   })
 
+  it('accepts the chat context Discourse AI sends, with participants as a list', async () => {
+    const user = testUser('mai')
+    const chatAuth = { user_id: user.user_id, username: user.username, channel_id: 3, message_id: 9, private_message: false, participants: ['mai', 'Ba_Moi_bot'] }
+    const result = await h.call('status', user, {}, { auth: chatAuth })
+    expect(result.status).toBe(200)
+    expect(result.body.ok).toBe(true)
+    // A chat is never remembered as her private-message thread.
+    expect((await getMemberByDiscourseId(h.db, user.user_id))?.personaTopicId).toBeNull()
+  })
+
   it('fails closed with a generic message when the database is down', async () => {
     const broken = { ...h.deps, db: { query: async () => { throw new Error('connection refused: secret host') }, transaction: async () => { throw new Error('x') } } }
     const response = await handleToolRequest('status', new Request('https://svc.test/x', {

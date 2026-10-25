@@ -35,8 +35,8 @@ const EnvelopeSchema = z.object({
     post_id: z.number().int().positive().safe().nullish(),
     /** Whether the conversation is a private message; only then can it be her thread with Bà Mối. */
     private_message: z.boolean().nullish(),
-    /** The private message's usernames, comma-separated (Discourse AI's context.participants). */
-    participants: z.string().max(2000).nullish(),
+    /** The conversation's usernames (Discourse AI's context.participants): comma-separated in private messages, a list in chat. */
+    participants: z.union([z.string().max(2000), z.array(z.string().max(60)).max(50).transform((names) => names.join(', '))]).nullish(),
     /** In Discourse Chat: the direct chat and the member message that triggered this turn. */
     channel_id: z.number().int().positive().safe().nullish(),
     message_id: z.number().int().positive().safe().nullish(),
