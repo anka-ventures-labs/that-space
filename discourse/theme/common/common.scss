@@ -85,7 +85,14 @@ h2,
 }
 
 // The feed is one list (top_menu=latest), so the lone list tab is noise.
-.list-controls .nav-pills {
+// Core styles it by id, so match the id to win.
+.list-controls #navigation-bar {
+  display: none;
+}
+
+// Categories live in the sidebar; the home feed needs no filter above it.
+// Category pages keep their breadcrumb so subcategories stay reachable.
+.navigation-topics .list-controls .category-breadcrumb {
   display: none;
 }
 

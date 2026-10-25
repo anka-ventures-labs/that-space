@@ -1596,3 +1596,8 @@ core's serialized `currentUser.any_posts` (no request, no browser storage; this
 also retires the per-account storage finding) and the tab rule applies to all
 list controls. The "Chưa phân loại" entry in one screenshot comes from
 Discourse's `create_post` spec helper enabling uncategorized topics.
+
+Fourth CI run (`3be4953`): request 29/29, browser 5/6. Only the lone tab
+remained: core styles `#navigation-bar` by id, which outranks a class rule. The
+rule now targets the id, and the home-only category breadcrumb is hidden via
+core's `navigation-topics` body class.
