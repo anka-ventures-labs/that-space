@@ -1,0 +1,17 @@
+{
+  "_comment": "Light palette applied to core Horizon. Horizon derives accents, links, sidebar and background tints from tertiary, so tertiary is the brand brown (white text passes WCAG AA on it).",
+  "colors": {
+    "primary": "33231c",
+    "secondary": "fbf8f3",
+    "tertiary": "7a4e36",
+    "quaternary": "a85c69",
+    "header_background": "fbf8f3",
+    "header_primary": "33231c",
+    "highlight": "e8ddce",
+    "selected": "eadfce",
+    "hover": "f1e9dd",
+    "danger": "9c423a",
+    "success": "55705a",
+    "love": "a85c69"
+  }
+}

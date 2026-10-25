@@ -88,7 +88,7 @@ RSpec.describe "Thật Space community bootstrap" do
     expect(Guardian.new(staff).can_post_in_category?(announcements)).to eq(true)
   end
 
-  it "creates private editable signup fields with the manifest choices" do
+  it "creates private editable fields, asking only membership questions at signup" do
     apply_that_space_community!
 
     defaults = that_space_manifest.fetch("user_field_defaults")
@@ -98,7 +98,13 @@ RSpec.describe "Thật Space community bootstrap" do
       defaults.each do |attribute, expected|
         expect(field.public_send(attribute)).to eq(expected)
       end
-      expect(field.on_signup?).to eq(true)
+      if definition.fetch("asked", "signup") == "signup"
+        expect(field.on_signup?).to eq(true)
+        expect(field.show_on_signup).to eq(true)
+      else
+        expect(field.optional?).to eq(true)
+        expect(field.show_on_signup).to eq(false)
+      end
       expect(field.for_all_users?).to eq(false)
       expect(field.user_field_options.pluck(:value)).to eq(definition.fetch("options"))
     end

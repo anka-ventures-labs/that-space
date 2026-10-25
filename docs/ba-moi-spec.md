@@ -102,7 +102,8 @@ matchmaking logic and thin glue are ours.
 ## Member journey
 
 1. **Join.** Any adult opens the public signup link, completes Google OAuth,
-   confirms they are at least 18 and answers the 15 community signup questions.
+   confirms they are at least 18 and answers Q1 (role). The other 14 community
+   questions are optional and answered later from her profile.
    The account becomes active without an invitation or staff approval; local
    password signup and login are disabled.
 

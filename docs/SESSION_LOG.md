@@ -1534,3 +1534,38 @@ community, the lotus blooms, and a fresh incognito signup reaches Google with
 the exact port-8443 callback. Rollback deployment
 `dpl_DmkUUcW8PaGB4SBAnHUHPKYQa6VQ` remains Ready. Full nonsecret evidence is in
 `docs/verification/vercel-prebuilt-f1a844f-production.json`.
+
+# 2026-10-25 — Member happy path on Discourse Horizon
+
+Minh reviewed the live community and found the post-signup screen clunky for
+non-technical members: duplicate logo/navigation, chat links, filters, four
+tabs, a hero repeating the nav, a staff email notice and untranslated labels,
+after a 16-question signup. Decision: stay on Discourse and rebuild the member
+layout around one clear path instead of switching platforms.
+
+Members now get core Horizon (pinned revision `c237680`, 2026.10.0-latest) with
+an owned `Thật Space Brand` component and "Thật Space Horizon" palette. The old
+full theme and our second navigation bar are gone from the member path; the old
+theme stays installed as the rollback target. The bootstrap reconciles the
+community sidebar to Bảng tin / Sự kiện / Triển lãm / Tin nhắn (+ staff-only
+Kiểm duyệt / Quản trị), the theme adds Bà Mối as the second link, and site
+settings remove tabs, welcome banner, user tips, the tutorial bot, chat, tags,
+uncategorized and the events plugin's English link. Home shows one first-step
+card ("Viết lời giới thiệu", opening a prefilled Giới thiệu post) until the
+member has posted, with Bà Mối as the quiet secondary action. "Chủ đề mới" is
+relabelled "Viết bài". Signup now requires only the 18+ attestation and Q1;
+the other 14 questions are optional profile fields (`asked: "later"`).
+
+Skipped: Discourse forks or a headless Next.js member UI (more cost than the
+problem needs), and switching platforms (Flarum 2 still RC; others would mean
+rebuilding the Google-only, privacy and Bà Mối integration). Known risks:
+Discourse discourages components on Horizon, so browser acceptance guards our
+component plus Portfolio/Thumbnails; existing members keep their old sidebar
+categories; Bà Mối opens a new PM each time; outgoing email remains disabled.
+Thảo has not reviewed the reduced signup yet.
+
+Local verification: Ruby/JSON/YAML syntax, gjs template parsing with
+content-tag, 31 files / 224 Vitest tests, typecheck and lint pass. The
+Discourse request/browser acceptance (Horizon, palette, sidebar, first-step
+journey, signup contract) runs only in GitHub CI. Production apply has not
+happened. Design: `docs/design/member-happy-path.md`.

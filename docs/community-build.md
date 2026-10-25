@@ -60,15 +60,16 @@ The community reconciler owns its marked categories/groups, external-ID user
 fields and named role automation. Same-named unowned records cause a conflict;
 resolve ownership deliberately before reapplying. It creates 13 categories
 (including four art subcategories), staff-post/member-read announcements, five
-private interest groups, one required 18+ attestation, and all 15 required,
-editable community signup questions. Answers are excluded from other members'
+private interest groups, one required 18+ attestation, the required Q1 role
+question, and 14 optional, editable community questions that are not shown at
+signup (`asked: "later"`). Answers are excluded from other members'
 profiles/cards/search. They never populate
 the matchmaking pool without its separate consent flow. Interest groups grant
 neither trust levels nor staff access.
 
 Privacy is enforced at the site boundary by required login. Google is the only
 self-service identity path; local passwords are disabled, and signup requires
-the 18+ attestation plus all community fields. Category ACLs use Discourse's
+the 18+ attestation plus Q1. Category ACLs use Discourse's
 standard `everyone` audience inside that private site, with staff-only posting
 in announcements. This permits native
 profile featured topics; core refuses to feature topics in group-restricted
@@ -81,20 +82,24 @@ adds membership but does not remove a previous selection. Q4/Q8 have separate
 storage keys; Q15 preserves its four offered answers and leaves the unused Art
 action unmapped. Source provenance is recorded in the manifest and phase plan.
 
-The presentation reconciler stores theme ownership in `PluginStore`, detects
-source/field/settings drift, imports local pinned sources, preserves unrelated
-child components, and sets the default member theme. The gallery uses image
+The presentation reconciler stores theme and palette ownership in
+`PluginStore`, detects source/field/settings drift, imports local pinned
+sources, preserves unrelated child components, and makes core Horizon the
+default member theme with the owned `Thật Space Brand` component, palette,
+Portfolio and Topic List Thumbnails attached. It also reconciles the community
+sidebar links, the `Viết bài` label and the quiet-onboarding site settings
+described in the [member happy path](design/member-happy-path.md). The gallery uses image
 tiles; the artist's Tác phẩm tab queries her own topics in Triển lãm. Member
 profiles allow bios, headers and featured topics. Follow is enabled for
 members with topic notifications and opt-out. Hosts may create their own events;
 members can RSVP; Host interest membership does not permit staff administration.
 
-The theme links forum, gallery, events and the member's profile. Set
-`ba_moi_username` to the exact installed AI account after running the existing
-Bà Mối installer/probe. Its private-message CTA is part of the public launch. It uses
-Discourse's composer and private-message permissions. Gallery/event links are
-same-site paths. Vietnamese navigation, palette and logo are included for
-desktop/mobile. Inter and Playfair Display are self-hosted theme assets with
+The sidebar carries Bảng tin, Bà Mối, Sự kiện, Triển lãm and Tin nhắn. Set
+`ba_moi_username` on the brand component to the exact installed AI account
+after running the existing Bà Mối installer/probe; until then the Bà Mối link is
+hidden. It uses Discourse's composer and private-message permissions. A member
+with no posts sees one first-step card on the home feed. Vietnamese navigation,
+palette and logo are included for desktop/mobile. Inter and Playfair Display are self-hosted theme assets with
 Latin/Vietnamese subsets; provenance and SIL licenses are retained in
 `discourse/theme/assets/`. Browser acceptance verifies the imported theme.
 The same owned logo upload configures Discourse's desktop/mobile header.
@@ -104,10 +109,11 @@ alongside failure diagnostics.
 ## Acceptance and live boundaries
 
 The request/browser specs exercise a completed Google OAuth handoff, rejection
-of password signup/login, all 16 required fields, topics/replies, notifications,
+of password signup/login, the two required signup fields, later profile answers, topics/replies, notifications,
 moderation flags, private profile answers, member profiles/artwork,
-following/opt-out, Host events/RSVP, theme import/drift, guest navigation and the
-Bà Mối composer. Test members and events are synthetic. These tests do not
+following/opt-out, Host events/RSVP, theme import/drift, Horizon/palette and
+sidebar reconciliation, the first-step journey, guest navigation and the Bà Mối
+composer. Test members and events are synthetic. These tests do not
 claim outgoing email delivery or an actual AI model response.
 
 The no-email release uses Google verification in place of activation mail and

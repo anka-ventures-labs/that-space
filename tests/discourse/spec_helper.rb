@@ -51,12 +51,18 @@ module ThatSpaceCommunitySpecSupport
     UserField.find_by!(name: definition.fetch("question"))
   end
 
+  # Answers for the questions asked at signup (18+ and Q1 role). The other
+  # questions are optional and answered later from the member's profile.
   def that_space_signup_fields
-    that_space_manifest.fetch("user_fields").to_h do |definition|
-      field = configured_user_field(definition.fetch("key"))
-      first_option = definition.fetch("options").first
-      [field.id.to_s, definition.fetch("type") == "multiselect" ? [first_option] : first_option]
+    that_space_manifest.fetch("user_fields").select { |definition| definition.fetch("asked", "signup") == "signup" }.to_h do |definition|
+      that_space_answer(definition.fetch("key"))
     end
+  end
+
+  def that_space_answer(key)
+    definition = that_space_manifest.fetch("user_fields").find { |item| item.fetch("key") == key }
+    first_option = definition.fetch("options").first
+    [configured_user_field(key).id.to_s, definition.fetch("type") == "multiselect" ? [first_option] : first_option]
   end
 end
 

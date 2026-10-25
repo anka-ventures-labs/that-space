@@ -9,7 +9,8 @@ chúng không cấp quyền quản trị hay kiểm duyệt.
 ## Tiếp nhận thành viên
 
 1. Thành viên chọn Đăng ký, hoàn tất Google OAuth, xác nhận điều kiện 18+ và
-   hoàn thành 15 câu hỏi cộng đồng. Không yêu cầu ảnh giấy tờ tùy thân.
+   trả lời Q1 (vai trò). 14 câu hỏi cộng đồng còn lại là tùy chọn, thành viên
+   trả lời sau trong hồ sơ. Không yêu cầu ảnh giấy tờ tùy thân.
 2. Câu trả lời mặc định chỉ thành viên đó và
    nhân sự có quyền quản trị xem được; thành viên khác không xem được qua hồ sơ
    hoặc thẻ người dùng.

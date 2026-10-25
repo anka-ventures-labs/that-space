@@ -25,8 +25,11 @@ with the full community and Bà Mối experience available from day one:
   Bà Mối remain in the authenticated Discourse community;
 - anyone aged 18 or older may register with Google, without an invitation or
   staff approval;
-- Discourse requires an explicit 18+ attestation and all 15 private community
-  onboarding answers;
+- Discourse signup requires only the explicit 18+ attestation and the Q1 role;
+  the other 14 private community questions are optional on the member profile;
+- members land on core Horizon with one sidebar navigation, one feed and a
+  single "Viết lời giới thiệu" first step
+  ([member happy path](docs/design/member-happy-path.md));
 - onboarding answers are private by default and are not sent to Bà Mối;
 - Bà Mối is available to ordinary registered members, with separate consent,
   a private interview, anonymous discovery, signals, relay chat, mutual reveal,
@@ -123,8 +126,9 @@ enforces:
   the account;
 - outgoing email disabled; Google verification replaces email activation.
 
-The first required signup field is the exact 18+ self-attestation. The next 15
-fields are Thảo's community onboarding questions. Do not collect identity
+The first required signup field is the exact 18+ self-attestation; Q1 (role) is
+the only other required signup question. Thảo's remaining 14 questions are
+optional and answered later from the member's profile. Do not collect identity
 document images. Apply changes with `--check` first and follow
 [community operations](docs/community-operations.md).
 

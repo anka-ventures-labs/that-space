@@ -89,7 +89,11 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(session[:current_user_id]).to be_nil
   end
 
-  it "requires the 18+ attestation and every onboarding answer after a verified Google handoff" do
+  it "requires only the 18+ attestation and the Q1 role after a verified Google handoff" do
+    expect(that_space_signup_fields.keys).to contain_exactly(
+      configured_user_field("adult_attestation").id.to_s,
+      configured_user_field("community_role").id.to_s,
+    )
     stage_verified_google_signup
 
     post "/u.json",
@@ -213,6 +217,13 @@ RSpec.describe "Thật Space member acceptance", type: :request do
   it "keeps onboarding answers out of another member's profile response" do
     member = create_google_member
     private_field = configured_user_field("relationship_status")
+    answer_id, answer = that_space_answer("relationship_status")
+    expect(member.reload.user_fields).not_to have_key(answer_id)
+
+    # Optional questions are answered later from the member's own profile.
+    put "/u/#{member.username}.json", params: { user_fields: { answer_id => answer } }
+    expect(response.status).to eq(200), response.body
+    expect(member.reload.user_fields.fetch(answer_id)).to eq(answer)
     other_member = Fabricate(:user, refresh_auto_groups: true)
 
     delete "/session/#{member.username}.json", xhr: true
@@ -234,7 +245,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
 
     expect(response.status).to eq(200)
     expect(response.parsed_body.fetch("user").fetch("user_fields")).to include(
-      private_field.id.to_s => that_space_signup_fields.fetch(private_field.id.to_s),
+      private_field.id.to_s => answer,
     )
   end
 end

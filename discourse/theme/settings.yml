@@ -2,26 +2,12 @@ ba_moi_username:
   type: string
   default: ""
   description:
-    en: "Discourse username for Bà Mối. Leave blank until the bot account exists. The member CTA is hidden unless this is a safe username."
-    vi: "Tên người dùng Discourse của Bà Mối. Để trống cho đến khi tài khoản bot tồn tại. Nút nhắn tin chỉ hiện với tên người dùng hợp lệ."
+    en: "Discourse username for Bà Mối. Leave blank until the bot account exists. The Bà Mối sidebar link and first-step aside are hidden unless this is a safe username."
+    vi: "Tên người dùng Discourse của Bà Mối. Để trống cho đến khi tài khoản bot tồn tại. Liên kết Bà Mối chỉ hiện với tên người dùng hợp lệ."
 
-gallery_path:
-  type: string
-  default: "/c/trien-lam"
+introduction_category_id:
+  type: integer
+  default: 0
   description:
-    en: "Relative path for the artwork gallery. External URLs are ignored."
-    vi: "Đường dẫn tương đối đến phòng trưng bày tác phẩm. URL ngoài trang sẽ bị bỏ qua."
-
-events_path:
-  type: string
-  default: "/upcoming-events"
-  description:
-    en: "Relative path for retreats and workshops. External URLs are ignored."
-    vi: "Đường dẫn tương đối đến retreat và workshop. URL ngoài trang sẽ bị bỏ qua."
-
-show_member_welcome:
-  type: bool
-  default: true
-  description:
-    en: "Show the welcome panel on forum list pages to signed-in members."
-    vi: "Hiện lời chào trên các trang danh sách diễn đàn cho thành viên đã đăng nhập."
+    en: "Category used by the first-step 'Viết lời giới thiệu' action. Set by the presentation bootstrap."
+    vi: "Chuyên mục cho nút 'Viết lời giới thiệu'. Được thiết lập bởi presentation bootstrap."

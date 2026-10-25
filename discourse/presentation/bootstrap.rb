@@ -6,8 +6,17 @@ require "digest"
 module ThatSpace
   # Runs inside the pinned Discourse checkout after CommunityBootstrap. Imports
   # local, pinned sources; it never downloads code or takes over an existing theme.
+  #
+  # Members use core Horizon with the Thật Space brand component on top. The
+  # design and its rationale are in docs/design/member-happy-path.md.
   class PresentationBootstrap
     STORE = "that_space_presentation"
+    # The pre-Horizon full theme was owned under "theme". It is left installed
+    # and unselected so it remains a one-setting rollback target.
+    BRAND_KEY = "brand"
+    LEGACY_THEME_KEY = "theme"
+    PALETTE_KEY = "palette"
+    PALETTE_NAME = "Thật Space Horizon"
     Result = Struct.new(:changes, :drift, keyword_init: true)
     class Error < StandardError; end
 
@@ -15,6 +24,7 @@ module ThatSpace
       @repo = File.expand_path(repo_path.to_s)
       @runtime = File.expand_path(runtime_path.to_s)
       @lock = JSON.parse(File.read(File.join(@repo, "discourse/runtime.lock.json")))
+      @palette = JSON.parse(File.read(File.join(@repo, "discourse/presentation/palette.json")))
     end
 
     def apply!
@@ -26,7 +36,12 @@ module ThatSpace
     end
 
     def theme
-      record = PluginStore.get(STORE, "theme")
+      record = PluginStore.get(STORE, BRAND_KEY)
+      record && Theme.find_by(id: record.fetch("id"))
+    end
+
+    def legacy_theme
+      record = PluginStore.get(STORE, LEGACY_THEME_KEY)
       record && Theme.find_by(id: record.fetch("id"))
     end
 
@@ -37,6 +52,8 @@ module ThatSpace
       @drift = []
       gallery = owned_category!("exhibition")
       retreat = owned_category!("retreat-workshop")
+      introduction = owned_category!("introduction")
+      sidebar_categories = %w[introduction healing-growth art-creation spirituality-tu-vi relationships].map { |key| owned_category!(key) }
       host = Group.find_by!(name: "ts-role-host")
       unless host.custom_fields["that_space.community.group_key"] == "role.host"
         raise Error, "Host interest group is not owned by the community manifest"
@@ -58,32 +75,51 @@ module ThatSpace
         "discourse_post_event_allowed_on_groups" => [Group[:admins].id, Group[:moderators].id, host.id].join("|"),
         "events_calendar_categories" => retreat.id.to_s,
         "flag_post_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
-        "ignore_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|")
+        "ignore_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
+        # Member happy path: one feed, one navigation, no tutorial or tip popups.
+        "top_menu" => "latest",
+        "enable_welcome_banner" => false,
+        "enable_user_tips" => false,
+        "discourse_narrative_bot_enabled" => false,
+        "chat_enabled" => false,
+        "tagging_enabled" => false,
+        "allow_uncategorized_topics" => false,
+        "sidebar_show_upcoming_events" => false,
+        "default_navigation_menu_categories" => sidebar_categories.map(&:id).join("|")
       }
       settings.each do |key, expected|
         difference("site setting #{key}", apply: apply) { SiteSetting.set(key, expected) } unless SiteSetting.public_send(key) == expected
       end
+      reconcile_create_label(apply: apply)
+      reconcile_community_section(gallery, apply: apply)
 
-      parent = import_owned("theme", File.join(@repo, "discourse/theme"), component: false, apply: apply)
+      horizon = Theme.horizon_theme
+      unless horizon
+        difference("install core Horizon theme", apply: apply) { SystemThemesManager.sync_theme!("horizon") }
+        horizon = Theme.horizon_theme
+      end
+
+      brand = import_owned(BRAND_KEY, File.join(@repo, "discourse/theme"), component: true, apply: apply)
       components = @lock.fetch("components").to_h do |pin|
         path = File.join(@runtime, "tmp/that-space-components", pin.fetch("name"))
         [pin.fetch("name"), import_owned(pin.fetch("name"), path, component: true, apply: apply)]
       end
-      unless parent && components.values.all?
-        @drift << "theme-dependent settings and attachments cannot be checked until the pinned themes are imported"
+      palette = reconcile_palette(apply: apply)
+      unless horizon && brand && palette && components.values.all?
+        @drift << "theme-dependent settings and attachments cannot be checked until Horizon and the pinned themes are imported"
         return result
       end
 
-      logo = parent.theme_fields.find_by(name: "that-space-logo")&.upload
+      logo = brand.theme_fields.find_by(name: "that-space-logo")&.upload
       if logo
         %w[logo logo_small mobile_logo].each do |setting|
           difference("site setting #{setting}", apply: apply) { SiteSetting.set(setting, logo) } unless SiteSetting.public_send(setting) == logo
         end
       else
-        @drift << "member theme logo is missing; native header branding cannot be checked"
+        @drift << "brand component logo is missing; native header branding cannot be checked"
       end
 
-      configure(parent, { "gallery_path" => gallery.url, "events_path" => "/upcoming-events" }, apply: apply)
+      configure(brand, { "introduction_category_id" => introduction.id }, apply: apply)
       portfolio = components.fetch("discourse-user-portfolio")
       configure(portfolio, { "portfolio_category" => gallery.id, "portfolio_thumbnail_style" => "grid" }, apply: apply)
       configure(components.fetch("discourse-topic-thumbnails"), {
@@ -96,10 +132,14 @@ module ThatSpace
         end unless current == text
       end
 
-      required = components.values.map(&:id)
-      missing = required - parent.child_theme_ids
-      difference("attach portfolio and thumbnails", apply: apply) { parent.child_theme_ids = parent.child_theme_ids | required } if missing.any?
-      difference("default member theme", apply: apply) { SiteSetting.default_theme_id = parent.id } unless SiteSetting.default_theme_id == parent.id
+      required = [brand.id] + components.values.map(&:id)
+      missing = required - horizon.child_theme_ids
+      difference("attach brand, portfolio and thumbnails to Horizon", apply: apply) { horizon.child_theme_ids = horizon.child_theme_ids | required } if missing.any?
+      unless horizon.color_scheme_id == palette.id && horizon.dark_color_scheme_id.nil?
+        # A single light palette: Horizon's stock dark palettes are not branded.
+        difference("Horizon palette", apply: apply) { horizon.update!(color_scheme_id: palette.id, dark_color_scheme_id: nil) }
+      end
+      difference("default member theme", apply: apply) { SiteSetting.default_theme_id = horizon.id } unless SiteSetting.default_theme_id == horizon.id
       Theme.clear_cache! if apply && @changes.any?
       result
     end
@@ -108,6 +148,84 @@ module ThatSpace
       row = CategoryCustomField.find_by(name: "that_space.community.category_key", value: key)
       raise Error, "Apply the community manifest first (missing category #{key})" unless row
       Category.find(row.category_id)
+    end
+
+    def reconcile_create_label(apply:)
+      # "Chủ đề mới" is forum jargon; members are asked to write a post.
+      expected = "Viết bài"
+      current = TranslationOverride.find_by(locale: "vi", translation_key: "js.topic.create")&.value
+      difference("vi label js.topic.create", apply: apply) { TranslationOverride.upsert!("vi", "js.topic.create", expected) } unless current == expected
+    end
+
+    def community_links(gallery)
+      # Review and Admin render only for staff; core hides them for members.
+      [
+        ["Bảng tin", "/latest", "house", "primary"],
+        ["Sự kiện", "/upcoming-events", "calendar-days", "primary"],
+        ["Triển lãm", gallery.url, "far-image", "primary"],
+        ["Tin nhắn", "/my/messages", "inbox", "primary"],
+        ["Kiểm duyệt", "/review", "flag", "primary"],
+        ["Quản trị", "/admin", "wrench", "primary"],
+        ["Về Thật Space", "/about", "circle-info", "secondary"],
+        ["Nội quy", "/faq", "circle-question", "secondary"]
+      ]
+    end
+
+    def reconcile_community_section(gallery, apply:)
+      section = SidebarSection.find_by(section_type: SidebarSection.section_types[:community])
+      unless section
+        @drift << "core community sidebar section is missing; sidebar links cannot be checked"
+        return
+      end
+      expected = community_links(gallery)
+      current = section.sidebar_section_links.includes(:linkable).filter_map do |link|
+        url = link.linkable
+        [url.name, url.value, url.icon, url.segment] if url.is_a?(SidebarUrl)
+      end
+      return if current == expected
+
+      difference("community sidebar links", apply: apply) do
+        SidebarSection.transaction do
+          urls = section.sidebar_urls.to_a
+          section.sidebar_section_links.destroy_all
+          urls.each(&:destroy!)
+          expected.each_with_index do |(name, value, icon, segment), position|
+            url = SidebarUrl.create!(name: name, value: value, icon: icon, segment: segment, external: false)
+            SidebarSectionLink.create!(user_id: Discourse.system_user.id, linkable: url, sidebar_section: section, position: position)
+          end
+        end
+        Site.clear_anon_cache!
+      end
+    end
+
+    def reconcile_palette(apply:)
+      colors = @palette.fetch("colors")
+      record = PluginStore.get(STORE, PALETTE_KEY)
+      scheme = record && ColorScheme.find_by(id: record.fetch("id"))
+      raise Error, "Owned palette was replaced with a different color scheme" if scheme && scheme.name != PALETTE_NAME
+      if !record && ColorScheme.exists?(name: PALETTE_NAME)
+        raise Error, "Color scheme #{PALETTE_NAME.inspect} already exists without an ownership record; refusing takeover"
+      end
+      unless scheme
+        difference("create #{PALETTE_NAME} palette", apply: apply) do
+          scheme = ColorScheme.create_from_base(name: PALETTE_NAME, colors: colors)
+          raise Error, "Palette could not be created: #{scheme.errors.full_messages.join(", ")}" unless scheme.persisted?
+          PluginStore.set(STORE, PALETTE_KEY, { "id" => scheme.id })
+        end
+        return scheme
+      end
+      actual = scheme.colors.to_h { |color| [color.name, color.hex.downcase] }
+      changed = colors.reject { |name, hex| actual[name] == hex.downcase }
+      if changed.any?
+        difference("#{PALETTE_NAME} palette colors #{changed.keys.sort.join(", ")}", apply: apply) do
+          changed.each do |name, hex|
+            color = scheme.color_scheme_colors.find { |item| item.name == name } || scheme.color_scheme_colors.build(name: name)
+            color.hex = hex
+          end
+          scheme.save!
+        end
+      end
+      scheme
     end
 
     def import_owned(key, path, component:, apply:)
