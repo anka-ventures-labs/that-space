@@ -51,6 +51,9 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_css("#reply-control.open")
     expect(page).to have_css("#reply-control .category-chooser", text: configured_category("introduction").name)
     expect(find("#reply-title").value).to start_with("Xin chào, mình là")
+    expect(page).to have_css("#reply-control .composer-actions", text: "Viết bài mới")
+    expect(page).to have_no_css("#reply-control", text: "Create topic")
+    expect(page).to have_button("Đăng bài")
     retain_theme_screenshot("that-space-first-step-composer")
   end
 
@@ -80,6 +83,7 @@ RSpec.describe "Thật Space member theme", type: :system do
     within(".sidebar-wrapper") { click_link("Bà Mối") }
     expect(page).to have_css("#reply-control.open")
     expect(page).to have_css("#reply-control #private-message-users", text: bot.username)
+    expect(page).to have_css("#reply-control .composer-actions", text: "Viết tin nhắn riêng")
     retain_theme_screenshot("that-space-ba-moi-composer")
   end
 

@@ -67,7 +67,7 @@ of it told them what to do first.
 | Palette | Owned color scheme "Thật Space Horizon"; Horizon derives tints from `tertiary` (brand brown, 7:1 with white). No dark palette | `discourse/presentation/palette.json` |
 | Sidebar | Core community section links reconciled server-side; Bà Mối added by the theme API | bootstrap + `api-initializers/that-space.gjs` |
 | Quiet onboarding | `top_menu=latest`, welcome banner, user tips, narrative bot, chat, tags, uncategorized and the events plugin's sidebar link off | bootstrap site settings |
-| Wording | vi override `js.topic.create = "Viết bài"` | bootstrap |
+| Wording | vi overrides (`VI_LABELS`): "Viết bài", "Đăng bài", composer mode labels core vi left in English, and a plain composer placeholder | bootstrap |
 | Signup | Manifest field `asked: "later"` → optional and not on the signup form | `discourse/community/manifest.json` |
 
 Apply order: the bootstrap first refuses a community sidebar holding custom

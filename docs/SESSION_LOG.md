@@ -1601,3 +1601,13 @@ Fourth CI run (`3be4953`): request 29/29, browser 5/6. Only the lone tab
 remained: core styles `#navigation-bar` by id, which outranks a class rule. The
 rule now targets the id, and the home-only category breadcrumb is hidden via
 core's `navigation-topics` body class.
+
+Fifth CI run (`0a10f5a`): both required checks pass (request 29/29, browser
+6/6). Minh then reported the composer mode switcher still read "Create topic":
+core vi lacks `composer_actions.create_topic.label` and siblings. The bootstrap
+now owns a small `VI_LABELS` set of vi overrides (missing composer labels, "Đăng
+bài" submit, plain placeholder instead of Markdown/BBCode, "bài" instead of
+"tút"), asserted in request and browser acceptance. Also confirmed for Minh:
+the ASUS community is public through Tailscale Funnel (public DNS resolves to
+Funnel relays; guests are redirected to Google sign-in), and none of this
+branch is applied there yet.

@@ -108,7 +108,7 @@ module ThatSpace
       settings.each do |key, expected|
         difference("site setting #{key}", apply: apply) { SiteSetting.set(key, expected) } unless SiteSetting.public_send(key) == expected
       end
-      reconcile_create_label(apply: apply)
+      reconcile_vi_labels(apply: apply)
       reconcile_community_section(sidebar_plan, apply: apply)
 
       unless ready
@@ -175,11 +175,28 @@ module ThatSpace
       end
     end
 
-    def reconcile_create_label(apply:)
-      # "Chủ đề mới" is forum jargon; members are asked to write a post.
-      expected = "Viết bài"
-      current = TranslationOverride.find_by(locale: "vi", translation_key: "js.topic.create")&.value
-      difference("vi label js.topic.create", apply: apply) { TranslationOverride.upsert!("vi", "js.topic.create", expected) } unless current == expected
+    # Plain Vietnamese for the member's writing path. Core vi lacks some
+    # composer labels (they fell back to English) and uses forum jargon
+    # ("chủ đề", "tút", "Markdown, BBCode") elsewhere.
+    VI_LABELS = {
+      "js.topic.create" => "Viết bài",
+      "js.composer.create_topic" => "Đăng bài",
+      "js.composer.reply_placeholder" => "Viết điều bạn muốn chia sẻ… Bạn có thể kéo thả hoặc dán hình ảnh vào đây.",
+      "js.composer.composer_actions.create_topic.label" => "Viết bài mới",
+      "js.composer.composer_actions.create_topic.desc" => "Đăng một bài mới cho cả cộng đồng",
+      "js.composer.composer_actions.create_personal_message.label" => "Viết tin nhắn riêng",
+      "js.composer.composer_actions.reply_to_message.label" => "Trả lời tin nhắn",
+      "js.composer.composer_actions.reply_to_message.desc" => "Trả lời cả cuộc trò chuyện",
+      "js.composer.composer_actions.reply_to_post.label" => "Trả lời bài của %{postUsername}",
+      "js.composer.composer_actions.reply_to_post.desc" => "Trả lời riêng một bài viết",
+      "js.composer.composer_actions.reply_to_topic.desc" => "Trả lời cả bài, không nhắm vào bình luận nào"
+    }.freeze
+
+    def reconcile_vi_labels(apply:)
+      VI_LABELS.each do |key, expected|
+        current = TranslationOverride.find_by(locale: "vi", translation_key: key)&.value
+        difference("vi label #{key}", apply: apply) { TranslationOverride.upsert!("vi", key, expected) } unless current == expected
+      end
     end
 
     def community_links(gallery)

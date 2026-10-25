@@ -64,7 +64,9 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(SiteSetting.discourse_narrative_bot_enabled).to eq(false)
     expect(SiteSetting.enable_welcome_banner(theme_id: Theme.horizon_theme.id)).to eq(false)
     expect(SiteSetting.tagging_enabled).to eq(false)
-    expect(TranslationOverride.find_by!(locale: "vi", translation_key: "js.topic.create").value).to eq("Viết bài")
+    ThatSpace::PresentationBootstrap::VI_LABELS.each do |key, value|
+      expect(TranslationOverride.find_by!(locale: "vi", translation_key: key).value).to eq(value)
+    end
 
     section.sidebar_urls.first.update!(name: "Topics")
     expect(presentation.check!.drift).to include("community sidebar links")
