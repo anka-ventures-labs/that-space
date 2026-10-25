@@ -76,12 +76,12 @@ RSpec.describe "Thật Space community extensions", type: :request do
     legacy = Theme.create!(name: "Thật Space", user_id: Discourse.system_user.id)
     PluginStore.set(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::LEGACY_THEME_KEY, { "id" => legacy.id })
     SiteSetting.default_theme_id = legacy.id
-    SiteSetting.top_menu = "latest|new|unread|hot|categories"
+    SiteSetting.top_menu = "latest|hot|categories"
 
     drift = presentation.check!.drift
     expect(drift).to include("default member theme", "site setting top_menu")
     expect(SiteSetting.default_theme_id).to eq(legacy.id)
-    expect(SiteSetting.top_menu).to eq("latest|new|unread|hot|categories")
+    expect(SiteSetting.top_menu).to eq("latest|hot|categories")
 
     presentation.apply!
     expect(SiteSetting.default_theme_id).to eq(Theme.horizon_theme.id)

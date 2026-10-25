@@ -1580,3 +1580,9 @@ visible changes ran before fallible imports (imports/configuration now run
 first); the first-step "introduced" flag was shared across accounts on one
 browser (now keyed by user id); and tests lacked a legacy-site migration,
 custom-sidebar refusal and Q1-only enforcement case (added).
+
+Second CI run (`9f21cae`): request acceptance 28/29 (`top_menu` cannot contain
+`unread` under unified new; test fixture corrected). Browser acceptance stalled
+after the first-step card stayed visible for a member who had posted: core
+serializes `post_count`/`topic_count` only to staff, and a topic's first post
+counts as a topic. The card now asks `/user_actions.json` for one topic or reply.

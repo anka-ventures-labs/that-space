@@ -77,12 +77,18 @@ export default class FirstStep extends Component {
     }
   }
 
+  // post_count/topic_count are staff-only fields, so ask the member's own
+  // activity stream for one topic (4) or reply (5) instead.
   async #loadPostCount() {
     try {
-      const result = await ajax(
-        `/u/${encodeURIComponent(this.currentUser.username)}.json`
-      );
-      const posted = (result?.user?.post_count ?? 0) > 0;
+      const result = await ajax("/user_actions.json", {
+        data: {
+          username: this.currentUser.username,
+          filter: "4,5",
+          limit: 1,
+        },
+      });
+      const posted = (result?.user_actions?.length ?? 0) > 0;
       if (posted) {
         try {
           window.localStorage.setItem(this.#introducedKey, "1");
