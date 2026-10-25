@@ -1730,3 +1730,19 @@ Option A chosen by Minh (ASUS stays until Thảo approves a move to AWS). Branch
 thread and redirects full-page top-level visits into it; the service posts
 notices into that thread. Browser acceptance simulates Discourse AI's forced
 thread reply for existing, first-contact and mobile cases.
+
+PR #8 merged (`8896548`). Its screenshots showed the thread conversation working
+on desktop and mobile, with core chat labels still in English ("Thread", "Chat
+in thread", "See in", "Chat"); vi overrides added in `fix/chat-vi-labels`.
+
+Vercel: added production `BA_MOI_NOTICE_TRANSPORT=chat`, then built main
+`8896548` locally from a clean archive. The production environment was loaded
+only into the build process, and the output audit found 0 native binaries, 0 env
+files and no secret values (the public DISCOURSE_URL is expected). The CLI's
+`builds.json` argv path was redacted. Staged `dpl_3KqbA9qbnBEhBWbj5dGjPVkjLpQj`
+with `--prebuilt --prod --skip-domain`, smoke-tested through `vercel curl`
+(protection bypass), then promoted. All eight canonical routes return 200, the
+unauthenticated tool call 401, and an authenticated chat-style status 200. A QA
+notice from Bà Mối landed in the QA member's current chat thread. Rollback is
+`dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C`. Evidence:
+`docs/verification/vercel-prebuilt-8896548-production.json`.
