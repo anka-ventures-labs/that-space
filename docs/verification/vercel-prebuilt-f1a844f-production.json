@@ -1,0 +1,60 @@
+{
+  "verifiedAt": "2026-10-25T07:12:15Z",
+  "commit": "f1a844fb4dbb32f33c578f78c294fb96b5a693de",
+  "pullRequest": "https://github.com/anka-ventures-labs/that-space/pull/3",
+  "exactMergeCi": {
+    "runId": 40170813082,
+    "headSha": "f1a844fb4dbb32f33c578f78c294fb96b5a693de",
+    "serviceChecks": "success",
+    "discourseCommunityAcceptance": "success"
+  },
+  "artifact": {
+    "target": "production",
+    "contentDigest": "a8ac0886bd2c2ba95c1feb45ea702a9b959da7c956674ea704441776875d604b",
+    "physicalFiles": 150,
+    "symlinks": 43,
+    "mappedEntries": 1856,
+    "uniqueMappedSources": 637,
+    "nodeRuntime": "nodejs24.x",
+    "functionArchitecture": "arm64",
+    "nativeNodeFiles": 0,
+    "machOBinaries": 0,
+    "elfBinaries": 0,
+    "physicalEnvironmentFiles": 0,
+    "mappedEnvironmentFiles": [".env.example"],
+    "sensitivePlaceholders": 0,
+    "operatorPathReferences": 0,
+    "linuxRuntimeAudit": "pass: no shipped native binaries"
+  },
+  "deployment": {
+    "id": "dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C",
+    "directUrl": "https://that-space-demo-a0jc168yy-minh-nguyens-projects-3a747261.vercel.app",
+    "canonicalUrl": "https://that-space-demo.vercel.app",
+    "status": "Ready",
+    "actualFunctionRegion": "sin1",
+    "method": "local prebuilt production artifact, staged with --skip-domain, then promoted"
+  },
+  "canonicalSmoke": {
+    "routes": {
+      "/": 200,
+      "/forum": 200,
+      "/tuvi": 200,
+      "/matchmaking": 200,
+      "/profile": 200,
+      "/privacy": 200,
+      "/terms": 200,
+      "/contact": 200
+    },
+    "unauthenticatedTool": 401,
+    "authenticatedSyntheticStatus": 200,
+    "desktop": "1440x768, no horizontal overflow or console issue; signup CTA above fold; lotus bloom toggled",
+    "mobile": "390x844, no horizontal overflow; signup CTA above fold",
+    "signup": "fresh incognito request redirected to Google OAuth",
+    "oauthCallback": "https://ubuntu-asus.tail349cbf.ts.net:8443/auth/google_oauth2/callback"
+  },
+  "rollback": {
+    "deploymentId": "dpl_DmkUUcW8PaGB4SBAnHUHPKYQa6VQ",
+    "status": "Ready",
+    "directUrl": "https://that-space-demo-qp93jdq1n-minh-nguyens-projects-3a747261.vercel.app"
+  }
+}

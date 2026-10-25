@@ -1509,3 +1509,28 @@ modal focus trap/return, offscreen lotus-loop suspension, focus contrast and
 browser-local Tử Vi disclosure. Restored the major handed-off decorative details
 it identified. Resolution evidence is retained in
 `docs/reviews/origami-assembly-20261025.md`.
+
+PR #3 merged to `main` as `f1a844fb4dbb32f33c578f78c294fb96b5a693de`.
+A fresh workflow-dispatch CI run `40170813082` passed both Service checks and
+the complete Discourse community request/frontend/browser acceptance on that
+exact merge commit. Vercel device authorization was restored without placing a
+token in chat. The first local v65 artifact was rejected before upload because
+its root OIDC `.env.local` appeared in the function upload map. A second clean
+archive sourced production configuration only into the build process and moved
+the environment file outside the source tree before Next tracing. Its audit
+found 150 physical files, 637 unique mapped sources, three Node 24 ARM64
+functions, zero native binaries, zero packaged environment files, no sensitive
+placeholder and no operator path.
+
+Uploaded only that clean prebuilt production artifact with `--skip-domain` as
+deployment `dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C`, verified Ready functions in
+`sin1`, then promoted the same deployment. The canonical
+`https://that-space-demo.vercel.app` resolves to it. All eight public routes
+return 200 with the origami copy, unauthenticated tool/cron/webhook boundaries
+reject correctly, and an authenticated synthetic status reaches the production
+database with 200. Real-browser checks pass at 1440×768 and 390×844 with no
+horizontal overflow or console issue; the signup CTA points to the public
+community, the lotus blooms, and a fresh incognito signup reaches Google with
+the exact port-8443 callback. Rollback deployment
+`dpl_DmkUUcW8PaGB4SBAnHUHPKYQa6VQ` remains Ready. Full nonsecret evidence is in
+`docs/verification/vercel-prebuilt-f1a844f-production.json`.
