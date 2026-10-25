@@ -11,7 +11,6 @@ import {
   setRelayTopicDiscourseId, setRelayedPostId, type PendingPost,
 } from '@/lib/db/repo'
 import type { Db } from '@/lib/db/db'
-import { DiscourseError } from '@/lib/discourse/client'
 import { redactAliasForCurrentPool } from './cards'
 import { CONSENT_VERSION, PERSONA_THREAD_TITLE, matchOpened, relayedMessage, relayIntro, relayTitle, revealAsked, revealed } from './copy'
 import type { ServiceDeps } from './deps'
@@ -43,16 +42,11 @@ async function perform(deps: ServiceDeps, item: Outbound): Promise<void> {
     if (!member?.discourseUsername) return // deleted since, or a sample: nothing to notify
     if (config.noticeTransport === 'chat') {
       // Upserted each time: Discourse returns the existing one-to-one chat.
-      // If Discourse refuses the chat (4xx other than rate limiting), the
-      // notice goes to her private thread instead; a bad bot key fails there
-      // too and stays queued. Outages (no status, 5xx, 429) stay queued.
-      try {
-        const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
-        await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
-        return
-      } catch (error) {
-        if (!(error instanceof DiscourseError) || error.status === null || error.status >= 500 || error.status === 429) throw error
-      }
+      // Any failure stays queued for retry and then dead-letters visibly; it
+      // never silently switches transport.
+      const { channelId } = await discourse.openDirectChat({ asUsername: config.personaUsername, targetUsername: member.discourseUsername })
+      await discourse.createChatMessage({ asUsername: config.personaUsername, channelId, raw })
+      return
     }
     if (member.personaTopicId) {
       await discourse.createPost({ asUsername: config.personaUsername, topicId: member.personaTopicId, raw })

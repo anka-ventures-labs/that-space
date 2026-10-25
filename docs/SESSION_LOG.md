@@ -1684,3 +1684,10 @@ CI on `9270642` proved the real Discourse AI bot path (negative-id bot user,
 own key) opens, posts into and reuses a member's direct chat. It also showed
 Discourse does not refuse the bot for a member who turned chat off. The test
 and docs now state that limitation instead of the assumed fallback.
+
+Targeted follow-up review `16312cd6-1453-44eb-8955-44838b3d1917` confirmed the
+three earlier findings resolved and flagged the broad 4xx private-message
+fallback as able to hide operational faults. With CI showing Discourse never
+refuses the chat-off case it was meant for, the fallback was removed: chat
+notices retry and then dead-letter visibly. Envelope ids are now also
+required to be safe integers.

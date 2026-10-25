@@ -33,8 +33,9 @@ messages because chat seemed to lack webhooks. That is no longer true:
 
 Safety-critical actions (delete, block, end, reveal) still need a confirmation
 from a later member message. In chat that binds to the direct chat's
-`channel_id` and `message_id`, which the tool script now forwards. If Discourse
-refuses the chat, Bà Mối's notices fall back to the member's private thread.
+`channel_id` and `message_id`, which the tool script now forwards. A failed chat
+notice stays queued and retries, then dead-letters visibly; it never silently
+becomes a private message.
 
 What members get from core chat: streaming replies, the replying indicator,
 Enter to send, photo/file upload within limits, unread badges, notifications
@@ -88,8 +89,8 @@ but keeps their data.
   chat notice delivery (one channel, no private message), retry after an
   outage, installer payload and drift.
 - Vitest: chat-context confirmation (same message refused, other chat refused,
-  same-numbered topic refused, later message accepted) and the private-thread
-  fallback when Discourse refuses the chat.
+  same-numbered topic refused, later message accepted), and a refused chat
+  notice stays queued rather than becoming a private message.
 - Discourse acceptance: a real Discourse AI agent bot user (negative id) opens
   a member's direct chat and posts into it with its own API key, and reuses it.
   It is not refused for a member who turned chat off; chat settings applied; the sidebar link opens a
