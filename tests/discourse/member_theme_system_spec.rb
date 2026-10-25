@@ -73,7 +73,11 @@ RSpec.describe "Thật Space member theme", type: :system do
     within(".sidebar-wrapper") { expect(page).to have_link("Quản trị") }
   end
 
-  it "opens a private-message composer addressed to the configured Bà Mối account" do
+  def ba_moi_threads_for(user)
+    Topic.where(archetype: Archetype.private_message).joins(:topic_allowed_users).where(topic_allowed_users: { user_id: user.id })
+  end
+
+  it "opens one ongoing chat with Bà Mối instead of a message editor" do
     bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
     that_space_theme.update_setting("ba_moi_username", bot.username)
     sign_in(member)
@@ -81,10 +85,41 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_button("Trò chuyện riêng với Bà Mối")
 
     within(".sidebar-wrapper") { click_link("Bà Mối") }
-    expect(page).to have_css("#reply-control.open")
-    expect(page).to have_css("#reply-control #private-message-users", text: bot.username)
-    expect(page).to have_css("#reply-control .composer-actions", text: "Viết tin nhắn riêng")
-    retain_theme_screenshot("that-space-ba-moi-composer")
+    expect(page).to have_css("body.ba-moi-chat")
+    expect(page).to have_css(".ba-moi-chat-input textarea")
+    expect(page).to have_no_css("#reply-control.open")
+    expect(page).to have_css(".topic-post", text: "Chào Bà Mối")
+    thread = ba_moi_threads_for(member).sole
+    expect(thread.topic_allowed_users.pluck(:user_id)).to contain_exactly(member.id, bot.id)
+
+    create_post(user: bot, topic: thread, raw: "Chào bạn, Bà đây. Bạn đang tìm kiếm điều gì?")
+    expect(page).to have_css(".topic-post.ba-moi-post", text: "Bà đây")
+
+    find(".ba-moi-chat-input textarea").set("Mình muốn tìm một mối quan hệ lâu dài")
+    find(".ba-moi-chat-input textarea").send_keys(:enter)
+    expect(page).to have_css(".topic-post:not(.ba-moi-post)", text: "mối quan hệ lâu dài")
+    expect(page).to have_no_css("#topic-footer-buttons", visible: true)
+    expect(thread.reload.posts.count).to eq(3)
+    retain_theme_screenshot("that-space-ba-moi-chat")
+
+    visit "/"
+    within(".sidebar-wrapper") { click_link("Bà Mối") }
+    expect(page).to have_current_path(%r{/t/[^/]+/#{thread.id}})
+    expect(ba_moi_threads_for(member).count).to eq(1)
+  end
+
+  it "gives phones the same chat with Bà Mối", mobile: true do
+    bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
+    that_space_theme.update_setting("ba_moi_username", bot.username)
+    thread = create_post(user: member, title: "Trò chuyện cùng Bà Mối", raw: "Chào Bà Mối 🌸", archetype: Archetype.private_message, target_usernames: bot.username).topic
+    create_post(user: bot, topic: thread, raw: "Chào bạn 🌸 Bà rất vui được gặp bạn. Trước khi bắt đầu, Bà cần bạn đọc và đồng ý vài điều nhé.")
+    sign_in(member)
+    visit "/t/#{thread.slug}/#{thread.id}"
+
+    expect(page).to have_css("body.ba-moi-chat")
+    expect(page).to have_css(".topic-post.ba-moi-post", text: "Bà rất vui")
+    expect(page).to have_css(".ba-moi-chat-input textarea", visible: true)
+    retain_theme_screenshot("that-space-ba-moi-chat-mobile")
   end
 
   it "renders an artist's portfolio from the gallery category" do

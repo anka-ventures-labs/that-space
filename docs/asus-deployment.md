@@ -332,11 +332,14 @@ no bootstrap, container recreation or new deployment ran. Nonsecret evidence:
 [`verification/session-recovery-20261005.json`](verification/session-recovery-20261005.json).
 
 The dedicated provider credential is in Infisical **That Space / prod /
-OPENROUTER_API_KEY**. Native secret `that_space_openrouter` (2) binds model
-`anthropic/claude-sonnet-5` (1, open_router). Native streaming/non-streaming
-validation passed. `ai_bot_enabled=true`; persona/global allowed group is
+OPENROUTER_API_KEY**. Native secret `that_space_openrouter` (2) binds two
+open_router models: `anthropic/claude-sonnet-5` (1), used by the moderation
+classifier, and `deepseek/deepseek-v4.1-flash` (2), Bà Mối's model since
+2026-10-25 (native tool calling; about $0.02/$1.00 per million input/output
+tokens versus $2/$10). To roll Bà Mối back, set `BA_MOI_LLM_ID=1` and rerun
+`npm run discourse:install`. Native streaming/non-streaming validation passed. `ai_bot_enabled=true`; persona/global allowed group is
 registered members (10); theme `ba_moi_username=Ba_Moi_bot`. Keep
-`BA_MOI_LLM_ID=1` and `BA_MOI_ALLOWED_GROUP_IDS=10` in this installation's
+`BA_MOI_LLM_ID=2` and `BA_MOI_ALLOWED_GROUP_IDS=10` in this installation's
 private operator configuration for both apply and check. Empty allowed groups
 do not grant ordinary member access. Read IDs from a new instance instead of
 assuming them. Final installer check reports no drift. No provider value is

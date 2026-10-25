@@ -162,6 +162,109 @@ h2,
   text-underline-offset: 0.2em;
 }
 
+// Bà Mối's thread reads as a chat: her messages left with her avatar, the
+// member's right in brand brown, no forum chrome, one pinned message box.
+.ba-moi-chat {
+  .topic-map,
+  .post__topic-map,
+  .timeline-container,
+  .topic-navigation,
+  #topic-footer-buttons,
+  .more-topics__container,
+  .post-menu-area,
+  .post__menu-area,
+  .post-actions,
+  .post-links-container,
+  .topic-post .names,
+  .topic-post .post-infos {
+    display: none;
+  }
+
+  .topic-post {
+    border: 0;
+    padding: 0.25rem 0;
+
+    .topic-body {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .cooked {
+      border-radius: 1.1rem;
+      line-height: 1.55;
+      max-width: min(36rem, 85%);
+      padding: 0.7rem 1rem;
+      width: fit-content;
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .ba-moi-post .cooked {
+    background: var(--that-space-wash);
+    border-bottom-left-radius: 0.3rem;
+    color: var(--that-space-ink);
+  }
+
+  .topic-post:not(.ba-moi-post) {
+    .topic-avatar {
+      display: none;
+    }
+
+    .topic-body {
+      align-items: flex-end;
+      display: flex;
+      flex-direction: column;
+      margin-left: auto;
+    }
+
+    .cooked {
+      background: var(--that-space-brown);
+      border-bottom-right-radius: 0.3rem;
+      color: #fff;
+
+      a {
+        color: #fff;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.ba-moi-chat-input {
+  align-items: flex-end;
+  background: var(--d-content-background, #fff);
+  border-top: 1px solid color-mix(in srgb, var(--that-space-sand) 45%, transparent);
+  bottom: 0;
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.75rem 0;
+  position: sticky;
+  z-index: 2;
+
+  textarea {
+    border: 1px solid color-mix(in srgb, var(--that-space-sand) 70%, transparent);
+    border-radius: 1.4rem;
+    field-sizing: content;
+    flex: 1;
+    font: inherit;
+    font-size: var(--font-up-1);
+    margin: 0;
+    max-height: 9rem;
+    min-height: 2.9rem;
+    padding: 0.7rem 1rem;
+    resize: none;
+  }
+
+  .ba-moi-chat-input__send.btn {
+    border-radius: 1.4rem;
+    min-height: 2.9rem;
+    padding: 0 1.25rem;
+  }
+}
+
 a:focus-visible,
 button:focus-visible {
   outline: 3px solid var(--that-space-sand);

@@ -1611,3 +1611,31 @@ bài" submit, plain placeholder instead of Markdown/BBCode, "bài" instead of
 the ASUS community is public through Tailscale Funnel (public DNS resolves to
 Funnel relays; guests are redirected to Google sign-in), and none of this
 branch is applied there yet.
+
+# 2026-10-25 — Bà Mối model switched to DeepSeek V4.1 Flash
+
+At Minh's request Bà Mối's agent now uses OpenRouter
+`deepseek/deepseek-v4.1-flash` (supports tool calling). Added Discourse AI model
+2 bound to the existing native secret 2 (the key was not re-entered), passed the
+native LLM test, set the private operator `BA_MOI_LLM_ID=2` and ran the installer:
+check showed only `default_llm_id` drift; apply then check reported no drift.
+Model 1 (Sonnet) stays for the moderation classifier and as the rollback target.
+A live QA private message as `ts_qa_nam` got a correct, in-voice reply about
+18 seconds later that used the status tool (paused profile, box open); the QA
+topic was then soft-deleted.
+
+Incident: the Discourse admin LLM listing returns the provider key in clear,
+and one diagnostic readout printed it into the session's tool output (not into
+Git, docs or any external service). Recommended rotation of the OpenRouter key
+in OpenRouter/Infisical and the Discourse native secret. Later calls redacted it.
+
+# 2026-10-25 — Bà Mối as a chat
+
+Minh found the Bà Mối entry felt like writing a forum post (message editor
+with title and toolbar) and that every click started a new thread although the
+service keeps one thread per member. The theme now opens the member's existing
+two-person thread with the bot (or starts it with "Chào Bà Mối 🌸"), and that
+thread renders as a chat: bubbles, no forum chrome, one pinned input where Enter
+sends via an ordinary reply. Backend, Discourse AI tools and the relay are
+unchanged. Browser acceptance covers first open, bot reply, Enter-to-send, no
+second thread on reopen, and a mobile render.
