@@ -3,13 +3,11 @@ import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
-import { ajax } from "discourse/lib/ajax";
 import Category from "discourse/models/category";
 import { settings } from "virtual:theme";
 import { BA_MOI_MESSAGE_TITLE, safeUsername } from "../lib/safe-values";
 
 const HOME_ROUTES = ["discovery.latest", "discovery.index"];
-const INTRODUCED_KEY_PREFIX = "that-space-introduced:";
 const INTRO_TITLE = "Xin chào, mình là ";
 const INTRO_BODY = [
   "Chào mọi người, mình là …",
@@ -19,31 +17,39 @@ const INTRO_BODY = [
   "Mình mong tìm thấy ở đây: …",
 ].join("\n");
 
-// Shown on the home feed until the member writes their first post. It is part
-// of the page layout, never a popup, and offers one primary action.
+// Shown on the home feed until the member has posted anything. It is part of
+// the page layout, never a popup, and offers one primary action.
 export default class FirstStep extends Component {
+  @service appEvents;
   @service composer;
   @service currentUser;
   @service router;
 
-  @tracked hasPosted = this.#rememberedIntroduced();
-
-  // Per account, so a shared browser never hides another member's first step.
-  get #introducedKey() {
-    return `${INTRODUCED_KEY_PREFIX}${this.currentUser?.id}`;
-  }
+  @tracked postedThisVisit = false;
 
   constructor() {
     super(...arguments);
-    if (this.currentUser && !this.hasPosted) {
-      this.#loadPostCount();
-    }
+    this.appEvents.on("topic:created", this, this.markPosted);
   }
 
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this.appEvents.off("topic:created", this, this.markPosted);
+  }
+
+  // any_posts is only refreshed on page load; keep it true for this session.
+  @action
+  markPosted() {
+    this.postedThisVisit = true;
+    this.currentUser?.set("any_posts", true);
+  }
+
+  // any_posts is core's own current-user flag (count fields are staff-only).
   get shouldRender() {
     return (
       Boolean(this.currentUser) &&
-      this.hasPosted === false &&
+      !this.currentUser.any_posts &&
+      !this.postedThisVisit &&
       HOME_ROUTES.includes(this.router.currentRouteName) &&
       !this.args.outletArgs?.category
     );
@@ -62,46 +68,6 @@ export default class FirstStep extends Component {
     return Boolean(
       this.baMoiUsername && this.currentUser?.can_send_private_messages
     );
-  }
-
-  #rememberedIntroduced() {
-    try {
-      if (!this.currentUser) {
-        return null;
-      }
-      return window.localStorage.getItem(this.#introducedKey) === "1"
-        ? true
-        : null;
-    } catch {
-      return null;
-    }
-  }
-
-  // post_count/topic_count are staff-only fields, so ask the member's own
-  // activity stream for one topic (4) or reply (5) instead.
-  async #loadPostCount() {
-    try {
-      const result = await ajax("/user_actions.json", {
-        data: {
-          username: this.currentUser.username,
-          filter: "4,5",
-          limit: 1,
-        },
-      });
-      const posted = (result?.user_actions?.length ?? 0) > 0;
-      if (posted) {
-        try {
-          window.localStorage.setItem(this.#introducedKey, "1");
-        } catch {
-          // Storage can be unavailable in private browsing; the check repeats.
-        }
-      }
-      if (!this.isDestroying && !this.isDestroyed) {
-        this.hasPosted = posted;
-      }
-    } catch {
-      // If the count is unknown, show the plain feed rather than a wrong prompt.
-    }
   }
 
   @action

@@ -21,9 +21,10 @@ Message and topic creation are delegated to core Discourse
 (`composer.openNewMessage`, `composer.openNewTopic`, the `new-message` route).
 The component does not construct a bot profile URL.
 
-The first-step card renders only for a signed-in member on the home feed, and
-only while their `post_count` is 0; once posted, a local flag avoids repeating
-the lookup. Guests receive nothing from this component.
+The first-step card renders only for a signed-in member on the home feed while
+core's current-user `any_posts` flag is false (it counts any post, including a
+private message to Bà Mối). It hides as soon as the member creates a topic in
+that visit. Guests receive nothing from this component.
 
 ## Source compatibility target
 

@@ -84,13 +84,9 @@ h2,
   }
 }
 
-// The home feed is one list: no tabs, category or tag filters above it.
-// Category pages keep their breadcrumb so subcategories stay reachable.
-.navigation-topics .list-controls {
-  .nav-pills,
-  .category-breadcrumb {
-    display: none;
-  }
+// The feed is one list (top_menu=latest), so the lone list tab is noise.
+.list-controls .nav-pills {
+  display: none;
 }
 
 // Bà Mối is added by the theme API, so it would land last; keep it second.

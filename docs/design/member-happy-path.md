@@ -48,6 +48,8 @@ of it told them what to do first.
 └────────────────────────┴───────────────────────────────────────────┘
 ```
 
+- The card is shown while core's current-user `any_posts` flag is false, so any
+  first post (including a message to Bà Mối) retires it. No extra request.
 - **Viết lời giới thiệu** opens the composer in Giới thiệu, prefilled with a
   three-line template.
 - **Bà Mối** (sidebar and the card's quiet secondary link) opens a private

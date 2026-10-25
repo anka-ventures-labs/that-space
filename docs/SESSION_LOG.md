@@ -1586,3 +1586,13 @@ Second CI run (`9f21cae`): request acceptance 28/29 (`top_menu` cannot contain
 after the first-step card stayed visible for a member who had posted: core
 serializes `post_count`/`topic_count` only to staff, and a topic's first post
 counts as a topic. The card now asks `/user_actions.json` for one topic or reply.
+
+Third CI run (`a077da8`): request acceptance 29/29; browser 4/6. Screenshots
+confirm Horizon, the brand palette, the reduced sidebar, the "Viết bài" button
+and the first-step card on desktop and full-width on mobile. Remaining: the lone
+"Gần đây" tab stayed visible (the page-class selector did not match Horizon) and
+the activity-stream lookup returned nothing in system tests. The card now uses
+core's serialized `currentUser.any_posts` (no request, no browser storage; this
+also retires the per-account storage finding) and the tab rule applies to all
+list controls. The "Chưa phân loại" entry in one screenshot comes from
+Discourse's `create_post` spec helper enabling uncategorized topics.
