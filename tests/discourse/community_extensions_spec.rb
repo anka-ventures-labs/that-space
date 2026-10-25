@@ -52,7 +52,7 @@ RSpec.describe "Thật Space community extensions", type: :request do
         ["Bảng tin", "/latest"],
         ["Sự kiện", "/upcoming-events"],
         ["Triển lãm", configured_category("exhibition").url],
-        ["Tin nhắn", "/my/messages"],
+        ["Hộp thư", "/my/messages"],
         ["Kiểm duyệt", "/review"],
         ["Quản trị", "/admin"],
         ["Về Thật Space", "/about"],
@@ -64,6 +64,7 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(SiteSetting.enable_public_channels).to eq(false)
     expect(SiteSetting.chat_max_direct_message_users).to eq(1)
     expect(SiteSetting.chat_allow_uploads).to eq(true)
+    expect(SiteSetting.chat_search_enabled).to eq(false)
     expect(SiteSetting.discourse_narrative_bot_enabled).to eq(false)
     expect(SiteSetting.enable_welcome_banner(theme_id: Theme.horizon_theme.id)).to eq(false)
     expect(SiteSetting.tagging_enabled).to eq(false)

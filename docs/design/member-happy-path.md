@@ -38,7 +38,7 @@ of it told them what to do first.
 │  Bà Mối                │ │ Chào bạn! Hãy để mọi người biết    │   │
 │  Sự kiện               │ │ bạn là ai.                         │   │
 │  Triển lãm             │ │ [ Viết lời giới thiệu ]            │   │
-│  Tin nhắn              │ │ Bạn đến để tìm người hợp duyên?    │   │
+│  Hộp thư               │ │ Bạn đến để tìm người hợp duyên?    │   │
 │  ─ Chuyên mục          │ │ Trò chuyện riêng với Bà Mối        │   │
 │  Giới thiệu            │ └────────────────────────────────────┘   │
 │  Chữa lành & …         │ topic card                                │

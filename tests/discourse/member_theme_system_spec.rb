@@ -34,7 +34,7 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(that_space_theme).to be_persisted
     expect(page).to have_css(".that-space-first-step", visible: true)
     within(".sidebar-wrapper") do
-      %w[Bảng\ tin Sự\ kiện Triển\ lãm Tin\ nhắn].each { |name| expect(page).to have_link(name) }
+      %w[Bảng\ tin Sự\ kiện Triển\ lãm Hộp\ thư].each { |name| expect(page).to have_link(name) }
       expect(page).to have_no_link("Quản trị")
       expect(page).to have_no_link("Kiểm duyệt")
       expect(page).to have_no_link("Bà Mối")
@@ -81,11 +81,12 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_button("Trò chuyện riêng với Bà Mối")
 
     within(".sidebar-wrapper") { click_link("Bà Mối") }
-    expect(page).to have_current_path(%r{/chat/c/})
+    # Desktop opens the chat drawer beside the feed; phones open full screen.
     expect(page).to have_css(".chat-composer__input")
     expect(page).to have_no_css("#reply-control.open")
-    channel = Chat::Channel.find(page.current_path[%r{/chat/c/[^/]+/(\d+)}, 1])
-    expect(channel).to be_direct_message_channel
+    expect(page).to have_content("Bắt đầu trò chuyện với")
+    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
+    channel = Chat::DirectMessageUser.find_by!(user_id: member.id).direct_message.direct_message_channel
     expect(channel.chatable.users).to contain_exactly(member, bot)
 
     find(".chat-composer__input").fill_in(with: "Chào Bà Mối, mình muốn tìm một mối quan hệ lâu dài")
@@ -98,7 +99,7 @@ RSpec.describe "Thật Space member theme", type: :system do
 
     visit "/"
     find(".that-space-first-step__ba-moi").click
-    expect(page).to have_current_path(%r{/chat/c/[^/]+/#{channel.id}})
+    expect(page).to have_css(".chat-message-container", text: "Bà đây")
     expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
   end
 

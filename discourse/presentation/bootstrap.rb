@@ -107,6 +107,7 @@ module ThatSpace
         "direct_message_enabled_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
         "chat_max_direct_message_users" => 1,
         "chat_allow_uploads" => true,
+        "chat_search_enabled" => false,
         "tagging_enabled" => false,
         "allow_uncategorized_topics" => false,
         "sidebar_show_upcoming_events" => false,
@@ -196,7 +197,10 @@ module ThatSpace
       "js.composer.composer_actions.reply_to_message.desc" => "Trả lời cả cuộc trò chuyện",
       "js.composer.composer_actions.reply_to_post.label" => "Trả lời bài của %{postUsername}",
       "js.composer.composer_actions.reply_to_post.desc" => "Trả lời riêng một bài viết",
-      "js.composer.composer_actions.reply_to_topic.desc" => "Trả lời cả bài, không nhắm vào bình luận nào"
+      "js.composer.composer_actions.reply_to_topic.desc" => "Trả lời cả bài, không nhắm vào bình luận nào",
+      # Core chat strings that vi leaves in English.
+      "js.chat.placeholder_users" => "Nhắn cho %{commaSeparatedNames}…",
+      "js.chat.channel.empty_state.direct_message_title" => "Bắt đầu trò chuyện với %{name}"
     }.freeze
 
     def reconcile_vi_labels(apply:)
@@ -212,7 +216,7 @@ module ThatSpace
         ["Bảng tin", "/latest", "house", "primary"],
         ["Sự kiện", "/upcoming-events", "calendar-days", "primary"],
         ["Triển lãm", gallery.url, "far-image", "primary"],
-        ["Tin nhắn", "/my/messages", "inbox", "primary"],
+        ["Hộp thư", "/my/messages", "inbox", "primary"],
         ["Kiểm duyệt", "/review", "flag", "primary"],
         ["Quản trị", "/admin", "wrench", "primary"],
         ["Về Thật Space", "/about", "circle-info", "secondary"],

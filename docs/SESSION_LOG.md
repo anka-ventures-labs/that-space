@@ -1658,3 +1658,11 @@ member's direct chat, and a `BA_MOI_NOTICE_TRANSPORT` switch (default `pm`)
 sends Bà Mối's notices to that chat through the existing outbox. Match chats,
 post-reveal attachments and "seen" receipts are phase 2. Plan and rollout
 order: `docs/plans/2026-10-25-ba-moi-chat.md`.
+
+First PR #6 CI: request acceptance passed; the desktop browser test expected a
+full-page chat URL, but Discourse opens direct chats in the desktop drawer
+(mobile was full screen, as expected). Kept the drawer (chat beside the feed)
+and asserted on the composer and the one member↔bot channel instead. Also:
+vi overrides for the chat placeholder and empty-state title (they rendered in
+English), chat search off, and the private-message inbox link renamed "Hộp thư"
+so it no longer duplicates chat's "Tin nhắn" section.
