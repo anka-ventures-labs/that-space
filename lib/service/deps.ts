@@ -20,6 +20,8 @@ const EnvSchema = z.object({
   BA_MOI_RELAY_USERNAME: z.string().min(1).default('thu_duyen'),
   /** Discourse user ids of the bot users, comma-separated. Their posts are never relayed. */
   BA_MOI_BOT_USER_IDS: z.string().default(''),
+  /** Where Bà Mối's own notices go: her private-message thread, or her direct chat. */
+  BA_MOI_NOTICE_TRANSPORT: z.enum(['pm', 'chat']).default('pm'),
 })
 
 export interface ServiceConfig {
@@ -31,6 +33,7 @@ export interface ServiceConfig {
   personaUsername: string
   relayUsername: string
   botUserIds: number[]
+  noticeTransport: 'pm' | 'chat'
 }
 
 export interface ServiceDeps {
@@ -81,6 +84,7 @@ export function getDeps(): ServiceDeps {
       personaUsername: env.BA_MOI_PERSONA_USERNAME,
       relayUsername: env.BA_MOI_RELAY_USERNAME,
       botUserIds: env.BA_MOI_BOT_USER_IDS.split(',').map((s) => s.trim()).filter(Boolean).map(Number).filter(Number.isInteger),
+      noticeTransport: env.BA_MOI_NOTICE_TRANSPORT,
     },
     now: () => new Date(),
     random: Math.random,

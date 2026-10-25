@@ -1644,3 +1644,50 @@ Superseded the private-message chat skin above at Minh's direction: Bà Mối
 moves to native Discourse Chat (streaming replies, replying indicator, uploads,
 unread badges) in a stacked change. The skin's theme files and tests were
 removed from this branch; PR #5 stays the member happy path.
+
+# 2026-10-25 — Bà Mối moves to native Discourse Chat (phase 1)
+
+Minh wanted Bà Mối to feel like a real chat (typing, delivery state, photos).
+Source checks on the pinned Discourse showed the original reason for private
+messages is gone: chat emits `chat_message_*` webhooks, Discourse AI agents
+can answer chat direct messages with streaming and the replying indicator, and
+tools get `channel_id`. Branch `feat/ba-moi-chat` (stacked on PR #5): chat
+enabled for one-to-one direct messages only, agent `allow_chat_direct_messages`,
+chat-style and text-only notes in the prompt, theme entry points open the
+member's direct chat, and a `BA_MOI_NOTICE_TRANSPORT` switch (default `pm`)
+sends Bà Mối's notices to that chat through the existing outbox. Match chats,
+post-reveal attachments and "seen" receipts are phase 2. Plan and rollout
+order: `docs/plans/2026-10-25-ba-moi-chat.md`.
+
+First PR #6 CI: request acceptance passed; the desktop browser test expected a
+full-page chat URL, but Discourse opens direct chats in the desktop drawer
+(mobile was full screen, as expected). Kept the drawer (chat beside the feed)
+and asserted on the composer and the one member↔bot channel instead. Also:
+vi overrides for the chat placeholder and empty-state title (they rendered in
+English), chat search off, and the private-message inbox link renamed "Hộp thư"
+so it no longer duplicates chat's "Tin nhắn" section.
+
+Codex review `0831f1f1-f5ca-4c7b-8b10-51ae3c03ffc1` (route `9d5b5f0a`) of
+`adc57b1` returned do-not-ship. All three findings were accepted and fixed:
+(1, high) in chat, Discourse AI gives tools `channel_id`/`message_id` rather than
+topic/post ids, so delete, block, end and reveal could never confirm. The tool
+script now forwards both, and confirmations bind to the negated channel id and
+message id, with a chat-context test; (2) acceptance now uses a real Discourse
+AI agent bot user (negative id) and its own API key against the chat
+endpoints. A live read showed the production `Ba_Moi_bot` is in the
+trust_level_0–4 groups, so `direct_message_enabled_groups` including
+trust_level_0 covers it. Refused chats (member turned chat off) now fall back to
+the private thread; (3) the sidebar click interception only handles plain
+primary clicks and registers once.
+
+CI on `9270642` proved the real Discourse AI bot path (negative-id bot user,
+own key) opens, posts into and reuses a member's direct chat. It also showed
+Discourse does not refuse the bot for a member who turned chat off. The test
+and docs now state that limitation instead of the assumed fallback.
+
+Targeted follow-up review `16312cd6-1453-44eb-8955-44838b3d1917` confirmed the
+three earlier findings resolved and flagged the broad 4xx private-message
+fallback as able to hide operational faults. With CI showing Discourse never
+refuses the chat-off case it was meant for, the fallback was removed: chat
+notices retry and then dead-letter visibly. Envelope ids are now also
+required to be safe integers.

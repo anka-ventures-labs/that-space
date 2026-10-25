@@ -68,10 +68,11 @@ export function agentPayload(input: { systemPrompt: string; toolIds: number[]; l
       // The native admin controller stores an omitted custom-tool options
       // value as false: [name, options, forced]. Match its serialized form.
       tools: input.toolIds.map((id) => [`custom-${id}`, false, false]),
-      // Only in private messages: her thread with Bà Mối is private by design.
+      // Only one-to-one: her direct chat with Bà Mối (and existing private
+      // threads). Never public topics or chat channels.
       allow_personal_messages: true,
       allow_topic_mentions: false,
-      allow_chat_direct_messages: false,
+      allow_chat_direct_messages: true,
       allow_chat_channel_mentions: false,
       allowed_group_ids: input.allowedGroupIds,
       ...(input.llmId ? { default_llm_id: input.llmId, force_default_llm: true } : {}),

@@ -81,7 +81,7 @@ describe('the Discourse AI installer contract', () => {
       },
       mutateAgent: (agent) => {
         agent.tools = [['custom-999', false, false]]
-        agent.allow_chat_direct_messages = true
+        agent.allow_chat_channel_mentions = true
         agent.user_id = null
       },
     })
@@ -90,7 +90,7 @@ describe('the Discourse AI installer contract', () => {
       'tool ba_moi_status parameters differs from the repo',
       'tool ba_moi_status secret_bindings differs from the repo',
       'agent Bà Mối tools differs from the repo',
-      'agent Bà Mối allow_chat_direct_messages differs from the repo',
+      'agent Bà Mối allow_chat_channel_mentions differs from the repo',
       'agent Bà Mối has no bot user',
     ]))
   })

@@ -38,7 +38,7 @@ of it told them what to do first.
 │  Bà Mối                │ │ Chào bạn! Hãy để mọi người biết    │   │
 │  Sự kiện               │ │ bạn là ai.                         │   │
 │  Triển lãm             │ │ [ Viết lời giới thiệu ]            │   │
-│  Tin nhắn              │ │ Bạn đến để tìm người hợp duyên?    │   │
+│  Hộp thư               │ │ Bạn đến để tìm người hợp duyên?    │   │
 │  ─ Chuyên mục          │ │ Trò chuyện riêng với Bà Mối        │   │
 │  Giới thiệu            │ └────────────────────────────────────┘   │
 │  Chữa lành & …         │ topic card                                │
@@ -52,10 +52,10 @@ of it told them what to do first.
   first post (including a message to Bà Mối) retires it. No extra request.
 - **Viết lời giới thiệu** opens the composer in Giới thiệu, prefilled with a
   three-line template.
-- **Bà Mối** (sidebar and the card's quiet secondary link) opens a private
-  message to the configured bot, titled "Trò chuyện cùng Bà Mối". Both are
-  hidden until `ba_moi_username` is set. This entry is interim: Bà Mối moves to
-  Discourse Chat in the stacked `feat/ba-moi-chat` change.
+- **Bà Mối** (sidebar and the card's quiet secondary link) opens the member's
+  one direct chat with her in native Discourse Chat (created on first use).
+  Both are hidden until `ba_moi_username` is set. See
+  `docs/plans/2026-10-25-ba-moi-chat.md`.
 - Staff additionally see Kiểm duyệt and Quản trị; core hides both from members.
 - "Về Thật Space" and "Nội quy" sit in the sidebar's "Thêm" drawer.
 
@@ -67,7 +67,7 @@ of it told them what to do first.
 | Brand | `Thật Space Brand` component attached to Horizon: fonts, first-step card, noise removal | `discourse/theme/` |
 | Palette | Owned color scheme "Thật Space Horizon"; Horizon derives tints from `tertiary` (brand brown, 7:1 with white). No dark palette | `discourse/presentation/palette.json` |
 | Sidebar | Core community section links reconciled server-side; Bà Mối added by the theme API | bootstrap + `api-initializers/that-space.gjs` |
-| Quiet onboarding | `top_menu=latest`, welcome banner, user tips, narrative bot, chat, tags, uncategorized and the events plugin's sidebar link off | bootstrap site settings |
+| Quiet onboarding | `top_menu=latest`, welcome banner, user tips, narrative bot, tags, uncategorized and the events plugin's sidebar link off; chat limited to one-to-one direct messages | bootstrap site settings |
 | Wording | vi overrides (`VI_LABELS`): "Viết bài", "Đăng bài", composer mode labels core vi left in English, and a plain composer placeholder | bootstrap |
 | Signup | Manifest field `asked: "later"` → optional and not on the signup form | `discourse/community/manifest.json` |
 

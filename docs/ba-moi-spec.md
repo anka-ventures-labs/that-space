@@ -39,7 +39,8 @@ matchmaking logic and thin glue are ours.
   - The forum.
   - Members' profile pages with a portfolio of their work.
   - Events for retreats and workshops.
-  - Direct messages with Bà Mối.
+  - Bà Mối's conversation, in native Discourse Chat (one direct chat per
+    member, since 2026-10-25; it was a private message before).
   - The anonymous chats.
   - Notifications, moderation, and Thảo's admin.
 - **Bà Mối is a Discourse AI persona** using Discourse AI's official OpenRouter
@@ -60,8 +61,10 @@ matchmaking logic and thin glue are ours.
   - Discourse's `post_created` webhook sends each new post to the service.
   - The service re-posts it into the other member's thread under the sender's
     alias.
-  - Discourse chat has no webhooks, which is why the relay uses private
-    messages.
+  - This was chosen when Discourse chat appeared to have no webhooks. The
+    pinned Discourse (2026.10) does emit `chat_message_*` webhooks, so moving
+    the match chats to Discourse Chat is the planned next phase (see
+    `docs/plans/2026-10-25-ba-moi-chat.md`).
 - **Rejected options, and why:**
   - A separate Bà Mối web app: more UI, sign-in and notification code, all of
     which Discourse already provides.
@@ -107,7 +110,8 @@ matchmaking logic and thin glue are ours.
    The account becomes active without an invitation or staff approval; local
    password signup and login are disabled.
 
-   She then opens a direct message with Bà Mối, who asks for consent, which is
+   She then taps Bà Mối in the sidebar, which opens her one direct chat with
+   Bà Mối in Discourse Chat. Bà Mối asks for consent, which is
    versioned. The consent text says that in the beta, admins can read her
    messages with Bà Mối and her relayed chats, and that deleting removes her
    matchmaking data but not those messages. Then Bà Mối asks for 18+ age, birth

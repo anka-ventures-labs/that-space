@@ -13,10 +13,14 @@ export const CRON_SECRET = 'c'.repeat(40)
 export const BOT_USER_IDS = [-110, 2]
 
 export interface DiscourseCall {
-  type: 'pm' | 'post'
+  type: 'pm' | 'post' | 'chat'
   asUsername: string
+  /** For chat messages: the direct chat's channel and the member it is with. */
+  channelId?: number
+  chatWith?: string
   recipients?: string[]
   title?: string
+  /** 0 for chat messages, which belong to no topic. */
   topicId: number
   postId: number
   raw: string
@@ -27,7 +31,10 @@ export function createFakeDiscourse() {
   const calls: DiscourseCall[] = []
   let nextTopicId = 5000
   let nextPostId = 90000
+  let nextChannelId = 700
+  const channels = new Map<string, number>()
   let failures = 0
+  const chatRefused = new Set<string>()
   const maybeFail = () => {
     if (failures > 0) {
       failures--
@@ -47,6 +54,19 @@ export function createFakeDiscourse() {
       calls.push(call)
       return { postId: call.postId }
     },
+    async openDirectChat({ asUsername, targetUsername }) {
+      maybeFail()
+      if (chatRefused.has(targetUsername)) throw new DiscourseError('Discourse 403: chat disabled', 403)
+      const key = `${asUsername}|${targetUsername}`
+      if (!channels.has(key)) channels.set(key, ++nextChannelId)
+      return { channelId: channels.get(key)! }
+    },
+    async createChatMessage({ asUsername, channelId, raw }) {
+      maybeFail()
+      const chatWith = [...channels].find(([, id]) => id === channelId)?.[0].split('|')[1]
+      calls.push({ type: 'chat' as const, asUsername, channelId, chatWith, raw, topicId: 0, postId: ++nextPostId })
+      return { messageId: nextPostId }
+    },
   }
   return {
     client,
@@ -54,9 +74,15 @@ export function createFakeDiscourse() {
     failNext(n: number) {
       failures = n
     },
+    /** Make Discourse refuse a direct chat with this member, as when she turned chat off. */
+    refuseChatWith(username: string) {
+      chatRefused.add(username)
+    },
     /** Topics started for a member, and every post in a topic. */
     pmsTo: (username: string) => calls.filter((c) => c.type === 'pm' && c.recipients?.includes(username)),
     postsIn: (topicId: number) => calls.filter((c) => c.topicId === topicId).map((c) => c.raw),
+    /** Chat messages sent to a member's direct chat. */
+    chatTo: (username: string) => calls.filter((c) => c.type === 'chat' && c.chatWith === username),
     clear() {
       calls.length = 0
     },
@@ -94,7 +120,7 @@ export function testUser(username: string): TestUser {
 
 export type ToolResponse = { status: number; body: Record<string, any> } // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export async function createHarness(options: { now?: Date; seed?: number } = {}) {
+export async function createHarness(options: { now?: Date; seed?: number; noticeTransport?: 'pm' | 'chat' } = {}) {
   const { db, close } = await createTestDb()
   const discourse = createFakeDiscourse()
   const logs: Array<Record<string, unknown>> = []
@@ -111,6 +137,7 @@ export async function createHarness(options: { now?: Date; seed?: number } = {})
       personaUsername: 'ba_moi',
       relayUsername: 'thu_duyen',
       botUserIds: BOT_USER_IDS,
+      noticeTransport: options.noticeTransport ?? 'pm',
     },
     now: () => now,
     random: seededRandom(options.seed ?? 7),

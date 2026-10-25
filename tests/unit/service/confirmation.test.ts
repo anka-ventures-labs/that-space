@@ -66,4 +66,25 @@ describe('consequential action confirmations', () => {
     expect(await issueConfirmation({ ...ctx, topicId: null }, 'delete', 'member-data')).toBeNull()
     expect(await issueConfirmation({ ...ctx, postId: null }, 'delete', 'member-data')).toBeNull()
   })
+
+  it('works in Bà Mối chat: deletion confirms only on a later message in the same direct chat', async () => {
+    const lan = testUser('lan')
+    await h.call('consent', lan, { action: 'opt_in', adult_confirmed: true })
+    const chat = (messageId: number, channelId = 812) => ({
+      auth: { user_id: lan.user_id, username: lan.username, channel_id: channelId, message_id: messageId, private_message: false },
+    })
+    const challenge = await h.call('consent', lan, { action: 'delete' }, chat(500))
+    expect(challenge.body.error).toBe('confirm_required')
+    const token = challenge.body.confirmation_token
+    expect(token).toEqual(expect.any(String))
+
+    expect((await h.call('consent', lan, { action: 'delete', confirmation_token: token }, chat(500))).body.ok).toBe(false)
+    expect((await h.call('consent', lan, { action: 'delete', confirmation_token: token }, chat(501, 813))).body.ok).toBe(false)
+    // A private-message topic with the same number is a different conversation.
+    expect((await h.call('consent', lan, { action: 'delete', confirmation_token: token }, {
+      auth: { user_id: lan.user_id, username: lan.username, topic_id: 812, post_id: 501, private_message: true, participants: 'lan, ba_moi' },
+    })).body.ok).toBe(false)
+    const confirmed = await h.call('consent', lan, { action: 'delete', confirmation_token: token }, chat(501))
+    expect(confirmed.body).toMatchObject({ ok: true, deleted: true })
+  })
 })

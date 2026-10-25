@@ -1,7 +1,8 @@
 import { apiInitializer } from "discourse/lib/api";
 import { settings } from "virtual:theme";
 import FirstStep from "../components/first-step";
-import { BA_MOI_MESSAGE_TITLE, safeUsername } from "../lib/safe-values";
+import { openBaMoiChat } from "../lib/ba-moi";
+import { safeUsername } from "../lib/safe-values";
 
 export default apiInitializer((api) => {
   // Staff keep operational notices; members get a quieter page.
@@ -14,39 +15,66 @@ export default apiInitializer((api) => {
   api.renderInOutlet("discovery-list-container-top", FirstStep);
 
   // Bà Mối sits in the sidebar beside the other destinations. The rest of the
-  // links are owned server-side by discourse/presentation/bootstrap.rb.
+  // links are owned server-side by discourse/presentation/bootstrap.rb. A
+  // click opens the member's one direct chat with her.
   const baMoi = safeUsername(settings.ba_moi_username);
-  if (baMoi) {
-    api.addCommunitySectionLink((BaseCommunitySectionLink) => {
-      return class BaMoiSectionLink extends BaseCommunitySectionLink {
-        get name() {
-          return "ba-moi";
-        }
+  if (!baMoi) {
+    return;
+  }
 
-        get route() {
-          return "new-message";
-        }
+  api.addCommunitySectionLink((BaseCommunitySectionLink) => {
+    return class BaMoiSectionLink extends BaseCommunitySectionLink {
+      get name() {
+        return "ba-moi";
+      }
 
-        get text() {
-          return "Bà Mối";
-        }
+      get href() {
+        return "/chat";
+      }
 
-        get title() {
-          return "Trò chuyện riêng với Bà Mối";
-        }
+      get text() {
+        return "Bà Mối";
+      }
 
-        get prefixValue() {
-          return "heart";
-        }
+      get title() {
+        return "Trò chuyện riêng với Bà Mối";
+      }
 
-        get query() {
-          return { username: baMoi, title: BA_MOI_MESSAGE_TITLE };
-        }
+      get prefixValue() {
+        return "heart";
+      }
 
-        get shouldDisplay() {
-          return Boolean(this.currentUser?.can_send_private_messages);
+      get shouldDisplay() {
+        return Boolean(this.currentUser?.can_direct_message);
+      }
+    };
+  });
+
+  // Only plain primary clicks (and Enter, which fires one) open the chat;
+  // modified or middle clicks keep normal link behaviour. Registered once
+  // per page even if the initializer runs again.
+  if (!document.documentElement.dataset.baMoiChatLink) {
+    document.documentElement.dataset.baMoiChatLink = "1";
+    document.addEventListener(
+      "click",
+      (event) => {
+        const link = event.target.closest?.('a[data-link-name="ba-moi"]');
+        if (
+          !link ||
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
         }
-      };
-    });
+        event.preventDefault();
+        event.stopPropagation();
+        openBaMoiChat(baMoi);
+      },
+      true
+    );
   }
 });

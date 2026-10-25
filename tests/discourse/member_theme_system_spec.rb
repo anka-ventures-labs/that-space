@@ -34,7 +34,7 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(that_space_theme).to be_persisted
     expect(page).to have_css(".that-space-first-step", visible: true)
     within(".sidebar-wrapper") do
-      %w[Bảng\ tin Sự\ kiện Triển\ lãm Tin\ nhắn].each { |name| expect(page).to have_link(name) }
+      %w[Bảng\ tin Sự\ kiện Triển\ lãm Hộp\ thư].each { |name| expect(page).to have_link(name) }
       expect(page).to have_no_link("Quản trị")
       expect(page).to have_no_link("Kiểm duyệt")
       expect(page).to have_no_link("Bà Mối")
@@ -73,7 +73,7 @@ RSpec.describe "Thật Space member theme", type: :system do
     within(".sidebar-wrapper") { expect(page).to have_link("Quản trị") }
   end
 
-  it "opens a private-message composer addressed to the configured Bà Mối account" do
+  it "opens one ongoing chat with Bà Mối in native Discourse Chat" do
     bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
     that_space_theme.update_setting("ba_moi_username", bot.username)
     sign_in(member)
@@ -81,10 +81,38 @@ RSpec.describe "Thật Space member theme", type: :system do
     expect(page).to have_button("Trò chuyện riêng với Bà Mối")
 
     within(".sidebar-wrapper") { click_link("Bà Mối") }
-    expect(page).to have_css("#reply-control.open")
-    expect(page).to have_css("#reply-control #private-message-users", text: bot.username)
-    expect(page).to have_css("#reply-control .composer-actions", text: "Viết tin nhắn riêng")
-    retain_theme_screenshot("that-space-ba-moi-composer")
+    # Desktop opens the chat drawer beside the feed; phones open full screen.
+    expect(page).to have_css(".chat-composer__input")
+    expect(page).to have_no_css("#reply-control.open")
+    expect(page).to have_content("Bắt đầu trò chuyện với")
+    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
+    channel = Chat::DirectMessageUser.find_by!(user_id: member.id).direct_message.direct_message_channel
+    expect(channel.chatable.users).to contain_exactly(member, bot)
+
+    find(".chat-composer__input").fill_in(with: "Chào Bà Mối, mình muốn tìm một mối quan hệ lâu dài")
+    find(".chat-composer__input").send_keys(:enter)
+    expect(page).to have_css(".chat-message-container", text: "mối quan hệ lâu dài")
+
+    ChatSDK::Message.create(raw: "Chào bạn 🌸 Bà đây. Bạn kể Bà nghe thêm nhé?", channel_id: channel.id, guardian: Guardian.new(bot))
+    expect(page).to have_css(".chat-message-container", text: "Bà đây")
+    retain_theme_screenshot("that-space-ba-moi-chat")
+
+    visit "/"
+    find(".that-space-first-step__ba-moi").click
+    expect(page).to have_css(".chat-message-container", text: "Bà đây")
+    expect(Chat::DirectMessageUser.where(user_id: member.id).count).to eq(1)
+  end
+
+  it "gives phones the same chat with Bà Mối", mobile: true do
+    bot = Fabricate(:user, username: "ba_moi", refresh_auto_groups: true)
+    that_space_theme.update_setting("ba_moi_username", bot.username)
+    sign_in(member)
+    visit "/"
+    find(".that-space-first-step__ba-moi").click
+
+    expect(page).to have_current_path(%r{/chat/c/})
+    expect(page).to have_css(".chat-composer__input", visible: true)
+    retain_theme_screenshot("that-space-ba-moi-chat-mobile")
   end
 
   it "renders an artist's portfolio from the gallery category" do

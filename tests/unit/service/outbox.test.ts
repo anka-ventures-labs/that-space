@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Db } from '@/lib/db/db'
-import { claimDuePosts, enqueuePost, MAX_POST_ATTEMPTS } from '@/lib/db/repo'
+import { claimDuePosts, enqueuePost, getMemberByDiscourseId, MAX_POST_ATTEMPTS } from '@/lib/db/repo'
 import { send } from '@/lib/service/outbox'
 import { revealAsked, revealed } from '@/lib/service/copy'
 import { HIM, HIS_SUMMARY, confirmedCall, createHarness, matchedPair, onboard, testUser, type Harness } from '../../helpers/service'
@@ -156,5 +156,49 @@ describe('durable Discourse delivery', () => {
     expect(responses.filter((r) => r.body.outcome === 'relayed')).toHaveLength(12)
     expect(responses.filter((r) => r.body.outcome === 'rate_limited')).toHaveLength(1)
     expect(h.discourse.postsIn(topicB)).toHaveLength(12)
+  })
+})
+
+describe('Bà Mối notices in chat', () => {
+  let h: Harness
+  beforeEach(async () => { h = await createHarness({ noticeTransport: 'chat' }) })
+  afterEach(async () => h.close())
+
+  it("delivers her notices to the member's direct chat, never as a private message", async () => {
+    const lan = testUser('lan')
+    await onboard(h, lan)
+    const member = await getMemberByDiscourseId(h.db, lan.user_id)
+    h.discourse.clear()
+    await send(h.deps, 'notice-1', { kind: 'persona_notice', memberId: member!.id, raw: 'Bà có tin vui cho bạn' })
+    await send(h.deps, 'notice-2', { kind: 'persona_notice', memberId: member!.id, raw: 'Thêm một tin nữa' })
+    const chats = h.discourse.chatTo('lan')
+    expect(chats.map((c) => c.raw)).toEqual(['Bà có tin vui cho bạn', 'Thêm một tin nữa'])
+    expect(new Set(chats.map((c) => c.channelId)).size).toBe(1)
+    expect(chats.every((c) => c.asUsername === 'ba_moi')).toBe(true)
+    expect(h.discourse.pmsTo('lan')).toEqual([])
+  })
+
+  it('keeps a chat notice queued through an outage and delivers it on retry', async () => {
+    const lan = testUser('lan')
+    await onboard(h, lan)
+    const member = await getMemberByDiscourseId(h.db, lan.user_id)
+    h.discourse.clear()
+    h.discourse.failNext(1)
+    expect(await send(h.deps, 'notice-outage', { kind: 'persona_notice', memberId: member!.id, raw: 'Tin chờ gửi' })).toBe('queued')
+    h.setNow(new Date(Date.now() + 3600_000))
+    await h.cron()
+    expect(h.discourse.chatTo('lan').map((c) => c.raw)).toEqual(['Tin chờ gửi'])
+  })
+
+  it('keeps a refused chat notice queued instead of silently sending a private message', async () => {
+    const lan = testUser('lan')
+    await onboard(h, lan)
+    const member = await getMemberByDiscourseId(h.db, lan.user_id)
+    h.discourse.clear()
+    h.discourse.refuseChatWith('lan')
+    expect(await send(h.deps, 'notice-refused', { kind: 'persona_notice', memberId: member!.id, raw: 'Bà có tin vui' })).toBe('queued')
+    expect(h.discourse.chatTo('lan')).toEqual([])
+    expect(h.discourse.postsIn(lan.topic_id)).toEqual([])
+    expect(h.discourse.pmsTo('lan')).toEqual([])
   })
 })
