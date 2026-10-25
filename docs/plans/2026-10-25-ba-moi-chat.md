@@ -97,3 +97,28 @@ but keeps their data.
   one-to-one chat with the configured bot; a member message and a bot message
   render; reopening from the first-step card returns to the same chat; mobile
   renders the composer.
+
+## Live finding: one conversation thread (2026-10-25)
+
+Discourse AI answers a member's top-level message in a direct chat by forcing a
+thread on that message, and its context is only that thread
+(`Playground#reply_to_chat_message`, `PromptMessagesBuilder.messages_from_chat`).
+Within one thread the conversation remembers itself; across top-level messages
+it does not.
+
+Chosen fix (option A, theme and service only, no server plugin):
+
+- The Bà Mối link opens her latest thread in the direct chat. On first contact
+  it sends "Chào Bà Mối 🌸" for the member, shows the chat, and moves into the
+  thread as soon as her reply creates it (15-second wait).
+- A member who lands on the top level of that chat full screen is redirected
+  into the latest thread. The desktop drawer does not change the URL, so it is
+  not redirected; a message typed there still starts a new thread.
+- The service posts notices into the latest thread
+  (`GET /chat/api/channels/:id/messages.json`, then `thread_id`), so Bà Mối
+  remembers them when the member replies.
+
+Rejected for now: a server plugin that patches Discourse AI to keep direct
+chats flat. It gives the best experience, but it needs a container rebuild on
+the constrained ASUS and patches pinned internals. Revisit on the AWS host if
+threads still confuse members.

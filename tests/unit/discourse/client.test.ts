@@ -36,6 +36,20 @@ describe('the Discourse client', () => {
     await expect(down.createPost({ asUsername: 'ba_moi', topicId: 1, raw: 'x' })).rejects.toMatchObject({ status: null })
   })
 
+  it('finds the newest conversation thread and posts into it with a GET then a POST', async () => {
+    const { calls, fetchImpl } = fakeFetch((url) => url.includes('/messages.json')
+      ? Response.json({ messages: [{ id: 1, thread_id: 7 }, { id: 9, thread_id: null }, { id: 5, thread_id: 8 }] })
+      : Response.json({ message_id: 12 }))
+    const client = createDiscourseClient({ baseUrl: 'https://forum.test', apiKeys, fetchImpl })
+    expect(await client.latestChatThreadId({ asUsername: 'ba_moi', channelId: 3 })).toBe(8)
+    expect(calls[0].init.method).toBe('GET')
+    expect(calls[0].init.body).toBeUndefined()
+    await client.createChatMessage({ asUsername: 'ba_moi', channelId: 3, raw: 'Tin', threadId: 8 })
+    expect(JSON.parse(calls[1].init.body as string)).toEqual({ message: 'Tin', thread_id: 8 })
+    const none = createDiscourseClient({ baseUrl: 'https://forum.test', apiKeys, fetchImpl: fakeFetch(() => Response.json({ messages: [{ id: 2 }] })).fetchImpl })
+    expect(await none.latestChatThreadId({ asUsername: 'ba_moi', channelId: 3 })).toBeNull()
+  })
+
   it('opens a direct chat as the bot and posts into it', async () => {
     const { calls, fetchImpl } = fakeFetch((url) =>
       url.includes('direct-message-channels') ? Response.json({ channel: { id: 812 } }) : Response.json({ success: 'OK', message_id: 9001 }))

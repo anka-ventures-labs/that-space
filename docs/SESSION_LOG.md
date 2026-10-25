@@ -1724,3 +1724,9 @@ Live QA as `ts_qa_nam` in direct chat 3 found two issues:
 
 The Vercel service is unchanged and `BA_MOI_NOTICE_TRANSPORT` stays `pm`
 until the threading decision.
+
+Option A chosen by Minh (ASUS stays until Thảo approves a move to AWS). Branch
+`feat/ba-moi-one-thread`: the theme opens or starts the member's current Bà Mối
+thread and redirects full-page top-level visits into it; the service posts
+notices into that thread. Browser acceptance simulates Discourse AI's forced
+thread reply for existing, first-contact and mobile cases.

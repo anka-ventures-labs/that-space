@@ -18,8 +18,10 @@ directory, attaches it to Horizon and configures its settings.
 | `introduction_category_id` | `0` | Category for "Viết lời giới thiệu". Set by the bootstrap to Giới thiệu. |
 
 Topic creation uses core's composer (`composer.openNewTopic`). Bà Mối opens
-the member's one direct chat with the bot through core chat's direct-message
-upsert (`lib/ba-moi.js`), so core Discourse Chat provides the conversation UI.
+the member's direct chat with the bot through core chat's direct-message upsert
+and goes straight into her latest conversation thread, because Discourse AI
+only remembers the thread it answers in (`lib/ba-moi.js`). Core Discourse Chat
+provides the conversation UI.
 The component does not construct a bot profile URL.
 
 The first-step card renders only for a signed-in member on the home feed while
