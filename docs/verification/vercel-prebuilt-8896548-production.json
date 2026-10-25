@@ -1,0 +1,48 @@
+{
+  "verifiedAt": "2026-10-25T11:45:00Z",
+  "commit": "889654892adab94228c688da86307e777d088879",
+  "pullRequests": [
+    "https://github.com/anka-ventures-labs/that-space/pull/5",
+    "https://github.com/anka-ventures-labs/that-space/pull/6",
+    "https://github.com/anka-ventures-labs/that-space/pull/7",
+    "https://github.com/anka-ventures-labs/that-space/pull/8"
+  ],
+  "exactHeadCi": {
+    "pr8RunId": 40188417693,
+    "pr8HeadSha": "215033c69539a421f30e047b463b6e65022b425a",
+    "serviceChecks": "success",
+    "discourseCommunityAcceptance": "success"
+  },
+  "environmentChange": {
+    "added": "BA_MOI_NOTICE_TRANSPORT=chat (production)"
+  },
+  "artifact": {
+    "target": "production",
+    "physicalFiles": 150,
+    "nodeRuntime": "nodejs24.x",
+    "functionArchitecture": "arm64",
+    "nativeNodeFiles": 0,
+    "nativeBinaries": 0,
+    "physicalEnvironmentFiles": 0,
+    "secretValuesInOutput": "none (DISCOURSE_URL present: public community link)",
+    "operatorPathReferences": "0 after redacting builds.json argv (CLI metadata, not Build Output API)",
+    "linuxRuntimeAudit": "pass: no shipped native binaries"
+  },
+  "deployment": {
+    "id": "dpl_3KqbA9qbnBEhBWbj5dGjPVkjLpQj",
+    "directUrl": "https://that-space-demo-kwefvlhs1-minh-nguyens-projects-3a747261.vercel.app",
+    "canonicalUrl": "https://that-space-demo.vercel.app",
+    "status": "Ready",
+    "method": "local prebuilt production artifact, staged with --skip-domain, smoke-tested through vercel curl protection bypass, then promoted"
+  },
+  "canonicalSmoke": {
+    "routes": { "/": 200, "/forum": 200, "/tuvi": 200, "/matchmaking": 200, "/profile": 200, "/privacy": 200, "/terms": 200, "/contact": 200 },
+    "unauthenticatedTool": 401,
+    "authenticatedChatStyleStatus": "200 ok (participants as a list accepted)",
+    "chatNotice": "QA persona notice delivered by Ba_Moi_bot into the QA member's current Bà Mối chat thread"
+  },
+  "rollback": {
+    "deploymentId": "dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C",
+    "noticeTransport": "set BA_MOI_NOTICE_TRANSPORT=pm to return notices to private messages"
+  }
+}
