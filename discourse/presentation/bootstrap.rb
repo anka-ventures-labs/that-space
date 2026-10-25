@@ -16,6 +16,7 @@ module ThatSpace
     BRAND_KEY = "brand"
     LEGACY_THEME_KEY = "theme"
     PALETTE_KEY = "palette"
+    SIDEBAR_KEY = "sidebar"
     PALETTE_NAME = "Thật Space Horizon"
     Result = Struct.new(:changes, :drift, keyword_init: true)
     class Error < StandardError; end
@@ -59,6 +60,24 @@ module ThatSpace
         raise Error, "Host interest group is not owned by the community manifest"
       end
 
+      # Refuse an unrecognised sidebar before any write, then import and
+      # configure everything fallible before the visible cutover below.
+      sidebar_plan = community_section_plan(gallery)
+      horizon = Theme.horizon_theme
+      unless horizon
+        difference("install core Horizon theme", apply: apply) { SystemThemesManager.sync_theme!("horizon") }
+        horizon = Theme.horizon_theme
+      end
+
+      brand = import_owned(BRAND_KEY, File.join(@repo, "discourse/theme"), component: true, apply: apply)
+      components = @lock.fetch("components").to_h do |pin|
+        path = File.join(@runtime, "tmp/that-space-components", pin.fetch("name"))
+        [pin.fetch("name"), import_owned(pin.fetch("name"), path, component: true, apply: apply)]
+      end
+      palette = reconcile_palette(apply: apply)
+      ready = horizon && brand && palette && components.values.all?
+      configure_imported(brand, components, gallery, introduction, apply: apply) if ready
+
       settings = {
         "hide_user_profiles_from_public" => true,
         "hide_new_user_profiles" => false,
@@ -78,7 +97,6 @@ module ThatSpace
         "ignore_allowed_groups" => [Group[:admins].id, Group[:moderators].id, Group[:trust_level_0].id].join("|"),
         # Member happy path: one feed, one navigation, no tutorial or tip popups.
         "top_menu" => "latest",
-        "enable_welcome_banner" => false,
         "enable_user_tips" => false,
         "discourse_narrative_bot_enabled" => false,
         "chat_enabled" => false,
@@ -91,25 +109,27 @@ module ThatSpace
         difference("site setting #{key}", apply: apply) { SiteSetting.set(key, expected) } unless SiteSetting.public_send(key) == expected
       end
       reconcile_create_label(apply: apply)
-      reconcile_community_section(gallery, apply: apply)
+      reconcile_community_section(sidebar_plan, apply: apply)
 
-      horizon = Theme.horizon_theme
-      unless horizon
-        difference("install core Horizon theme", apply: apply) { SystemThemesManager.sync_theme!("horizon") }
-        horizon = Theme.horizon_theme
-      end
-
-      brand = import_owned(BRAND_KEY, File.join(@repo, "discourse/theme"), component: true, apply: apply)
-      components = @lock.fetch("components").to_h do |pin|
-        path = File.join(@runtime, "tmp/that-space-components", pin.fetch("name"))
-        [pin.fetch("name"), import_owned(pin.fetch("name"), path, component: true, apply: apply)]
-      end
-      palette = reconcile_palette(apply: apply)
-      unless horizon && brand && palette && components.values.all?
+      unless ready
         @drift << "theme-dependent settings and attachments cannot be checked until Horizon and the pinned themes are imported"
         return result
       end
 
+      reconcile_horizon_settings(horizon, apply: apply)
+      required = [brand.id] + components.values.map(&:id)
+      missing = required - horizon.child_theme_ids
+      difference("attach brand, portfolio and thumbnails to Horizon", apply: apply) { horizon.child_theme_ids = horizon.child_theme_ids | required } if missing.any?
+      unless horizon.color_scheme_id == palette.id && horizon.dark_color_scheme_id.nil?
+        # A single light palette: Horizon's stock dark palettes are not branded.
+        difference("Horizon palette", apply: apply) { horizon.update!(color_scheme_id: palette.id, dark_color_scheme_id: nil) }
+      end
+      difference("default member theme", apply: apply) { SiteSetting.default_theme_id = horizon.id } unless SiteSetting.default_theme_id == horizon.id
+      Theme.clear_cache! if apply && @changes.any?
+      result
+    end
+
+    def configure_imported(brand, components, gallery, introduction, apply:)
       logo = brand.theme_fields.find_by(name: "that-space-logo")&.upload
       if logo
         %w[logo logo_small mobile_logo].each do |setting|
@@ -131,23 +151,28 @@ module ThatSpace
           portfolio.theme_translation_overrides.find_or_initialize_by(locale: "vi", translation_key: key).update!(value: text)
         end unless current == text
       end
-
-      required = [brand.id] + components.values.map(&:id)
-      missing = required - horizon.child_theme_ids
-      difference("attach brand, portfolio and thumbnails to Horizon", apply: apply) { horizon.child_theme_ids = horizon.child_theme_ids | required } if missing.any?
-      unless horizon.color_scheme_id == palette.id && horizon.dark_color_scheme_id.nil?
-        # A single light palette: Horizon's stock dark palettes are not branded.
-        difference("Horizon palette", apply: apply) { horizon.update!(color_scheme_id: palette.id, dark_color_scheme_id: nil) }
-      end
-      difference("default member theme", apply: apply) { SiteSetting.default_theme_id = horizon.id } unless SiteSetting.default_theme_id == horizon.id
-      Theme.clear_cache! if apply && @changes.any?
-      result
     end
 
     def owned_category!(key)
       row = CategoryCustomField.find_by(name: "that_space.community.category_key", value: key)
       raise Error, "Apply the community manifest first (missing category #{key})" unless row
       Category.find(row.category_id)
+    end
+
+    # Themeable site settings live on the theme. Horizon ships the welcome
+    # banner on; core keeps an owner's override across Horizon re-syncs.
+    def reconcile_horizon_settings(horizon, apply:)
+      { "enable_welcome_banner" => false }.each do |name, expected|
+        next if SiteSetting.public_send(name, theme_id: horizon.id) == expected
+
+        difference("Horizon setting #{name}", apply: apply) do
+          outcome = Themes::ThemeSiteSettingManager.call(
+            params: { theme_id: horizon.id, name: name, value: expected },
+            guardian: Discourse.system_user.guardian
+          )
+          raise Error, "Horizon setting #{name} could not be saved" unless outcome.success?
+        end
+      end
     end
 
     def reconcile_create_label(apply:)
@@ -171,28 +196,47 @@ module ThatSpace
       ]
     end
 
-    def reconcile_community_section(gallery, apply:)
-      section = SidebarSection.find_by(section_type: SidebarSection.section_types[:community])
+    # The community section is a core record that admins can edit. Only a
+    # section of core links or one this bootstrap wrote is replaced; custom
+    # admin or plugin links are refused before any write.
+    def community_section_plan(gallery)
+      section = SidebarSection.find_by(section_type: "community")
       unless section
         @drift << "core community sidebar section is missing; sidebar links cannot be checked"
-        return
+        return nil
       end
       expected = community_links(gallery)
-      current = section.sidebar_section_links.includes(:linkable).filter_map do |link|
+      current = section.sidebar_section_links.includes(:linkable).map do |link|
         url = link.linkable
-        [url.name, url.value, url.icon, url.segment] if url.is_a?(SidebarUrl)
+        url.is_a?(SidebarUrl) ? [url.name, url.value, url.icon, url.segment] : [link.linkable_type, link.linkable_id]
       end
-      return if current == expected
+      return { section: section, expected: expected, current: current } if current == expected
 
+      # Core-only: every link is a core community path (names may be edited).
+      core_only = current.all? { |link| link.length == 4 && SidebarUrl::COMMUNITY_SECTION_LINK_PATHS.include?(link[1]) }
+      unless core_only || PluginStore.get(STORE, SIDEBAR_KEY)
+        raise Error, "Community sidebar has unrecognised links; refusing takeover. Reset it in Admin → Sidebar or remove the custom links first"
+      end
+      { section: section, expected: expected, current: current }
+    end
+
+    def reconcile_community_section(plan, apply:)
+      return unless plan
+      return if plan[:current] == plan[:expected] && PluginStore.get(STORE, SIDEBAR_KEY)
+
+      section = plan[:section]
       difference("community sidebar links", apply: apply) do
         SidebarSection.transaction do
-          urls = section.sidebar_urls.to_a
-          section.sidebar_section_links.destroy_all
-          urls.each(&:destroy!)
-          expected.each_with_index do |(name, value, icon, segment), position|
-            url = SidebarUrl.create!(name: name, value: value, icon: icon, segment: segment, external: false)
-            SidebarSectionLink.create!(user_id: Discourse.system_user.id, linkable: url, sidebar_section: section, position: position)
+          if plan[:current] != plan[:expected]
+            urls = section.sidebar_urls.to_a
+            section.sidebar_section_links.destroy_all
+            urls.each(&:destroy!)
+            plan[:expected].each_with_index do |(name, value, icon, segment), position|
+              url = SidebarUrl.create!(name: name, value: value, icon: icon, segment: segment, external: false)
+              SidebarSectionLink.create!(user_id: Discourse.system_user.id, linkable: url, sidebar_section: section, position: position)
+            end
           end
+          PluginStore.set(STORE, SIDEBAR_KEY, { "section_id" => section.id })
         end
         Site.clear_anon_cache!
       end

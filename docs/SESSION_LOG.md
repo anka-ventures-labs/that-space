@@ -1569,3 +1569,14 @@ content-tag, 31 files / 224 Vitest tests, typecheck and lint pass. The
 Discourse request/browser acceptance (Horizon, palette, sidebar, first-step
 journey, signup contract) runs only in GitHub CI. Production apply has not
 happened. Design: `docs/design/member-happy-path.md`.
+
+First CI run on `bc2f2eb` failed: `enable_welcome_banner` is themeable in this
+Discourse revision and must be set per theme, and unanswered optional fields
+are stored as nil keys. Codex review `25348bda-faac-4443-8f62-c76a904d2194`
+(route `f51d5c8d`) returned do-not-ship with four findings, all accepted:
+the sidebar rewrite could delete admin-added links (now refused unless the
+section holds only core links or is bootstrap-owned, checked before any write);
+visible changes ran before fallible imports (imports/configuration now run
+first); the first-step "introduced" flag was shared across accounts on one
+browser (now keyed by user id); and tests lacked a legacy-site migration,
+custom-sidebar refusal and Q1-only enforcement case (added).

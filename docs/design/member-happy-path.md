@@ -68,6 +68,13 @@ of it told them what to do first.
 | Wording | vi override `js.topic.create = "Viết bài"` | bootstrap |
 | Signup | Manifest field `asked: "later"` → optional and not on the signup form | `discourse/community/manifest.json` |
 
+Apply order: the bootstrap first refuses a community sidebar holding custom
+(non-core) links it does not own, then imports and configures Horizon, the
+component, palette and pinned components, and only then changes the visible
+site settings, sidebar, Horizon attachments and default theme. The welcome
+banner is a themeable setting, so it is set on Horizon itself; core preserves
+that override when it re-syncs Horizon.
+
 Horizon is a core theme: it cannot be edited and upgrades with the pinned
 Discourse revision. Discourse advises caution with components on Horizon; the
 browser acceptance suite is the guard for our component, Portfolio and Topic

@@ -108,6 +108,19 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     expect(response.parsed_body).to include("success" => false)
     expect(User.find_by_email("google-member@example.com")).to be_nil
 
+    role_id = configured_user_field("community_role").id.to_s
+    post "/u.json",
+         params: {
+           email: "google-member@example.com",
+           username: "google_member",
+           name: "Google Member",
+           user_fields: that_space_signup_fields.except(role_id),
+         }
+
+    expect(response.status).to eq(200), response.body
+    expect(response.parsed_body).to include("success" => false)
+    expect(User.find_by_email("google-member@example.com")).to be_nil
+
     post "/u.json",
          params: {
            email: "google-member@example.com",
@@ -218,7 +231,7 @@ RSpec.describe "Thật Space member acceptance", type: :request do
     member = create_google_member
     private_field = configured_user_field("relationship_status")
     answer_id, answer = that_space_answer("relationship_status")
-    expect(member.reload.user_fields).not_to have_key(answer_id)
+    expect(member.reload.user_fields[answer_id]).to be_nil
 
     # Optional questions are answered later from the member's own profile.
     put "/u/#{member.username}.json", params: { user_fields: { answer_id => answer } }

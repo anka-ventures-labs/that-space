@@ -9,7 +9,7 @@ import { settings } from "virtual:theme";
 import { BA_MOI_MESSAGE_TITLE, safeUsername } from "../lib/safe-values";
 
 const HOME_ROUTES = ["discovery.latest", "discovery.index"];
-const INTRODUCED_KEY = "that-space-introduced";
+const INTRODUCED_KEY_PREFIX = "that-space-introduced:";
 const INTRO_TITLE = "Xin chào, mình là ";
 const INTRO_BODY = [
   "Chào mọi người, mình là …",
@@ -27,6 +27,11 @@ export default class FirstStep extends Component {
   @service router;
 
   @tracked hasPosted = this.#rememberedIntroduced();
+
+  // Per account, so a shared browser never hides another member's first step.
+  get #introducedKey() {
+    return `${INTRODUCED_KEY_PREFIX}${this.currentUser?.id}`;
+  }
 
   constructor() {
     super(...arguments);
@@ -61,7 +66,12 @@ export default class FirstStep extends Component {
 
   #rememberedIntroduced() {
     try {
-      return window.localStorage.getItem(INTRODUCED_KEY) === "1" ? true : null;
+      if (!this.currentUser) {
+        return null;
+      }
+      return window.localStorage.getItem(this.#introducedKey) === "1"
+        ? true
+        : null;
     } catch {
       return null;
     }
@@ -75,7 +85,7 @@ export default class FirstStep extends Component {
       const posted = (result?.user?.post_count ?? 0) > 0;
       if (posted) {
         try {
-          window.localStorage.setItem(INTRODUCED_KEY, "1");
+          window.localStorage.setItem(this.#introducedKey, "1");
         } catch {
           // Storage can be unavailable in private browsing; the check repeats.
         }

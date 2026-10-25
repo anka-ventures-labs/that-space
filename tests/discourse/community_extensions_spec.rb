@@ -62,7 +62,7 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(SiteSetting.top_menu).to eq("latest")
     expect(SiteSetting.chat_enabled).to eq(false)
     expect(SiteSetting.discourse_narrative_bot_enabled).to eq(false)
-    expect(SiteSetting.enable_welcome_banner).to eq(false)
+    expect(SiteSetting.enable_welcome_banner(theme_id: Theme.horizon_theme.id)).to eq(false)
     expect(SiteSetting.tagging_enabled).to eq(false)
     expect(TranslationOverride.find_by!(locale: "vi", translation_key: "js.topic.create").value).to eq("Viết bài")
 
@@ -70,6 +70,35 @@ RSpec.describe "Thật Space community extensions", type: :request do
     expect(presentation.check!.drift).to include("community sidebar links")
     presentation.apply!
     expect(section.reload.sidebar_urls.order("sidebar_section_links.position").first.name).to eq("Bảng tin")
+  end
+
+  it "checks a site still on the legacy theme without writing, then cuts over and keeps the rollback theme" do
+    legacy = Theme.create!(name: "Thật Space", user_id: Discourse.system_user.id)
+    PluginStore.set(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::LEGACY_THEME_KEY, { "id" => legacy.id })
+    SiteSetting.default_theme_id = legacy.id
+    SiteSetting.top_menu = "latest|new|unread|hot|categories"
+
+    drift = presentation.check!.drift
+    expect(drift).to include("default member theme", "site setting top_menu")
+    expect(SiteSetting.default_theme_id).to eq(legacy.id)
+    expect(SiteSetting.top_menu).to eq("latest|new|unread|hot|categories")
+
+    presentation.apply!
+    expect(SiteSetting.default_theme_id).to eq(Theme.horizon_theme.id)
+    expect(presentation.legacy_theme).to eq(legacy)
+    expect(presentation.check!.drift).to be_empty
+  end
+
+  it "refuses an admin-customised sidebar before changing anything" do
+    section = SidebarSection.find_by!(section_type: "community")
+    custom = SidebarUrl.create!(name: "Admin pick", value: "/c/thong-bao", icon: "star", segment: "primary", external: false)
+    SidebarSectionLink.create!(user_id: Discourse.system_user.id, linkable: custom, sidebar_section: section, position: 99)
+    PluginStore.remove(ThatSpace::PresentationBootstrap::STORE, ThatSpace::PresentationBootstrap::SIDEBAR_KEY)
+    SiteSetting.top_menu = "latest|new"
+
+    expect { presentation.apply! }.to raise_error(ThatSpace::PresentationBootstrap::Error, /refusing takeover/)
+    expect(SiteSetting.top_menu).to eq("latest|new")
+    expect(section.reload.sidebar_urls).to include(custom)
   end
 
   it "refuses to take over an unrelated same-named theme" do
