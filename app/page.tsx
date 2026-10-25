@@ -1,72 +1,49 @@
-import Image from "next/image";
 import Link from "next/link";
+import OrigamiLotus from "@/components/OrigamiLotus";
+import PaperSteps from "@/components/PaperSteps";
 import { getPublicSiteConfig } from "@/lib/public-site";
 
 const features = [
-  { title: "Bà Mối đồng hành", description: "Trò chuyện riêng với Bà Mối AI, tạo thẻ ẩn danh và nhận những lời giới thiệu có chủ đích." },
-  { title: "Bạn giữ quyền quyết định", description: "Chỉ tham gia khi bạn đồng ý riêng; có thể tạm dừng, kết thúc, chặn hoặc xóa dữ liệu mai mối." },
-  { title: "Cộng đồng thật", description: "Chia sẻ, portfolio, sự kiện và những cuộc trò chuyện chỉ dành cho thành viên đã đăng nhập." },
+  { href: "/forum", n: "01 · Diễn đàn", title: "Forum", body: "Connect with people who understand your journey. Share stories, seek wisdom, and find your circle in warm community spaces." },
+  { href: "/tuvi", n: "02 · Lá số", title: "Tử Vi Horoscope", body: "Explore a personal Tử Vi experience rooted in Vietnamese astrology and discover prompts for love, career, and spiritual reflection." },
+  { href: "/matchmaking", n: "03 · Tìm duyên", title: "Matchmaking", body: "Meet Bà Mối in private, review anonymous cards, and open contact only after both people explicitly choose to reveal." },
 ];
 
 export default function HomePage() {
-  const publicSite = getPublicSiteConfig();
-
+  const site = getPublicSiteConfig();
   return (
-    <div className="min-h-screen">
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F0E8] to-[#EDE6D8] px-4 py-20 text-center md:py-24">
-        <div className="absolute left-10 top-10 h-40 w-40 rounded-full bg-[#C4A882]/10 blur-3xl" />
-        <div className="absolute bottom-10 right-10 h-60 w-60 rounded-full bg-[#C4A882]/10 blur-3xl" />
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-7">
-          <Image src="/logo.jpg" alt="Thật Space" width={120} height={120} className="rounded-full border-4 border-[#C4A882] object-cover shadow-xl" priority />
-          <div className="space-y-4">
-            <h1 className="font-[family-name:var(--font-playfair)] text-5xl font-bold leading-tight text-[#5C3D2E] md:text-6xl">Thật Space</h1>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#8B6F47]">Gặp người hợp ý cùng Bà Mối</p>
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#5C3D2E]/80 md:text-xl">Một cộng đồng riêng tư để người trưởng thành kết nối có chủ đích — bắt đầu bằng cuộc trò chuyện với Bà Mối.</p>
+    <div className="paper-page paper-grain">
+      <OrigamiLotus signupHref={site.signupHref} loginHref={site.loginHref} registrationOpen={site.publicRegistrationEnabled} />
+
+      <section className="dark-fold-section">
+        <div className="paper-shell">
+          <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
+            <h2 className="paper-title max-w-2xl text-[clamp(36px,4.4vw,60px)]">Everything you need to <em className="text-[#C4A882]">flourish</em></h2>
+            <p className="m-0 max-w-sm leading-relaxed text-[#E2D4BC]">Three pillars of connection, wisdom, and belonging — folded into one private space.</p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href={publicSite.signupHref} className="rounded-full bg-[#5C3D2E] px-7 py-3 font-medium text-[#F5F0E8] shadow-md transition-colors hover:bg-[#7A5542]">
-              {publicSite.publicRegistrationEnabled ? "Tham gia Thật Space" : "Liên hệ Thật Space"}
-            </Link>
-            {publicSite.loginHref && (
-              <Link href={publicSite.loginHref} className="rounded-full border-2 border-[#5C3D2E] px-7 py-3 font-medium text-[#5C3D2E] transition-colors hover:bg-[#5C3D2E] hover:text-[#F5F0E8]">Đăng nhập thành viên</Link>
-            )}
+          <div className="feature-grid">
+            {features.map((feature) => <Link key={feature.href} href={feature.href} className="feature-card fold-card paper-grain"><svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d={feature.href === "/forum" ? "M6 10h30v20H18l-8 7v-7H6zM24 34h8l8 8v-8h10V18h-8" : feature.href === "/tuvi" ? "M28 4l6 18 18 6-18 6-6 18-6-18-18-6 18-6zM28 4v48M4 28h48" : "M28 50 6 26l6-14 16 8 16-8 6 14zM28 20v30M6 26h44"} /></svg><span className="eyebrow">{feature.n}</span><h3 className="serif m-0 text-3xl font-medium">{feature.title}</h3><p className="m-0 leading-relaxed text-[#6E4D3C]">{feature.body}</p><span className="mt-auto font-semibold">Explore →</span></Link>)}
           </div>
-          <p className="max-w-xl text-sm leading-relaxed text-[#5C3D2E]/70">
-            {publicSite.publicRegistrationEnabled
-              ? "Bất kỳ ai từ đủ 18 tuổi đều có thể tự đăng ký, không phân biệt giới tính. Đăng nhập bằng Google; không cần lời mời hay chờ phê duyệt thủ công."
-              : "Thật Space dành cho bất kỳ ai từ đủ 18 tuổi, không phân biệt giới tính. Kênh đăng ký công khai đang tạm dừng; hãy xem trang Liên hệ để biết trạng thái mới nhất."}
-          </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 md:py-20">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#5C3D2E] md:text-4xl">Dành cho những kết nối có chủ đích</h2>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((feature) => (
-            <article key={feature.title} className="rounded-2xl border border-[#C4A882]/30 bg-white/60 p-7 text-center shadow-sm">
-              <h3 className="mb-3 font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#5C3D2E]">{feature.title}</h3>
-              <p className="text-sm leading-relaxed text-[#5C3D2E]/75">{feature.description}</p>
-            </article>
-          ))}
+      <section className="paper-shell py-28">
+        <div className="mb-12 max-w-2xl"><span className="eyebrow">How it unfolds</span><h2 className="paper-title mt-4 text-[clamp(34px,4vw,54px)]">One sheet of paper, four folds.</h2><p className="text-[#6E4D3C]">Hover or tap each fold to open it.</p></div>
+        <PaperSteps />
+      </section>
+
+      <section className="paper-shell pb-28">
+        <h2 className="paper-title mb-14 text-center text-[clamp(34px,4vw,54px)]">Built for honest connection</h2>
+        <div className="grid items-start gap-10 md:grid-cols-3">
+          {[[-2,"R","Riêng tư theo mặc định","Hồ sơ mai mối chỉ xuất hiện khi bạn đồng ý và duyệt thẻ ẩn danh của mình."],[1.5,"C","Cả hai cùng chọn","Thông tin liên hệ chỉ mở khi hai người cùng xác nhận; bạn luôn có thể tạm dừng hoặc kết thúc."],[-1,"B","Bạn giữ quyền quyết định","Chặn, xóa dữ liệu mai mối và nhận hỗ trợ đều là những đường đi có thật trong sản phẩm."]].map(([tilt,initial,title,body]) => <article key={String(title)} className="paper-note paper-grain" style={{ transform: `rotate(${tilt}deg)` }}><div className="avatar-fold mb-5 h-11 w-11">{initial}</div><h3 className="serif text-xl font-medium">{title}</h3><p className="leading-relaxed text-[#6E4D3C]">{body}</p></article>)}
         </div>
       </section>
 
-      <section className="bg-[#5C3D2E]/5 px-4 py-16 md:py-20">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-[#C4A882]/30 bg-white/60 p-8 text-center md:p-10">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#5C3D2E]">Bà Mối là nơi cuộc gặp bắt đầu</h2>
-          <div className="mt-5 space-y-4 text-left leading-relaxed text-[#5C3D2E]/75">
-            <p>Nhắn riêng với Bà Mối để tham gia tự nguyện, kể điều bạn đang tìm kiếm và duyệt thẻ ẩn danh trước khi xuất hiện trong hộp Duyên.</p>
-            <p>Khi hai người cùng muốn làm quen, Thư Duyên mở một phòng trò chuyện ẩn danh. Danh tính và thông tin liên hệ chỉ được mở sau khi cả hai cùng xác nhận.</p>
-            <p>Câu trả lời đăng ký cộng đồng không tự động được dùng cho mai mối. Bạn có thể tạm dừng hoặc xóa dữ liệu Bà Mối bất cứ lúc nào.</p>
-          </div>
-          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href={publicSite.signupHref} className="rounded-full bg-[#5C3D2E] px-6 py-3 font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
-              {publicSite.publicRegistrationEnabled ? "Bắt đầu với Bà Mối" : "Liên hệ Thật Space"}
-            </Link>
-            <Link href="/privacy" className="rounded-full border border-[#5C3D2E]/40 px-6 py-3 font-medium text-[#5C3D2E] transition-colors hover:bg-[#5C3D2E]/5">Quyền riêng tư</Link>
-          </div>
+      <section className="paper-shell pb-28">
+        <div className="cta-sheet paper-grain flex flex-col items-center gap-6">
+          <h2 className="paper-title relative z-10 text-[clamp(36px,4.6vw,64px)] text-[#3F2A1F]">Ready to find your space?</h2>
+          <p className="relative z-10 m-0 max-w-xl leading-relaxed text-[#3F2A1F]">Join a Vietnamese community designed for deeper connection, thoughtful conversation, and voluntary matchmaking with Bà Mối.</p>
+          <Link href={site.signupHref} className="paper-button paper-button-primary relative z-10 mt-2 px-9">{site.publicRegistrationEnabled ? "Join the Community — It’s Free" : "Xem cách tham gia"}</Link>
         </div>
       </section>
     </div>

@@ -5,92 +5,39 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-type NavbarProps = {
-  communityUrl: string;
-  publicRegistrationEnabled: boolean;
-};
+type NavbarProps = { communityUrl: string; publicRegistrationEnabled: boolean };
 
 export default function Navbar({ communityUrl, publicRegistrationEnabled }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const normalizedCommunityUrl = communityUrl.trim().replace(/\/+$/, "");
+  const community = communityUrl.trim().replace(/\/+$/, "");
   const navLinks = [
-    { href: "/", label: "Trang chủ", external: false },
-    ...(normalizedCommunityUrl
-      ? [{ href: normalizedCommunityUrl, label: "Cộng đồng", external: true }]
-      : []),
-    { href: "/privacy", label: "Quyền riêng tư", external: false },
-    { href: "/contact", label: "Liên hệ", external: false },
+    { href: "/forum", label: "Forum" },
+    { href: "/tuvi", label: "Tử Vi" },
+    { href: "/matchmaking", label: "Tìm Duyên" },
+    { href: "/profile", label: "Profile" },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[#C4A882]/40 bg-[#F5F0E8]/95 shadow-sm backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="group flex items-center gap-3">
-          <Image src="/logo.jpg" alt="Thật Space" width={44} height={44} className="rounded-full border-2 border-[#C4A882] object-cover transition-colors group-hover:border-[#5C3D2E]" />
-          <span className="hidden font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#5C3D2E] sm:block">Thật Space</span>
+    <nav className="paper-nav" aria-label="Main">
+      <div className="paper-nav-inner">
+        <Link href="/" className="paper-logo" aria-label="Thật Space — Trang chủ">
+          <Image src="/logo.jpg" alt="Thật Space" width={48} height={48} priority />
         </Link>
-
-        <ul className="hidden items-center gap-7 md:flex">
+        <div id="mobile-navigation" className="paper-nav-links" data-open={menuOpen}>
           {navLinks.map((link) => {
-            const isActive = !link.external && pathname === link.href;
-            return (
-              <li key={link.href}>
-                <Link href={link.href} className={`pb-1 text-sm font-medium tracking-wide transition-colors ${isActive ? "border-b-2 border-[#C4A882] text-[#5C3D2E]" : "text-[#5C3D2E]/70 hover:border-b-2 hover:border-[#C4A882]/50 hover:text-[#5C3D2E]"}`}>
-                  {link.label}
-                </Link>
-              </li>
-            );
+            const active = pathname === link.href || (link.href === "/forum" && pathname.startsWith("/forum/"));
+            return <Link key={link.href} href={link.href} aria-current={active ? "page" : undefined} className="paper-nav-link" onClick={() => setMenuOpen(false)}>{link.label}</Link>;
           })}
-          {normalizedCommunityUrl && (
-            <li>
-              <Link href={`${normalizedCommunityUrl}/login`} className="text-sm font-medium text-[#5C3D2E]/70 transition-colors hover:text-[#5C3D2E]">
-                Đăng nhập
-              </Link>
-            </li>
-          )}
-          <li>
-            <Link href={publicRegistrationEnabled && normalizedCommunityUrl ? `${normalizedCommunityUrl}/signup` : "/contact"} className="rounded-full bg-[#5C3D2E] px-4 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
-              {publicRegistrationEnabled ? "Đăng ký" : "Liên hệ"}
-            </Link>
-          </li>
-        </ul>
-
-        <button
-          className="rounded-md p-2 text-[#5C3D2E] transition-colors hover:bg-[#C4A882]/20 md:hidden"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Chuyển menu"
-          aria-expanded={menuOpen}
-          aria-controls="mobile-navigation"
-        >
-          {menuOpen ? (
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-          ) : (
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-          )}
-        </button>
-      </div>
-
-      {menuOpen && (
-        <div id="mobile-navigation" className="space-y-3 border-t border-[#C4A882]/30 bg-[#F5F0E8] px-4 py-4 md:hidden">
-          {navLinks.map((link) => {
-            const isActive = !link.external && pathname === link.href;
-            return (
-              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive ? "bg-[#C4A882]/30 text-[#5C3D2E]" : "text-[#5C3D2E]/70 hover:bg-[#C4A882]/20 hover:text-[#5C3D2E]"}`}>
-                {link.label}
-              </Link>
-            );
-          })}
-          {normalizedCommunityUrl && (
-            <Link href={`${normalizedCommunityUrl}/login`} onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-[#5C3D2E]/70 hover:bg-[#C4A882]/20 hover:text-[#5C3D2E]">
-              Đăng nhập thành viên
-            </Link>
-          )}
-          <Link href={publicRegistrationEnabled && normalizedCommunityUrl ? `${normalizedCommunityUrl}/signup` : "/contact"} onClick={() => setMenuOpen(false)} className="block rounded-full bg-[#5C3D2E] px-4 py-2 text-center text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#7A5542]">
-            {publicRegistrationEnabled ? "Đăng ký" : "Liên hệ"}
+          {community && <Link href={`${community}/login`} className="paper-nav-link" onClick={() => setMenuOpen(false)}>Đăng nhập</Link>}
+          <Link href={publicRegistrationEnabled && community ? `${community}/signup` : "/contact"} className="paper-button paper-button-primary ml-2 min-h-11 px-5 text-[15px]" onClick={() => setMenuOpen(false)}>
+            {publicRegistrationEnabled ? "Join" : "Liên hệ"}
           </Link>
         </div>
-      )}
+        <button className="paper-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Chuyển menu" aria-expanded={menuOpen} aria-controls="mobile-navigation">
+          {menuOpen ? "×" : "☰"}
+        </button>
+      </div>
     </nav>
   );
 }

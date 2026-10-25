@@ -18,9 +18,11 @@ Private community: <https://ubuntu-asus.tail349cbf.ts.net:8443>
 The approved soft-launch shape is public self-service membership for any adult,
 with the full community and Bà Mối experience available from day one:
 
-- public routes are `/`, `/privacy`, `/terms`, and `/contact`;
-- the former static forum, profile, Tử Vi, and matchmaking demo routes have
-  been removed;
+- the origami public experience ships `/`, `/forum`, `/forum/[slug]`, `/tuvi`,
+  `/matchmaking`, and `/profile`, plus `/privacy`, `/terms`, and `/contact`;
+- designed public forum, profile, Tử Vi, and matchmaking screens are explicitly
+  labelled previews; account data, posting, messaging, private profiles, and
+  Bà Mối remain in the authenticated Discourse community;
 - anyone aged 18 or older may register with Google, without an invitation or
   staff approval;
 - Discourse requires an explicit 18+ attestation and all 15 private community
@@ -66,6 +68,11 @@ not add real secrets to tracked files.
 | Route | Content |
 | --- | --- |
 | `/` | Bà Mối-led product, adult eligibility, public signup, and community features |
+| `/forum` | Filterable public preview of the handed-off origami forum; posting opens the authenticated community |
+| `/forum/[slug]` | Public sample thread in the handed-off folded-letter treatment |
+| `/tuvi` | Interactive 12-palace sample chart with clear cultural/illustrative disclaimer |
+| `/matchmaking` | Interactive compatibility-letter preview; real participation opens Bà Mối signup |
+| `/profile` | Static public profile artboard; real member profiles remain private |
 | `/privacy` | Community/Bà Mối data handling and active processors |
 | `/terms` | 18+ eligibility, account rules, and conduct terms |
 | `/contact` | Account, data, community, and Bà Mối support |
@@ -95,9 +102,11 @@ tests/unit/       Node unit tests; database suites use PGlite
 tests/integration/Local Bà Mối journeys through the real dispatcher
 ```
 
-Brand colors live in `tailwind.config.ts`. Playfair Display and Inter are loaded
-by `app/layout.tsx`. `next.config.js` keeps the logo unoptimized so the static
-public surface does not depend on the image optimization server.
+The implementation source of truth is `docs/design/origami/`: Fraunces and Be
+Vietnam Pro, paper tokens, sharp folds, grain, shadows, interactive cards, and
+the cursor-following 29-petal lotus are ported into the actual Next.js routes.
+`next.config.js` keeps the logo unoptimized so the static public surface does not
+depend on the image optimization server.
 
 ## Public self-service admission
 

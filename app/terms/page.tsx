@@ -7,8 +7,9 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <article className="mx-auto max-w-3xl px-4 py-16 leading-relaxed text-[#5C3D2E]/80 md:py-20">
-      <h1 className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-[#5C3D2E]">Điều khoản cộng đồng</h1>
+    <article className="legal-paper paper-grain">
+      <span className="eyebrow">Legal · Terms</span>
+      <h1 className="paper-title mt-3 text-5xl">Điều khoản cộng đồng</h1>
       <p className="mt-3 text-sm text-[#5C3D2E]/65">Cập nhật ngày 11 tháng 10 năm 2026</p>
       <div className="mt-8 space-y-5">
         <p>Thật Space dành cho bất kỳ ai từ đủ 18 tuổi, không phân biệt giới tính. Khi đăng ký, bạn tự xác nhận mình đáp ứng điều kiện tuổi này. Không gửi ảnh giấy tờ tùy thân cho Thật Space.</p>

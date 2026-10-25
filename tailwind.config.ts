@@ -9,18 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#5C3D2E",
-        secondary: "#C4A882",
-        cream: "#F5F0E8",
-        brown: {
-          dark: "#5C3D2E",
-          light: "#C4A882",
-        },
+        ink: { DEFAULT: "#5C3D2E", deep: "#3F2A1F", 700: "#4E3326", 500: "#6E4D3C", 400: "#7A5A48" },
+        kraft: { DEFAULT: "#C4A882", 600: "#A88B66", 300: "#D2BE9C" },
+        washi: { DEFAULT: "#F5F0E8", 200: "#EFE7DA" },
+        crease: "#E2D4BC",
+        sheet: "#FBF8F2",
+        accent: "#8A6450",
       },
       fontFamily: {
-        playfair: ["var(--font-playfair)", "serif"],
-        inter: ["var(--font-inter)", "sans-serif"],
-        lato: ["Lato", "sans-serif"],
+        serif: ["var(--font-fraunces)", "Georgia", "serif"],
+        sans: ["var(--font-vietnam)", "system-ui", "sans-serif"],
       },
     },
   },

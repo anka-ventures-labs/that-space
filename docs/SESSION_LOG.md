@@ -1474,3 +1474,38 @@ JSON parsing, whitespace and actual credential-value checks passed (19 distinct
 private values checked, zero found). Inspect the existing PR's new exact-head
 hosted checks after push. No real invitations or merge;
 full Tử Vi/charts/readings/PDF remain excluded.
+# 2026-10-25 — Origami public launch assembly
+
+Made `anka-ventures-labs/that-space` public and assembled the origami design
+handoff onto the existing public self-service launch work on
+`feat/origami-public-launch`. The `.dc.html` handoff is implemented as the
+actual Next.js presentation: shared paper tokens and type, responsive navigation
+and footer, the 29-petal cursor-following/blooming lotus, forum/thread routes,
+Tử Vi unfolding chart, matchmaking compatibility letter, profile, and paper
+legal/support/404 surfaces. Persistent signup, identity, community posting,
+profiles, messaging, and Bà Mối remain on the real Discourse/service boundary;
+public sample content is labelled and CTAs use the existing independent gates.
+
+Updated Next.js 15.5.27→15.5.28 and Zod ^4.6.5→^4.6.6 (resolved 4.6.7) for current critical/high
+production advisories; the production-only audit is clean and the 21-page build
+passes. T3 browser QA found and fixed a deterministic hydration mismatch from
+cross-runtime floating-point facet normals. Desktop and 390×844 checks show no
+horizontal overflow across the handed-off routes. Public Funnel/TLS/signup and
+the exact Google callback work in a clean incognito flow. One cold browser load
+received a transient 503 for the Vietnamese locale module and remained on the
+Discourse splash; a clean retry succeeded. The existing runbook records the same
+cold rotational-disk stall class. Vercel CLI authentication is absent and ASUS
+SSH is denied by tailnet policy, so production deployment and host tuning remain
+explicit operator gates. Full implementation and release sequence are in
+`docs/plans/2026-10-25-origami-public-launch.md`.
+
+Sonnet assembly review `d7a02969-e30d-4499-8f83-772a79296d0a` initially returned
+DO NOT SHIP for indexable/misleading sample-member content and CSS ordering that
+suppressed intended spacing. The full retained output was read and acknowledged;
+routing feedback is closed. Fixed the confirmed blockers plus its concrete
+accessibility/performance findings: persistent preview labels and noindex,
+neutral/contextual sample data, Tailwind component layering, hero CTA placement,
+modal focus trap/return, offscreen lotus-loop suspension, focus contrast and
+browser-local Tử Vi disclosure. Restored the major handed-off decorative details
+it identified. Resolution evidence is retained in
+`docs/reviews/origami-assembly-20261025.md`.

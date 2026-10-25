@@ -45,10 +45,10 @@ describe("Landing Page", () => {
     process.env.PUBLIC_SUPPORT_EMAIL = "hello@example.test";
     render(<HomePage />);
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thật Space");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/A private space/i);
     expect(screen.getByRole("link", { name: "Tham gia Thật Space" })).toHaveAttribute("href", "https://community.example.test/signup");
     expect(screen.getByRole("link", { name: "Đăng nhập thành viên" })).toHaveAttribute("href", "https://community.example.test/login");
-    expect(screen.getByText(/không cần lời mời hay chờ phê duyệt thủ công/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bất kỳ ai từ đủ 18 tuổi/i)).toBeInTheDocument();
   });
 
   it("does not emit a broken community or login link when the community URL is absent", () => {
@@ -80,7 +80,7 @@ describe("Landing Page", () => {
   it("states open adult eligibility and presents Bà Mối as the core journey", () => {
     render(<HomePage />);
     expect(screen.getByText(/không phân biệt giới tính/i)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Bà Mối là nơi cuộc gặp bắt đầu/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Everything you need to flourish/i })).toBeInTheDocument();
     expect(screen.getByText(/không tự động được dùng cho mai mối/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /quyền riêng tư/i })).toHaveAttribute("href", "/privacy");
   });

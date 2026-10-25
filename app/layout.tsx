@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Be_Vietnam_Pro, Fraunces } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getPublicSiteConfig } from "@/lib/public-site";
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin", "vietnamese"],
-  variable: "--font-playfair",
+  variable: "--font-fraunces",
   display: "swap",
 });
 
-const inter = Inter({
+const vietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
-  variable: "--font-inter",
+  variable: "--font-vietnam",
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://that-space-demo.vercel.app"),
   title: "Thật Space — Kết nối có chủ đích cùng Bà Mối",
   description:
     "Cộng đồng riêng tư và Bà Mối AI dành cho bất kỳ ai từ đủ 18 tuổi muốn kết nối có chủ đích.",
@@ -31,8 +33,8 @@ export default function RootLayout({
   const publicSite = getPublicSiteConfig();
 
   return (
-    <html lang="vi" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="bg-[#F5F0E8] text-[#5C3D2E] font-[family-name:var(--font-inter)]">
+    <html lang="vi" className={`${fraunces.variable} ${vietnam.variable}`}>
+      <body>
         <Navbar
           communityUrl={publicSite.communityUrl}
           publicRegistrationEnabled={publicSite.publicRegistrationEnabled}

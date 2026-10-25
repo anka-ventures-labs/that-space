@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { forumThreads } from '../../lib/origami-data'
 
 const root = resolve(__dirname, '../..')
 
@@ -15,9 +16,13 @@ describe('public launch route boundary', () => {
     'app/tuvi/page.tsx',
     'app/matchmaking/page.tsx',
     'app/profile/page.tsx',
-    'lib/forum-data.ts',
-    'lib/matchmaking-data.ts',
-  ])('does not ship the former demo surface %s', (path) => {
-    expect(existsSync(resolve(root, path))).toBe(false)
+    'lib/origami-data.ts',
+  ])('ships the authoritative origami handoff surface %s', (path) => {
+    expect(existsSync(resolve(root, path))).toBe(true)
+  })
+
+  it('keeps public sample titles inclusive and explicitly non-member data', () => {
+    expect(forumThreads.every((thread) => !/chị em|phụ nữ/i.test(thread.title))).toBe(true)
+    expect(forumThreads.filter((thread) => thread.sampleReplies.length > 0)).toHaveLength(1)
   })
 })

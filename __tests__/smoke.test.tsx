@@ -59,44 +59,40 @@ describe("Landing Page Smoke Test", () => {
     process.env.DISCOURSE_URL = originalDiscourseUrl;
   });
 
-  it("renders the Thật Space brand name as the page heading", () => {
+  it("renders the authoritative handoff hero", () => {
     render(<HomePage />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thật Space");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/A private space to connect, grow, and discover/i);
   });
 
-  it("serves the brand logo", () => {
+  it("renders the interactive origami lotus control", () => {
     render(<HomePage />);
-    expect(screen.getByAltText("Thật Space")).toHaveAttribute("src", "/logo.jpg");
+    expect(screen.getByRole("button", { name: /hoa sen origami/i })).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("renders the Vietnamese tagline", () => {
+  it("renders the truthful Vietnamese eligibility copy", () => {
     render(<HomePage />);
-    expect(
-      screen.getByText(
-        "Một cộng đồng riêng tư để người trưởng thành kết nối có chủ đích — bắt đầu bằng cuộc trò chuyện với Bà Mối.",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Bất kỳ ai từ đủ 18 tuổi/i)).toBeInTheDocument();
   });
 
   it("renders the three capability sections", () => {
     render(<HomePage />);
     expect(
-      screen.getByRole("heading", { name: "Bà Mối đồng hành", level: 3 }),
+      screen.getByRole("heading", { name: "Forum", level: 3 }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Bạn giữ quyền quyết định", level: 3 }),
+      screen.getByRole("heading", { name: "Tử Vi Horoscope", level: 3 }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Cộng đồng thật", level: 3 }),
+      screen.getByRole("heading", { name: "Matchmaking", level: 3 }),
     ).toBeInTheDocument();
   });
 
-  it("keeps every visitor-facing string in Vietnamese with no placeholder copy", () => {
+  it("keeps launch copy inclusive and free of placeholder text", () => {
     const { container } = render(<HomePage />);
     const text = container.textContent ?? "";
     expect(text).not.toMatch(/lorem ipsum/i);
     expect(text).not.toMatch(/A private space for women/i);
-    expect(text).not.toMatch(/Join the Community/i);
     expect(text).not.toMatch(/chỉ dành cho phụ nữ/i);
+    expect(text).toMatch(/không phân biệt giới tính/i);
   });
 });
