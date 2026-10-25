@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "manifest_id": "that-space-community-moderation",
+  "revision": "2026-10-01",
+  "native_spam": {
+    "setting_type": "spam",
+    "enabled": false,
+    "custom_instructions": "Native AI spam scanning is intentionally disabled for this beta because its pinned implementation can automatically hide a post and silence its author. That Space uses the review-only llm_triage automation below for spam and safety classification."
+  },
+  "triage": {
+    "name": "Thật Space community moderation review",
+    "agent_name": "Thật Space community moderation classifier",
+    "script": "llm_triage",
+    "trigger": "post_created_edited",
+    "review_marker": "THAT_SPACE_HUMAN_REVIEW",
+    "safe_marker": "THAT_SPACE_SAFE",
+    "max_post_tokens": 4000,
+    "prompt_path": "community-review-prompt.md"
+  }
+}

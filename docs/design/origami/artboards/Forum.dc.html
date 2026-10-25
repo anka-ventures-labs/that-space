@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Forum</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn{position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#F5F0E8 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+.slip{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.slip:hover{transform:translateX(6px);box-shadow:0 2px 0 #E2D4BC,0 22px 30px -22px rgba(63,42,31,.5)}
+.tab{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.tab:hover{transform:translateX(4px)}
+</style>
+</helmet>
+<div class="ts grain" style="background-color: #F5F0E8; min-height: 100vh">
+  <header style="border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html"><img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)"></a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" aria-current="page" style="padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; background: linear-gradient(transparent 70%, #E2D4BC 70%)">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Profile</a>
+        <a href="Main.dc.html" class="btn btn-ink" style="margin-left: 10px; padding: 12px 22px; background: #5C3D2E; color: #F5F0E8; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 2px; box-shadow: 0 2px 0 #3F2A1F">Join</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- header band with paper boats -->
+  <section style="position: relative; overflow: hidden; padding: 64px 24px 88px; background: #EFE7DA">
+    <div style="position: relative; max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 640px">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Diễn đàn · {{ count }} bài viết</span>
+        <h1 class="serif" style="margin: 0; font-size: clamp(42px, 5vw, 68px); line-height: 1.02; font-weight: 400">Cộng Đồng Forum</h1>
+        <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #6E4D3C">Nơi chị em chia sẻ, lắng nghe và đồng hành cùng nhau.</p>
+      </div>
+      <svg width="300" height="120" viewBox="0 0 300 120" aria-hidden="true">
+        <g><polygon points="20,70 130,70 112,96 38,96" fill="#5C3D2E"></polygon><polygon points="20,70 75,70 75,96 38,96" fill="#7A5442"></polygon><polygon points="75,14 75,70 40,70" fill="#C4A882"></polygon><polygon points="75,14 110,70 75,70" fill="#A88B66"></polygon></g>
+        <g transform="translate(170 32) scale(.62)"><polygon points="20,70 130,70 112,96 38,96" fill="#A88B66"></polygon><polygon points="20,70 75,70 75,96 38,96" fill="#C4A882"></polygon><polygon points="75,14 75,70 40,70" fill="#FBF8F2"></polygon><polygon points="75,14 110,70 75,70" fill="#E2D4BC"></polygon></g>
+        <path d="M0 104 Q 25 96 50 104 T 100 104 T 150 104 T 200 104 T 250 104 T 300 104" fill="none" stroke="#C4A882" stroke-width="2"></path>
+      </svg>
+    </div>
+    <div aria-hidden="true" style="position: absolute; bottom: -1px; left: 0; right: 0; height: 28px; background: #F5F0E8; clip-path: polygon(0 100%, 0 40%, 12.5% 0, 25% 40%, 37.5% 0, 50% 40%, 62.5% 0, 75% 40%, 87.5% 0, 100% 40%, 100% 100%)"></div>
+  </section>
+
+  <section style="padding: 40px 24px 96px">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start">
+      <!-- sidebar: index tabs -->
+      <aside aria-label="Chủ đề" style="flex: 1 1 260px; max-width: 320px; display: flex; flex-direction: column; gap: 20px">
+        <h2 class="serif" style="margin: 0; font-size: 22px; font-weight: 500">Chủ đề</h2>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+            <button type="button" class="tab" onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 16px 0 20px; border: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 500; text-align: left; color: {{c.ink}}; background: {{c.bg}}; clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); box-shadow: inset 6px 0 0 {{c.edge}}">
+              <span>{{ c.label }}</span>
+              <span style="min-width: 28px; margin-right: 10px; font-size: 13px; font-weight: 600; text-align: right">{{ c.n }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button type="button" class="btn btn-ink" style="min-height: 52px; padding: 0 20px; border: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; background: #5C3D2E; color: #F5F0E8; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F; display: flex; align-items: center; justify-content: center; gap: 10px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          Tạo bài viết mới
+        </button>
+      </aside>
+
+      <!-- thread list -->
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+          <p style="margin: 0; font-size: 15px; color: #6E4D3C">{{ shown }} bài viết · {{ activeLabel }}</p>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #6E4D3C">Sắp xếp
+            <select onChange="{{ onSort }}" style="min-height: 44px; padding: 0 14px; font: inherit; font-size: 14px; color: #5C3D2E; background: #FBF8F2; border: 1px solid #C4A882; border-radius: 2px">
+              <option value="new">Mới nhất</option>
+              <option value="replies">Nhiều reply nhất</option>
+            </select>
+          </label>
+        </div>
+        <sc-for list="{{ threads }}" as="t" hint-placeholder-count="6">
+          <article class="slip grain" style="position: relative; display: flex; gap: 20px; align-items: flex-start; padding: 24px 28px 24px 36px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 14px 22px -20px rgba(63,42,31,.5)">
+            <span aria-hidden="true" style="position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: {{t.edge}}"></span>
+            <span aria-hidden="true" style="position: absolute; left: 10px; top: 0; width: 12px; height: 12px; background: linear-gradient(135deg, {{t.edge}} 50%, transparent 50%)"></span>
+            <span aria-hidden="true" class="serif" style="flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: linear-gradient(135deg, #E2D4BC 50%, #D2BE9C 50%)">{{ t.initial }}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+              <a href="Thread.dc.html" class="serif" style="font-size: 21px; line-height: 1.3; font-weight: 500; text-decoration: none">{{ t.title }}</a>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 13px; color: #7A5A48">
+                <span style="padding: 4px 10px; font-weight: 600; color: #5C3D2E; background: {{t.chip}}">{{ t.category }}</span>
+                <span>{{ t.author }}</span>
+                <span aria-hidden="true">·</span>
+                <span>{{ t.time }}</span>
+              </div>
+            </div>
+            <div style="flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-left: 12px; border-left: 1px dashed #D2BE9C">
+              <span class="serif" style="font-size: 26px; font-weight: 500">{{ t.replies }}</span>
+              <span style="font-size: 12px; color: #7A5A48">phản hồi</span>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background: #3F2A1F; color: #C4A882; padding: 32px 24px">
+    <p style="max-width: 1240px; margin: 0 auto; font-size: 13px">© 2026 Thật Space. All rights reserved.</p>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const active = s.cat || 'All';
+    const sort = s.sort || 'new';
+    const tone = {
+      'Introductions': { edge: '#E2D4BC', chip: '#F1E9DC' },
+      'Life & Growth': { edge: '#C4A882', chip: '#EADFCB' },
+      'Relationships': { edge: '#8A6450', chip: '#E5D6C2' },
+      'Spirituality': { edge: '#5C3D2E', chip: '#DCCAAE' }
+    };
+    const all = [
+      ['Mình mới gia nhập Thật Space — xin chào tất cả chị em!', 'Nguyễn Thị Mai', '2 giờ trước', 24, 'Introductions'],
+      ['Chia sẻ về hành trình yoga của mình sau 6 tháng kiên trì', 'Lê Phương Linh', '5 giờ trước', 35, 'Life & Growth'],
+      ['Có ai cũng cảm thấy cô đơn trong đám đông không?', 'Trần Minh Châu', '1 ngày trước', 63, 'Relationships'],
+      ['Thực hành thiền định buổi sáng đã thay đổi cuộc sống mình', 'Phạm Hương Giang', '2 ngày trước', 41, 'Spirituality'],
+      ['Làm thế nào để vượt qua chia tay khi yêu nhau 3 năm?', 'Võ Thanh Thảo', '3 ngày trước', 78, 'Relationships'],
+      ['Kết bạn mới tuổi 30 có khó không? Trải nghiệm của mình', 'Đỗ Kiều Trang', '4 ngày trước', 52, 'Life & Growth'],
+      ['Phong thủy cho phòng ngủ — thu hút năng lượng tốt cho năm mới', 'Bùi Minh Hạnh', '5 ngày trước', 29, 'Spirituality'],
+      ['Self-love trong văn hoá Việt Nam — câu chuyện của mình', 'Huỳnh Ngọc Trân', '1 tuần trước', 94, 'Life & Growth'],
+      ['Những người mẹ đơn thân ở đây — chúng ta cùng chia sẻ nhé', 'Phan Thị Lan', '1 tuần trước', 112, 'Relationships'],
+      ['Tử Vi năm Giáp Thìn 2024 — chia sẻ trải nghiệm của các bạn', 'Nguyễn Bảo Anh', '2 tuần trước', 47, 'Spirituality']
+    ].map((r, i) => ({ i, title: r[0], author: r[1], time: r[2], replies: r[3], category: r[4], initial: r[1].split(' ').pop()[0], edge: tone[r[4]].edge, chip: tone[r[4]].chip }));
+    let threads = active === 'All' ? all : all.filter((t) => t.category === active);
+    if (sort === 'replies') threads = threads.slice().sort((a, b) => b.replies - a.replies);
+    const labels = ['All', 'Introductions', 'Life & Growth', 'Relationships', 'Spirituality'];
+    const cats = labels.map((l) => {
+      const on = l === active;
+      return {
+        label: l === 'All' ? 'Tất cả' : l,
+        n: l === 'All' ? all.length : all.filter((t) => t.category === l).length,
+        pressed: on ? 'true' : 'false',
+        bg: on ? '#5C3D2E' : '#FBF8F2',
+        ink: on ? '#F5F0E8' : '#5C3D2E',
+        edge: l === 'All' ? '#A88B66' : tone[l].edge,
+        pick: () => this.setState({ cat: l })
+      };
+    });
+    return {
+      cats, threads,
+      count: all.length,
+      shown: threads.length,
+      activeLabel: active === 'All' ? 'Tất cả chủ đề' : active,
+      onSort: (e) => this.setState({ sort: e.target.value })
+    };
+  }
+}
+</script>
+</body>
+</html>

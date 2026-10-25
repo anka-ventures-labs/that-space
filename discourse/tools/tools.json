@@ -1,0 +1,112 @@
+[
+  {
+    "endpoint": "status",
+    "summary": "Where the member stands with Bà Mối",
+    "description": "Check where the member stands: consent (with the exact consent text to show while she hasn't agreed), interview answers still missing, card state, whether today's Duyên box is open, daily allowances, pending signals and open matches. Call it at the start of every conversation and whenever unsure.",
+    "parameters": []
+  },
+  {
+    "endpoint": "consent",
+    "summary": "Opt in, pause, resume or delete",
+    "description": "Record the member's decision. opt_in only after they have read the consent text, said yes and confirmed they are 18 or older (adult_confirmed: true). pause hides them from the pool; resume brings them back. delete is two-step: call without a token to receive a short-lived confirmation_token, explain the deletion and ask for confirmation, then only after the member's next clear yes call again with that token.",
+    "parameters": [
+      { "name": "action", "type": "string", "description": "What she decided.", "required": true, "enum": ["opt_in", "pause", "resume", "delete"] },
+      { "name": "adult_confirmed", "type": "boolean", "description": "She said she is 18 or older. Required for opt_in.", "required": false },
+      { "name": "confirmation_token", "type": "string", "description": "Short-lived service token from the immediately preceding delete challenge. Send only after the member replies with a clear confirmation.", "required": false }
+    ]
+  },
+  {
+    "endpoint": "profile_update",
+    "summary": "Save interview answers",
+    "description": "Save one or more of her interview answers, as soon as she gives them. Send only what she actually said. Returns what is still missing. Married members are introduced for friendship only.",
+    "list_params": ["hobbies"],
+    "parameters": [
+      { "name": "intent", "type": "string", "description": "What she is looking for: Kết bạn (friendship), Hẹn hò vui vẻ không ràng buộc (casual), Mối quan hệ lâu dài (long_term), Kết hôn (marriage).", "required": false, "enum": ["friendship", "casual", "long_term", "marriage"] },
+      { "name": "gender", "type": "string", "description": "Her own gender: Nữ, Nam, Khác.", "required": false, "enum": ["female", "male", "other"] },
+      { "name": "seeking", "type": "string", "description": "Who she wants to meet: Nữ, Nam, Cả hai.", "required": false, "enum": ["female", "male", "both"] },
+      { "name": "birth_date", "type": "string", "description": "Solar birth date, YYYY-MM-DD. She must be 18 or older.", "required": false },
+      { "name": "birth_time", "type": "string", "description": "Birth time HH:MM (24h) if she knows it, or none if she doesn't remember. Optional; used only for astrology.", "required": false },
+      { "name": "city", "type": "string", "description": "The city or province she lives in. Only the region reaches the pool.", "required": false },
+      { "name": "age_min", "type": "integer", "description": "Youngest age she wants to meet (18 or more). Defaults to her age minus 5.", "required": false },
+      { "name": "age_max", "type": "integer", "description": "Oldest age she wants to meet. Defaults to her age plus 5.", "required": false },
+      { "name": "marital", "type": "string", "description": "Độc thân (single), Đã ly hôn (divorced), Góa (widowed), Đã kết hôn (married).", "required": false, "enum": ["single", "divorced", "widowed", "married"] },
+      { "name": "children", "type": "string", "description": "Chưa có (none), Có, đang sống cùng (yes_live_with), Có, không sống cùng (yes_not_live_with).", "required": false, "enum": ["none", "yes_live_with", "yes_not_live_with"] },
+      { "name": "wants_children", "type": "string", "description": "Whether she wants (more) children; asked only for long-term and marriage. Có, Không, Chưa chắc.", "required": false, "enum": ["yes", "no", "unsure"] },
+      { "name": "hobbies", "type": "string", "description": "Her hobbies, comma-separated, in her own Vietnamese words, up to 8, e.g. \"leo núi, nấu ăn, vẽ tranh\".", "required": false },
+      { "name": "open_answer", "type": "string", "description": "Her answer to \"Bạn muốn mọi người biết điều gì nhất về bạn?\", in her own words (up to 600 characters). Kept private; used for matching.", "required": false },
+      { "name": "occupation", "type": "string", "description": "Her work, only if she volunteers it. Kept private.", "required": false }
+    ]
+  },
+  {
+    "endpoint": "card_preview",
+    "summary": "Preview her anonymous card",
+    "description": "Build her anonymous card from her answers, exactly as others would see it, with a plain template summary. Use it to write a better summary in your own words before card_confirm.",
+    "parameters": []
+  },
+  {
+    "endpoint": "card_confirm",
+    "summary": "Confirm her card with a summary",
+    "description": "Store her card with the short summary you wrote and she approved, and put her in the pool. The summary must not contain her name, city, job, any date or time, zodiac/can chi, or contact details; if it does, the tool returns the violations: rewrite and try again.",
+    "parameters": [
+      { "name": "summary_text", "type": "string", "description": "2 to 3 warm Vietnamese sentences about her personality and hobbies, 10 to 400 characters, approved by her.", "required": true }
+    ]
+  },
+  {
+    "endpoint": "box_open",
+    "summary": "Open today's Duyên box",
+    "description": "Open her Duyên box: once per Vietnam calendar day, it brings one person who fits her well (not necessarily the best). Returns an introduction (card and fit), no_match (which still uses today's box), or cooldown with the time of the next box.",
+    "parameters": []
+  },
+  {
+    "endpoint": "search",
+    "summary": "Find people with certain traits",
+    "description": "Find up to 3 people who fit her and match what she asked for, best first. Only what cards show can be searched. Each result counts toward her daily allowance, and nobody is shown twice.",
+    "list_params": ["keywords"],
+    "parameters": [
+      { "name": "keywords", "type": "string", "description": "Comma-separated Vietnamese words or phrases to find in a card's hobbies or summary, e.g. \"leo núi, thiền\". Any one matches.", "required": false },
+      { "name": "region", "type": "string", "description": "Region shown on the card.", "required": false, "enum": ["miền Bắc", "miền Trung", "miền Nam"] },
+      { "name": "age_min", "type": "integer", "description": "Youngest age.", "required": false },
+      { "name": "age_max", "type": "integer", "description": "Oldest age.", "required": false },
+      { "name": "element", "type": "string", "description": "Mệnh (nạp âm element) shown on the card.", "required": false, "enum": ["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"] }
+    ]
+  },
+  {
+    "endpoint": "interest",
+    "summary": "Send a signal (Muốn làm quen)",
+    "description": "Send the person from an introduction a signal that she would like to get to know them. Use only a discovery_id returned by box_open or search, and only after she says yes. If they had already said yes to her, the match opens at once.",
+    "parameters": [
+      { "name": "discovery_id", "type": "string", "description": "The discovery_id of the introduction.", "required": true }
+    ]
+  },
+  {
+    "endpoint": "signals",
+    "summary": "Signals waiting for her answer",
+    "description": "List the signals other members sent her that are waiting for her answer: each sender's anonymous card and how they fit, seen from her side. Signals expire after 7 days.",
+    "parameters": []
+  },
+  {
+    "endpoint": "signal_respond",
+    "summary": "Answer a signal",
+    "description": "Record her answer to a signal: accept (if the sender still wants it, the match opens), decline (final: they will never be introduced again), or dismiss (let it go for now). The sender only ever hears \"chưa có duyên\" unless she accepts.",
+    "parameters": [
+      { "name": "signal_id", "type": "string", "description": "The signal_id from the signals tool.", "required": true },
+      { "name": "response", "type": "string", "description": "Her answer.", "required": true, "enum": ["accept", "decline", "dismiss"] }
+    ]
+  },
+  {
+    "endpoint": "matches",
+    "summary": "Her matches and chats",
+    "description": "List her matches: the alias she knows each person by, the state (mutual_interest, revealed, closed), who has asked to reveal, and the link to the anonymous chat.",
+    "parameters": []
+  },
+  {
+    "endpoint": "match_action",
+    "summary": "End, block or reveal",
+    "description": "Act on one of their matches: end the chat, block the person (the chat closes and they are never introduced again; they are only told the chat ended), or reveal (when both have asked, each gets the other's profile link). Every action is two-step: call without a token to receive a short-lived confirmation_token, explain the exact action and ask, then only after the member's next clear yes call again with that token.",
+    "parameters": [
+      { "name": "match_id", "type": "string", "description": "The match_id from the matches tool.", "required": true },
+      { "name": "action", "type": "string", "description": "What they want.", "required": true, "enum": ["end", "block", "reveal"] },
+      { "name": "confirmation_token", "type": "string", "description": "Short-lived service token for this exact member, thread, match and action. Send only after the member replies with a clear confirmation.", "required": false }
+    ]
+  }
+]

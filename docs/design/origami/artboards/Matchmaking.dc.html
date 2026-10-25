@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Tìm Duyên</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn{position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#FBF8F2 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+.pcard{transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.pcard:hover{transform:translateY(-8px) rotate(.4deg);box-shadow:0 2px 0 #E2D4BC,0 30px 40px -26px rgba(63,42,31,.55)}
+.pcard .ear{transition:width .4s,height .4s}
+.pcard:hover .ear{width:60px;height:60px}
+.sheet{animation:open .7s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 0}
+.scrim{animation:fade .3s ease both}
+@keyframes open{from{opacity:0;transform:perspective(1000px) rotateX(-70deg) translateY(-20px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet,.scrim{animation:none}}
+</style>
+</helmet>
+<div class="ts grain" style="position: relative; background-color: #F5F0E8; min-height: 100vh">
+  <header style="border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html"><img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)"></a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tử Vi</a>
+        <a href="Matchmaking.dc.html" aria-current="page" style="padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; background: linear-gradient(transparent 70%, #E2D4BC 70%)">Tìm Duyên</a>
+        <a href="Profile.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Profile</a>
+        <a href="Main.dc.html" class="btn btn-ink" style="margin-left: 10px; padding: 12px 22px; background: #5C3D2E; color: #F5F0E8; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 2px; box-shadow: 0 2px 0 #3F2A1F">Join</a>
+      </div>
+    </nav>
+  </header>
+
+  <section style="padding: 72px 24px 48px">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 40px">
+      <div style="flex: 1 1 480px; display: flex; flex-direction: column; gap: 18px; max-width: 700px">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A6450">Spiritual matchmaking</span>
+        <h1 class="serif" style="margin: 0; font-size: clamp(42px, 5vw, 72px); line-height: 1.02; font-weight: 400">Tìm <em style="color: #8A6450">Duyên</em></h1>
+        <p style="margin: 0; font-size: 18px; line-height: 1.65; color: #6E4D3C">At Thật Space, we believe true connection goes beyond surface compatibility. Our matchmaking is guided by the ancient wisdom of Tử Vi — Vietnamese astrology — to reveal soul-level resonance between you and your potential match.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.65; color: #7A5A48">Each compatibility reading examines your birth charts, elemental energies, and spiritual pathways to illuminate the depth and potential of every connection you explore.</p>
+      </div>
+      <!-- two cranes meeting -->
+      <svg width="320" height="180" viewBox="0 0 320 180" aria-hidden="true">
+        <g transform="translate(20 50)"><polygon points="52,44 74,2 66,46" fill="#A88B66"></polygon><polygon points="8,26 42,44 34,50" fill="#8A6450"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#C4A882"></polygon><polygon points="34,50 54,62 60,40" fill="#B39672"></polygon><polygon points="44,46 26,4 64,44" fill="#DCCAAE"></polygon><polygon points="74,48 104,14 82,52" fill="#A88B66"></polygon><polygon points="104,14 116,22 106,20" fill="#5C3D2E"></polygon></g>
+        <g transform="translate(300 50) scale(-1 1)"><polygon points="52,44 74,2 66,46" fill="#3F2A1F"></polygon><polygon points="8,26 42,44 34,50" fill="#5C3D2E"></polygon><polygon points="34,50 60,40 80,52 54,62" fill="#7A5442"></polygon><polygon points="34,50 54,62 60,40" fill="#5C3D2E"></polygon><polygon points="44,46 26,4 64,44" fill="#8A6450"></polygon><polygon points="74,48 104,14 82,52" fill="#5C3D2E"></polygon><polygon points="104,14 116,22 106,20" fill="#3F2A1F"></polygon></g>
+        <path d="M60 140 C 120 170, 200 170, 260 140" fill="none" stroke="#C4A882" stroke-width="2" stroke-dasharray="3 6"></path>
+        <polygon points="160,122 166,136 180,142 166,148 160,162 154,148 140,142 154,136" fill="#C4A882"></polygon>
+      </svg>
+    </div>
+  </section>
+
+  <section style="padding: 0 24px 112px">
+    <div style="max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px">
+      <sc-for list="{{ profiles }}" as="p" hint-placeholder-count="6">
+        <article class="pcard grain" style="position: relative; display: flex; flex-direction: column; gap: 18px; padding: 32px 28px 28px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 18px 28px -24px rgba(63,42,31,.55)">
+          <span class="ear" aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 36px; height: 36px; background: linear-gradient(225deg, #F5F0E8 50%, #D2BE9C 50%)"></span>
+          <div style="display: flex; align-items: center; gap: 16px">
+            <span aria-hidden="true" class="serif" style="flex: none; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: {{p.avInk}}; background: linear-gradient(135deg, {{p.avA}} 50%, {{p.avB}} 50%)">{{ p.initials }}</span>
+            <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+              <h2 class="serif" style="margin: 0; font-size: 22px; font-weight: 500; line-height: 1.2">{{ p.name }}</h2>
+              <span style="font-size: 13px; font-weight: 600; color: #7A5A48">{{ p.sign }}</span>
+            </div>
+            <span style="margin-left: auto; flex: none; display: flex; flex-direction: column; align-items: flex-end">
+              <span class="serif" style="font-size: 26px; font-weight: 500">{{ p.score }}%</span>
+              <span style="font-size: 11px; color: #7A5A48">hợp</span>
+            </span>
+          </div>
+          <p style="margin: 0; flex: 1; font-size: 15px; line-height: 1.65; color: #6E4D3C">{{ p.bio }}</p>
+          <button type="button" class="btn" onClick="{{ p.open }}" style="min-height: 48px; border: 2px solid #5C3D2E; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; background: transparent; color: #5C3D2E; border-radius: 2px; box-shadow: 0 3px 0 #C4A882">View Compatibility</button>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- modal: an unfolded letter -->
+  <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" onClick="{{ close }}" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(63,42,31,.62)"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="mm-title" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 21; display: flex; align-items: center; justify-content: center; padding: 24px; pointer-events: none">
+      <div class="sheet grain" style="pointer-events: auto; position: relative; width: 100%; max-width: 560px; max-height: 100%; overflow-y: auto; box-sizing: border-box; padding: 40px 40px 32px; background-color: #FBF8F2; box-shadow: 0 40px 70px -30px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: 22px">
+        <div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; background: linear-gradient(180deg, transparent 49.7%, rgba(63,42,31,.08) 50%, rgba(255,255,255,.6) 50.3%, transparent 52%)"></div>
+        <button type="button" onClick="{{ close }}" aria-label="Close" style="position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; background: transparent; cursor: pointer; color: #5C3D2E; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+        <div style="position: relative; display: flex; align-items: center; gap: 16px">
+          <span aria-hidden="true" class="serif" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: {{sel.avInk}}; background: linear-gradient(135deg, {{sel.avA}} 50%, {{sel.avB}} 50%)">{{ sel.initials }}</span>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="mm-title" class="serif" style="margin: 0; font-size: 28px; font-weight: 500">{{ sel.name }}</h2>
+            <span style="font-size: 14px; font-weight: 600; color: #7A5A48">{{ sel.sign }}</span>
+          </div>
+        </div>
+        <!-- score seal -->
+        <div style="position: relative; display: flex; align-items: center; gap: 20px; padding: 20px; background: #5C3D2E; color: #F5F0E8">
+          <span style="flex: none; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); background: repeating-conic-gradient(from 22.5deg, #C4A882 0deg 45deg, #B39672 45deg 90deg)">
+            <span class="serif" style="font-size: 32px; font-weight: 600; color: #3F2A1F">{{ sel.score }}</span>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #C4A882">Overall match score</span>
+            <span class="serif" style="font-size: 24px">{{ sel.score }}% Compatible</span>
+          </div>
+        </div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{ sel.details }}" as="d" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed #E2D4BC">
+              <span style="font-size: 15px; font-weight: 500">{{ d.label }}</span>
+              <span role="img" aria-label="{{ d.aria }}" style="display: flex; gap: 6px">
+                <sc-for list="{{ d.stars }}" as="st" hint-placeholder-count="5">
+                  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 12.5,7.5 19,10 12.5,12.5 10,19 7.5,12.5 1,10 7.5,7.5" fill="{{st.fill}}" stroke="#A88B66" stroke-width="1"></polygon></svg>
+                </sc-for>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="position: relative; margin: 0; font-size: 16px; line-height: 1.7; color: #4E3326">{{ sel.description }}</p>
+        <button type="button" class="btn btn-ink" onClick="{{ close }}" style="position: relative; min-height: 50px; border: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; background: #5C3D2E; color: #F5F0E8; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F">Close</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const raw = [["Trần Minh Châu","MC","Aries","Yêu thiên nhiên, thiền định và sách triết học. Tìm kiếm kết nối tâm hồn chân thành qua những buổi trò chuyện sâu.",92,[["Love",5],["Communication",5],["Spirituality",4]],"A rare and beautiful alignment — Aries and your chart resonate at a soul level. Châu brings passion and boldness while you bring depth and grounding. Together you create a bond that is both fiery and enduring."],["Lê Phương Linh","PL","Gemini","Writer, dreamer, người đi tìm vẻ đẹp trong từng khoảnh khắc nhỏ. Thích poetry và những buổi sáng bình yên.",78,[["Love",4],["Communication",5],["Spirituality",3]],"Linh and you share an exceptional intellectual bond — conversations will never run dry. Gemini brings creativity and adaptability. A deeply enriching connection that blossoms with time and trust."],["Võ Thanh Thảo","TT","Taurus","Bếp núc, vườn cây và âm nhạc dân gian là thế giới của mình. Tin vào sức mạnh của sự kiên nhẫn và tình yêu đích thực.",85,[["Love",4],["Communication",4],["Spirituality",5]],"Taurus and you share deeply aligned core values — authenticity, stability, and the beauty of simple living. Thảo brings warmth and a sense of safety that is rare and precious."],["Nguyễn Bảo Anh","BA","Libra","Luật sư ban ngày, nghệ sĩ ban đêm. Tin rằng cuộc sống đẹp nhất khi có sự cân bằng giữa lý trí và cảm xúc.",87,[["Love",4],["Communication",5],["Spirituality",4]],"Libra and you create perfect balance. Bảo Anh brings fairness, aesthetic sensibility, and extraordinary listening skills. A connection full of mutual growth and shared inspiration."],["Đỗ Kiều Trang","KT","Scorpio","Bác sĩ tâm lý với tấm lòng nhân hậu. Tìm kiếm kết nối thực sự và những người không sợ nhìn thẳng vào cảm xúc.",74,[["Love",4],["Communication",3],["Spirituality",5]],"Scorpio and you share a profound spiritual connection. Trang has the gift of seeing what others hide — both fascinating and challenging. This bond demands courage and absolute authenticity."],["Huỳnh Ngọc Trân","NT","Capricorn","Startup founder với tâm hồn nghệ sĩ. Thích leo núi, viết nhật ký và những cuộc trò chuyện bên bếp lửa dưới bầu trời đêm.",81,[["Love",4],["Communication",4],["Spirituality",4]],"Capricorn and you have mutual respect woven into your charts. Trân brings vision, dedication, and a quietly loyal heart. A wonderful foundation for a deep and lasting connection."]];
+    const avs = [
+      ['#DCCAAE', '#C4A882', '#3F2A1F'], ['#5C3D2E', '#4E3326', '#F5F0E8'], ['#E2D4BC', '#D2BE9C', '#3F2A1F'],
+      ['#A88B66', '#8A6450', '#FBF8F2'], ['#F3EBDD', '#E2D4BC', '#5C3D2E'], ['#7A5442', '#5C3D2E', '#F5F0E8']
+    ];
+    const profiles = raw.map((r, i) => ({
+      name: r[0], initials: r[1], sign: r[2], bio: r[3], score: r[4], description: r[6],
+      avA: avs[i][0], avB: avs[i][1], avInk: avs[i][2],
+      details: r[5].map((d) => ({
+        label: d[0], aria: d[1] + ' of 5',
+        stars: [0, 1, 2, 3, 4].map((k) => ({ fill: k < d[1] ? '#C4A882' : 'transparent' }))
+      })),
+      open: () => this.setState({ sel: i })
+    }));
+    const s = this.state || {};
+    const has = typeof s.sel === 'number';
+    return {
+      profiles,
+      hasSel: has,
+      sel: has ? profiles[s.sel] : profiles[0],
+      close: () => this.setState({ sel: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+  "capturedAt": "2026-10-04T18:07:45.106Z",
+  "source": "1787b835ca130d5e79d04fe64f4fe0f325f0390f",
+  "productionDeployment": "dpl_ENbPZPxbsomoaYwAq9jYvWpvAPPr",
+  "productionUrl": "https://that-space-demo.vercel.app",
+  "forumUrl": "https://ubuntu-asus.tail349cbf.ts.net:8443",
+  "region": "sin1",
+  "method": "controlled trusted service HTTP calls and native Discourse APIs/webhooks with two synthetic normal accounts; actual model/tool conversation and rendered phone acceptance are excluded",
+  "checks": {
+    "freshMatchVerified": true,
+    "relayIsolationVerified": true,
+    "signedRelayHoldVerified": true,
+    "nativeWebhookVerified": true,
+    "outageQueueVerified": true,
+    "outageRetryDeliveryVerified": true,
+    "recoveredRevealNoticeVerified": true,
+    "mutualRevealAccepted": true,
+    "mutualRevealNoticesVerified": true,
+    "afterRevealContactVerified": true,
+    "nativeContactWebhookVerified": true,
+    "nativeBotLoopVerified": true,
+    "blockAccepted": true,
+    "blockDiscoveryVerified": true,
+    "nativeClosedWebhookVerified": true,
+    "noPostBlockRelayRecorded": true,
+    "closureDeliveryQueueVerified": true,
+    "closureNoticesVerified": true,
+    "serviceDeletionVerified": true,
+    "remainingFixturePaused": true,
+    "nativeMessageHistoryRetained": true
+  },
+  "nativeEvidence": {
+    "outageRevealNotice": 43,
+    "mutualRevealNotices": [
+      44,
+      46
+    ],
+    "contactSource": 47,
+    "contactRecipient": 48,
+    "postAfterBlock": 51,
+    "contactOutcome": "relayed",
+    "botOutcome": "ignored_bot",
+    "closedOutcome": "ignored_closed"
+  },
+  "outageScheduledReceipt": {
+    "httpStatus": 200,
+    "timedOut": false,
+    "claimed": 1,
+    "sent": 1,
+    "retrying": 0,
+    "dead": 0,
+    "notificationAttempts": 5,
+    "recipientRead": true
+  },
+  "deletionResidualCounts": {
+    "members": 0,
+    "profiles": 0,
+    "cards": 0,
+    "discoveries": 0,
+    "daily_openings": 0,
+    "interests": 0,
+    "matches": 0,
+    "relay_topics": 0,
+    "relay_messages": 0,
+    "blocks": 0,
+    "pending_posts": 0
+  },
+  "pool": {
+    "sampleMembers": 30,
+    "sampleCards": 30,
+    "nonFixtureMembers": 0,
+    "discoverableSynthetic": 0,
+    "remainingFixtureStatus": "paused"
+  },
+  "remainingGates": {
+    "dedicatedProviderCredential": false,
+    "nativeModelConversationAccepted": false,
+    "reviewOnlyAiModerationAccepted": false,
+    "renderedPhoneAccepted": false
+  },
+  "realMembersInvited": false
+}

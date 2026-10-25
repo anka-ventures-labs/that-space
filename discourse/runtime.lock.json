@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-01",
+  "discourse": {
+    "repository": "https://github.com/discourse/discourse.git",
+    "commit": "c237680d280a34b1025f79bf37b865c5349313a3"
+  },
+  "test_image": "discourse/discourse_test@sha256:428694a2c15215003b325804c3e0b9627388f36bfe243f2fa2dcd4b37c293587",
+  "plugins": [
+    {
+      "name": "discourse-follow",
+      "repository": "https://github.com/discourse/discourse-follow.git",
+      "commit": "419abd56f69c34ce8e94ad8e267c3c556790e683"
+    }
+  ],
+  "components": [
+    {
+      "name": "discourse-user-portfolio",
+      "repository": "https://github.com/discourse/discourse-user-portfolio.git",
+      "commit": "7d1c7df5694a746912280db91af0bfcd53fb7735"
+    },
+    {
+      "name": "discourse-topic-thumbnails",
+      "repository": "https://github.com/discourse/discourse-topic-thumbnails.git",
+      "commit": "a104bf91dd105bb0491558a5a9d6755f38dfadd9"
+    }
+  ]
+}

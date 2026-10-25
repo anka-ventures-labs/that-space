@@ -1,0 +1,124 @@
+## Dedicated launcher configuration for the private Thật Space beta.
+##
+## Install as /var/discourse/containers/that-space.yml after replacing the
+## administrator email. It intentionally shares no container, volume, or public
+## port with the existing Taylor services.
+##
+## Public origin: https://ubuntu-asus.tail349cbf.ts.net:8443
+## Funnel 8443 terminates TLS and forwards only to 127.0.0.1:8080.
+
+templates:
+  - "templates/postgres.template.yml"
+  - "templates/redis.template.yml"
+  - "templates/web.template.yml"
+  - "templates/web.ratelimited.template.yml"
+
+base_image: "discourse/base@sha256:5028d077b061225507e7093fda1ff5bdc64d483b5c0397776f9a52c50008cd9b"
+
+expose:
+  - "127.0.0.1:8080:80"
+
+# Leave CPU and memory for Taylor on the shared host. The limits also apply
+# during bootstrap; swap absorbs build peaks without consuming all host RAM.
+docker_args: "--memory=2g --memory-swap=4g --cpus=2"
+
+params:
+  # A full commit SHA makes the application source deterministic. The launcher
+  # revision and base image digest are recorded by the operator before build.
+  version: c237680d280a34b1025f79bf37b865c5349313a3
+  db_default_text_search_config: "pg_catalog.simple"
+  db_shared_buffers: "256MB"
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+
+  # Sized for the ASUS's 3.2 GiB RAM plus swap. Keep one supervised Sidekiq
+  # process for regular jobs; do not add speculative plugin workers.
+  UNICORN_WORKERS: 2
+  UNICORN_SIDEKIQS: 1
+
+  # Replace before the first build. This is an admin address, never an API key.
+  DISCOURSE_DEVELOPER_EMAILS: "REPLACE_WITH_ADMIN_EMAIL"
+  DISCOURSE_SKIP_EMAIL_SETUP: "1"
+
+  # Google is the only admission path, so a verified Google identity replaces
+  # email activation. Add real values through the deployment's secret mechanism
+  # and enable only after the exact callback is tested.
+  #
+  # The exact redirect URI registered in Google Cloud must match this host and
+  # port, including ":8443", with no trailing slash:
+  #   https://ubuntu-asus.tail349cbf.ts.net:8443/auth/google_oauth2/callback
+  DISCOURSE_GOOGLE_OAUTH2_CLIENT_ID: "REPLACE_WITH_GOOGLE_CLIENT_ID"
+  DISCOURSE_GOOGLE_OAUTH2_CLIENT_SECRET: "REPLACE_WITH_GOOGLE_CLIENT_SECRET"
+  DISCOURSE_ENABLE_GOOGLE_OAUTH2_LOGINS: "true"
+
+  # No transactional mailer. Google-only signup does not need an activation
+  # email. Notification email stays off; members are notified in-app instead.
+
+  # The hostname deliberately excludes the externally visible port. Discourse
+  # maps these normal DISCOURSE_* production values to its configuration, so
+  # its canonical URL is https://ubuntu-asus.tail349cbf.ts.net:8443.
+  DISCOURSE_HOSTNAME: "ubuntu-asus.tail349cbf.ts.net"
+  DISCOURSE_PORT: "8443"
+  DISCOURSE_FORCE_HTTPS: "true"
+
+  # Guests must authenticate before any community content or uploads are
+  # visible. New members self-register with Google, complete the 18+
+  # attestation and all onboarding fields, and enter without staff approval.
+  # Password signup and password login remain disabled. The owned manifest
+  # reconciles the same non-secret settings after startup.
+  DISCOURSE_LOGIN_REQUIRED: "true"
+  DISCOURSE_ALLOW_NEW_REGISTRATIONS: "true"
+  DISCOURSE_ENABLE_SIGNUP_CTA: "true"
+  DISCOURSE_INVITE_ONLY: "false"
+  DISCOURSE_INVITE_CODE: ""
+  DISCOURSE_MUST_APPROVE_USERS: "false"
+  DISCOURSE_ENABLE_LOCAL_LOGINS: "false"
+  DISCOURSE_AUTH_SKIP_CREATE_CONFIRM: "false"
+  DISCOURSE_ENABLE_SMTP: "false"
+  # Valid enum choices are "no", "yes" and "non-staff". "yes" disables outgoing
+  # mail entirely; do not imply delivery until a real mailer passes a live test.
+  DISCOURSE_DISABLE_EMAILS: "yes"
+  DISCOURSE_DEFAULT_LOCALE: "vi"
+
+volumes:
+  - volume:
+      host: /var/discourse/shared/that-space
+      guest: /shared
+  - volume:
+      host: /var/discourse/shared/that-space/log/var-log
+      guest: /var/log
+
+hooks:
+  # The current upstream base image does not promise Python. The pinned runtime
+  # preparer is Python, so add only that small build dependency when needed.
+  before_code:
+    - exec:
+        cmd:
+          - |-
+            if ! command -v python3 >/dev/null 2>&1; then
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3
+              rm -rf /var/lib/apt/lists/*
+            fi
+  # The web template's `code` hook runs immediately after its pinned Discourse
+  # checkout. This hook therefore pins Follow and stages the two local theme
+  # components before dependency installation and asset compilation.
+  after_code:
+    - exec:
+        cd: $home
+        cmd:
+          - sudo -H -E -u discourse python3 /shared/source/scripts/discourse/prepare-runtime.py --discourse-path /var/www/discourse
+    # Nginx's server outlet is regenerated from the container image on rebuild.
+    # Keep the owned source on the shared volume and install it after checkout;
+    # public-assets is intentionally a separate persistent directory populated
+    # only by exact owned-theme routes.
+    - exec:
+        cmd:
+          - |-
+            mkdir -p /etc/nginx/conf.d/outlets/server
+            mkdir -p /shared/operations/nginx/public-assets
+            install -m 0644 /shared/source/discourse/deployment/private-uploads.conf \
+              /etc/nginx/conf.d/outlets/server/that-space-private-uploads.conf

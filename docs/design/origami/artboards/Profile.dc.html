@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thật Space — Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F0E8}
+a{color:#5C3D2E}a:hover{color:#3F2A1F}
+.ts{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#5C3D2E;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 50}
+.grain{background-image:url(/textures/paper-grain.png);background-size:256px 256px}
+.btn{position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn-ink::after{content:'';position:absolute;right:0;top:0;width:12px;height:12px;background:linear-gradient(225deg,#FBF8F2 50%,#8A6450 50%)}
+.btn-ink:hover{color:#F5F0E8}
+.env{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.env:hover{transform:translateY(-6px)}
+.env .flap{transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-origin:50% 0}
+.env:hover .flap{transform:perspective(600px) rotateX(160deg)}
+</style>
+</helmet>
+<div class="ts grain" style="background-color: #F5F0E8; min-height: 100vh">
+  <header style="border-bottom: 1px solid #E2D4BC">
+    <nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+      <a href="Main.dc.html"><img src="/logo.jpg" alt="Thật Space" style="width: 48px; height: 48px; display: block; border-radius: 3px; box-shadow: 0 1px 0 #E2D4BC, 0 6px 14px -8px rgba(63,42,31,.5)"></a>
+      <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap">
+        <a href="Forum.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Forum</a>
+        <a href="TuVi.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tử Vi</a>
+        <a href="Matchmaking.dc.html" style="padding: 12px 14px; font-size: 15px; font-weight: 500; text-decoration: none">Tìm Duyên</a>
+        <a href="Profile.dc.html" aria-current="page" style="padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; background: linear-gradient(transparent 70%, #E2D4BC 70%)">Profile</a>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width: 1080px; margin: 0 auto; padding: 56px 24px 96px; display: flex; flex-direction: column; gap: 64px">
+    <!-- member card -->
+    <section class="grain" style="position: relative; display: flex; flex-wrap: wrap; gap: 36px; align-items: center; padding: 44px; background-color: #FBF8F2; box-shadow: 0 2px 0 #E2D4BC, 0 34px 50px -34px rgba(63,42,31,.6)">
+      <span aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: linear-gradient(225deg, #F5F0E8 50%, #E2D4BC 50%)"></span>
+      <div aria-hidden="true" style="flex: none; position: relative; width: 148px; height: 148px; transform: rotate(45deg); background: linear-gradient(90deg, #C4A882 50%, #A88B66 50%); box-shadow: 0 20px 30px -20px rgba(63,42,31,.7)">
+        <span class="serif" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; transform: rotate(-45deg); font-size: 46px; color: #3F2A1F">NT</span>
+      </div>
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <h1 class="serif" style="margin: 0; font-size: clamp(36px, 4vw, 52px); line-height: 1.05; font-weight: 400">Nguyễn Thị Lan</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 14px">
+          <span style="padding: 6px 12px; font-weight: 600; background: #E2D4BC">Song Ngư · Pisces</span>
+          <span style="padding: 6px 12px; color: #6E4D3C; box-shadow: inset 0 0 0 1px #D2BE9C">Gia nhập Tháng 1, 2024</span>
+        </div>
+        <p style="margin: 0; font-size: 16px; line-height: 1.7; color: #4E3326">Kỹ sư phần mềm với tình yêu Tử Vi và thiên văn học. Mình tin rằng sự hiểu biết nội tâm là nền tảng của mọi kết nối đích thực. Đang trên hành trình khám phá bản thân và tìm kiếm những người bạn đồng hành chân thành.</p>
+      </div>
+    </section>
+
+    <!-- readings as envelopes -->
+    <section aria-labelledby="readings-h" style="display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+        <h2 id="readings-h" class="serif" style="margin: 0; font-size: 32px; font-weight: 400">My Readings</h2>
+        <a href="TuVi.dc.html" class="btn btn-ink" style="padding: 14px 22px; background: #5C3D2E; color: #F5F0E8; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 2px; box-shadow: 0 3px 0 #3F2A1F">New Reading</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px">
+        <a href="TuVi.dc.html" class="env grain" style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 92px 28px 28px; background-color: #EFE7DA; text-decoration: none; color: #5C3D2E; box-shadow: 0 2px 0 #E2D4BC, 0 22px 30px -24px rgba(63,42,31,.55)">
+          <span class="flap" aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: #C4A882; clip-path: polygon(0 0, 100% 0, 50% 100%)"></span>
+          <span aria-hidden="true" style="position: absolute; top: 52px; left: 50%; width: 30px; height: 30px; margin-left: -15px; background: #5C3D2E; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)"></span>
+          <span style="font-size: 13px; color: #7A5A48">15 tháng 1, 2024</span>
+          <span class="serif" style="font-size: 24px; font-weight: 500">Tháng 1 — Tử Vi Reading</span>
+          <span style="font-size: 15px; line-height: 1.65; color: #6E4D3C">Năm Giáp Thìn mang đến những chuyển biến sâu sắc trong tình cảm và sự nghiệp. Đây là thời điểm tốt để khởi đầu những dự án mới và nuôi dưỡng các mối quan hệ ý nghĩa.</span>
+        </a>
+        <a href="TuVi.dc.html" class="env grain" style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 92px 28px 28px; background-color: #EFE7DA; text-decoration: none; color: #5C3D2E; box-shadow: 0 2px 0 #E2D4BC, 0 22px 30px -24px rgba(63,42,31,.55)">
+          <span class="flap" aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: #A88B66; clip-path: polygon(0 0, 100% 0, 50% 100%)"></span>
+          <span aria-hidden="true" style="position: absolute; top: 52px; left: 50%; width: 30px; height: 30px; margin-left: -15px; background: #5C3D2E; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)"></span>
+          <span style="font-size: 13px; color: #7A5A48">10 tháng 11, 2023</span>
+          <span class="serif" style="font-size: 24px; font-weight: 500">Tháng 11 — Tử Vi Reading</span>
+          <span style="font-size: 15px; line-height: 1.65; color: #6E4D3C">Tháng 11 là giai đoạn của sự chữa lành và tái tạo nội tâm. Những người thuộc cung Song Ngư sẽ cảm nhận được sức mạnh tâm linh tăng trưởng rõ rệt trong giai đoạn này.</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- matches as hanging tags -->
+    <section aria-labelledby="matches-h" style="display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+        <h2 id="matches-h" class="serif" style="margin: 0; font-size: 32px; font-weight: 400">My Matches</h2>
+        <a href="Matchmaking.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; text-decoration: none">Explore More <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg></a>
+      </div>
+      <div style="position: relative; padding-top: 28px">
+        <span aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #C4A882"></span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px">
+          <sc-for list="{{ matches }}" as="m" hint-placeholder-count="3">
+            <div class="grain" style="position: relative; display: flex; align-items: center; gap: 16px; padding: 24px 22px; background-color: #FBF8F2; transform: rotate({{m.tilt}}deg); transform-origin: 50% -28px; box-shadow: 0 2px 0 #E2D4BC, 0 18px 26px -22px rgba(63,42,31,.55)">
+              <span aria-hidden="true" style="position: absolute; top: -28px; left: 50%; height: 28px; border-left: 2px solid #C4A882"></span>
+              <span aria-hidden="true" style="position: absolute; top: 8px; left: 50%; width: 10px; height: 10px; margin-left: -4px; border-radius: 50%; box-shadow: inset 0 0 0 2px #C4A882"></span>
+              <span aria-hidden="true" class="serif" style="flex: none; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 19px; color: {{m.ink}}; background: linear-gradient(135deg, {{m.a}} 50%, {{m.b}} 50%)">{{ m.initials }}</span>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 600">{{ m.name }}</span>
+                <span style="font-size: 13px; color: #7A5A48">{{ m.sign }}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+                <span class="serif" style="font-size: 24px; font-weight: 500">{{ m.score }}%</span>
+                <a href="Matchmaking.dc.html" style="font-size: 13px; font-weight: 600">Nhắn tin</a>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      matches: [
+        { name: 'Trần Minh Châu', initials: 'MC', sign: 'Aries', score: 92, a: '#DCCAAE', b: '#C4A882', ink: '#3F2A1F', tilt: -1.5 },
+        { name: 'Nguyễn Bảo Anh', initials: 'BA', sign: 'Libra', score: 87, a: '#A88B66', b: '#8A6450', ink: '#FBF8F2', tilt: 1 },
+        { name: 'Võ Thanh Thảo', initials: 'TT', sign: 'Taurus', score: 85, a: '#E2D4BC', b: '#D2BE9C', ink: '#3F2A1F', tilt: -0.8 }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

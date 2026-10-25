@@ -1,0 +1,33 @@
+{
+  "name": "Thật Space",
+  "authors": "Thật Space",
+  "theme_version": "1.0.0",
+  "minimum_discourse_version": null,
+  "maximum_discourse_version": null,
+  "license_url": null,
+  "about_url": null,
+  "assets": {
+    "that-space-logo": "assets/logo.jpg",
+    "inter-latin": "assets/inter-latin.woff2",
+    "inter-vietnamese": "assets/inter-vietnamese.woff2",
+    "inter-latin-ext": "assets/inter-latin-ext.woff2",
+    "playfair-latin": "assets/playfair-latin.woff2",
+    "playfair-vietnamese": "assets/playfair-vietnamese.woff2",
+    "playfair-latin-ext": "assets/playfair-latin-ext.woff2"
+  },
+  "color_schemes": {
+    "Thật Space": {
+      "primary": "5C3D2E",
+      "secondary": "F5F0E8",
+      "tertiary": "C4A882",
+      "header_background": "F5F0E8",
+      "header_primary": "5C3D2E",
+      "highlight": "E8DDCE",
+      "selected": "E8DDCE",
+      "hover": "EDE5D9",
+      "danger": "9C423A",
+      "success": "55705A",
+      "love": "A85C69"
+    }
+  }
+}
