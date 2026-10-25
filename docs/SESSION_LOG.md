@@ -1746,3 +1746,14 @@ unauthenticated tool call 401, and an authenticated chat-style status 200. A QA
 notice from Bà Mối landed in the QA member's current chat thread. Rollback is
 `dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C`. Evidence:
 `docs/verification/vercel-prebuilt-8896548-production.json`.
+
+PR #9 merged; ASUS source moved to `d10c87c` (previous tree kept as
+`source-5fe1666-20261025`). The first presentation apply hit Discourse's
+15-second theme script compile timeout under host load (MiniRacer); the rerun
+applied the brand import (one-thread Bà Mối) and the chat vi labels, and the
+recheck reports no drift. The brand component has no field errors,
+`ba_moi_username=Ba_Moi_bot`, Horizon is the default, and the AI installer check
+reports no drift. Live state: Horizon member layout, reduced signup, Bà Mối in
+one remembered chat thread on DeepSeek V4.1 Flash, and service notices into that
+thread. Next: Thảo's review; AWS host after her approval; phase 2 (match chats
+in chat, photos after reveal, seen receipts).
