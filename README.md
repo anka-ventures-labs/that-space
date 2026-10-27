@@ -148,6 +148,12 @@ messages are held before mutual reveal, then deletes that temporary tail on
 reveal, end, block or member deletion. Setting `BA_MOI_ENABLED=false` still stops
 tool, webhook and retry ingress with HTTP 503.
 
+Consent is also fail-closed. Agreement and age are asked separately. The service
+records consent only when the tool payload explicitly confirms age 18+; a missing
+flag returns a service-owned age question, while `false` ends the flow without
+recording consent. The Discourse custom tool ends the native model/tool chain for
+both expected branches, preventing them from becoming model retry loops.
+
 The complete service journey is verified locally with `npm run test:beta` and
 must also pass with two fresh non-staff accounts on the exact deployed release.
 

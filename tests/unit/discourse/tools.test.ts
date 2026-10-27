@@ -7,14 +7,21 @@ import { TOOLS } from '@/lib/service/dispatch'
 
 const template = readFileSync('discourse/tools/tool.js', 'utf8')
 const definitions = JSON.parse(readFileSync('discourse/tools/tools.json', 'utf8')) as ToolDefinition[]
+const persona = readFileSync('discourse/persona/ba-moi.md', 'utf8')
 const SERVICE = 'https://that-space.vercel.app/api/ba-moi/v1'
 const SECRET = 's'.repeat(40)
 
 /** Runs a rendered tool the way Discourse AI does: globals context, http, secrets; then invoke(params). */
-function run(endpoint: string, params: Record<string, unknown>, respond: (url: string, body: unknown) => { status: number; body: string }) {
+function run(
+  endpoint: string,
+  params: Record<string, unknown>,
+  respond: (url: string, body: unknown) => { status: number; body: string },
+  chainMode: 'working' | 'missing' | 'throwing' = 'working',
+) {
   const def = definitions.find((d) => d.endpoint === endpoint)!
   const calls: Array<{ url: string; headers: Record<string, string>; body: { auth: Record<string, unknown>; args: Record<string, unknown> } }> = []
-  const sandbox = {
+  let customRaw: string | null = null
+  const sandbox: Record<string, unknown> = {
     context: { user_id: 101, username: 'lan', topic_id: 4001, private_message: true, participants: 'lan, ba_moi', post_id: 9 },
     secrets: { get: (alias: string) => { if (alias !== TOOL_SECRET_ALIAS) throw new Error('alias not declared'); return SECRET } },
     http: {
@@ -25,10 +32,12 @@ function run(endpoint: string, params: Record<string, unknown>, respond: (url: s
       },
     },
   }
+  if (chainMode === 'working') sandbox.chain = { setCustomRaw: (raw: string) => { customRaw = raw } }
+  if (chainMode === 'throwing') sandbox.chain = { setCustomRaw: () => { throw new Error('unsupported') } }
   vm.createContext(sandbox)
   vm.runInContext(renderToolScript(template, def, SERVICE), sandbox)
   const result = vm.runInContext(`invoke(${JSON.stringify(params)})`, sandbox)
-  return { result, calls, details: vm.runInContext('details()', sandbox) }
+  return { result, calls, customRaw, details: vm.runInContext('details()', sandbox) }
 }
 
 const ok = () => ({ status: 200, body: JSON.stringify({ ok: true, echoed: true }) })
@@ -61,6 +70,28 @@ describe('the Discourse AI tool script', () => {
     expect(run('status', {}, () => ({ status: 200, body: '<html>' })).result).toMatchObject({ ok: false, error: 'bad_response' })
     expect(run('status', {}, () => { throw new Error('timeout') }).result).toMatchObject({ ok: false, error: 'unreachable' })
     expect(run('status', {}, () => ({ status: 200, body: '{}' })).result.message_vi).toBeUndefined()
+  })
+
+  it('ends the native tool chain with a service-owned user-input prompt', () => {
+    const response = {
+      ok: true,
+      requires_user_input: 'adult_confirmation',
+      stop_tool_loop: true,
+      message_vi: 'Bạn xác nhận mình từ 18 tuổi trở lên, đúng không?',
+    }
+    const { result, calls, customRaw } = run('consent', { action: 'opt_in' }, () => ({ status: 200, body: JSON.stringify(response) }))
+    expect(calls).toHaveLength(1)
+    expect(result).toEqual(response)
+    expect(customRaw).toBe(response.message_vi)
+    expect(run('status', {}, () => ({ status: 200, body: JSON.stringify({ ok: true }) })).customRaw).toBeNull()
+    expect(run('status', {}, () => ({ status: 200, body: JSON.stringify({ ok: true, stop_tool_loop: false, message_vi: 'x' }) })).customRaw).toBeNull()
+    expect(run('status', {}, () => ({ status: 200, body: JSON.stringify({ ok: true, stop_tool_loop: true, message_vi: '' }) })).customRaw).toBeNull()
+  })
+
+  it('preserves a terminal service result when the native chain API is unavailable', () => {
+    const response = { ok: true, stop_tool_loop: true, message_vi: 'Dừng tại đây.' }
+    expect(run('consent', {}, () => ({ status: 200, body: JSON.stringify(response) }), 'missing').result).toEqual(response)
+    expect(run('consent', {}, () => ({ status: 200, body: JSON.stringify(response) }), 'throwing').result).toEqual(response)
   })
 
   it('refuses to render with an unsafe service URL', () => {
@@ -105,7 +136,14 @@ describe('tools.json matches the service contract', () => {
     expect(agent).toMatchObject({
       name: AGENT_NAME, tools: [['custom-3', false, false], ['custom-4', false, false]], allow_personal_messages: true,
       allow_topic_mentions: false, allow_chat_direct_messages: true, allow_chat_channel_mentions: false, default_llm_id: 2,
+      temperature: 0.2,
     })
     expect(agentPayload({ systemPrompt: 'x', toolIds: [], allowedGroupIds: [] }).ai_agent).not.toHaveProperty('default_llm_id')
+  })
+
+  it('makes expected user-input branches terminal for the current model turn', () => {
+    expect(persona).toContain('stop_tool_loop: true')
+    expect(persona).toContain('không bao giờ gọi cùng một công cụ với cùng tham số quá một lần')
+    expect(definitions.find((definition) => definition.endpoint === 'consent')?.description).toContain('end the turn without another tool call')
   })
 })

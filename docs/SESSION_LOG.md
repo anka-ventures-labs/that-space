@@ -1746,3 +1746,33 @@ unauthenticated tool call 401, and an authenticated chat-style status 200. A QA
 notice from Bà Mối landed in the QA member's current chat thread. Rollback is
 `dpl_8KFk7usXWsEEoh6QGbCXrDfxeL6C`. Evidence:
 `docs/verification/vercel-prebuilt-8896548-production.json`.
+
+# 2026-10-27 — Bà Mối consent loop hard stop
+
+Production evidence for Minh's `đồng ý` turn showed four sequential DeepSeek
+V4.1 Flash completions and three identical `ba_moi_consent` calls without
+`adult_confirmed`; the Vercel tool calls themselves completed in 7–114 ms. The
+service correctly refused to record consent, but Discourse AI treated the
+expected age question as a tool error and kept asking the model to repair it.
+
+The consent handler now fails closed on a missing or false age flag. A missing
+flag returns a successful `requires_user_input` result with `stop_tool_loop:
+true` and a service-owned 18+ question; `false` ends the flow without recording
+consent. The installed custom tool maps both results to Discourse AI's native
+`chain.setCustomRaw`, which posts the service-owned message and hard-stops the
+tool chain without another model completion.
+The persona and tool descriptions forbid bare `đồng ý` from proving age, forbid
+same-turn duplicate calls, and narrow status refreshes. Agent temperature moves
+from 0.7 to 0.2. DeepSeek remains selected: the only configured alternative,
+Claude Sonnet 5, was marginally faster in unlike live workloads but about 90x
+more expensive per observed request, so the evidence did not justify switching.
+
+Sonnet assembly review `ac8f4031-2998-4685-9984-80b7f5c71ec8` returned
+DO NOT SHIP on three introduced edge cases. All are resolved: explicit
+`adult_confirmed: false` now ends ineligible without re-prompting, the consent
+copy asks agreement and age as separate questions, and a missing or throwing
+native chain API preserves the valid service result instead of reporting bad
+JSON. Focused coverage now includes false/missing age, inactive/empty stop
+signals, a non-consent tool, and absent/throwing chain APIs. The pinned live
+Discourse source was also inspected: `chain.setCustomRaw` sets the final bot raw
+content and makes `Custom#chain_next_response?` false.

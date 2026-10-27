@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { getCard, getMemberByDiscourseId, getProfile, recordConsent } from '@/lib/db/repo'
 import { redactCardForCurrentPool } from '@/lib/service/cards'
 import { CONFIRMATION_TTL_MS } from '@/lib/service/confirmation'
-import { CONSENT_TEXT, CONSENT_VERSION } from '@/lib/service/copy'
+import { ADULT_CONFIRMATION_PROMPT, CONSENT_TEXT, CONSENT_VERSION } from '@/lib/service/copy'
 import { PROFILE, confirmedCall, createHarness, onboard, testUser, type Harness } from '../../helpers/service'
 
 let h: Harness
@@ -24,7 +24,23 @@ describe('consent', () => {
     expect((await h.call('profile_update', user, { intent: 'friendship' })).body.error).toBe('consent_required')
     expect((await h.call('box_open', user)).body.error).toBe('consent_required')
 
-    expect((await h.call('consent', user, { action: 'opt_in' })).body.error).toBe('adult_required')
+    const awaitingAdult = await h.call('consent', user, { action: 'opt_in' })
+    expect(awaitingAdult.body).toMatchObject({
+      ok: true,
+      opted_in: false,
+      requires_user_input: 'adult_confirmation',
+      stop_tool_loop: true,
+      message_vi: ADULT_CONFIRMATION_PROMPT,
+    })
+    expect((await h.call('status', user)).body).toMatchObject({ opted_in: false, consent: { version: CONSENT_VERSION } })
+    const underage = await h.call('consent', user, { action: 'opt_in', adult_confirmed: false })
+    expect(underage.body).toMatchObject({
+      ok: true,
+      opted_in: false,
+      eligible: false,
+      stop_tool_loop: true,
+    })
+    expect((await h.call('status', user)).body).toMatchObject({ opted_in: false, consent: { version: CONSENT_VERSION } })
     expect((await h.call('consent', user, { action: 'opt_in', adult_confirmed: true })).body).toMatchObject({ ok: true, opted_in: true })
     const after = await h.call('status', user)
     expect(after.body).toMatchObject({ opted_in: true, consent: null, card: 'none' })

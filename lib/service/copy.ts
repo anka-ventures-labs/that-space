@@ -13,7 +13,6 @@ export const ERROR_MESSAGES = {
   invalid_args: 'Thông tin gửi lên chưa đúng định dạng, Bà hỏi lại nhé.',
   internal: 'Bà Mối đang gặp chút trục trặc. Bạn thử lại sau ít phút nhé.',
   consent_required: 'Bạn cần đồng ý tham gia Bà Mối trước đã.',
-  adult_required: 'Bà Mối chỉ dành cho người từ 18 tuổi trở lên.',
   paused: 'Bạn đang tạm dừng Bà Mối. Khi muốn quay lại, bạn nói "tiếp tục" nhé.',
   profile_incomplete: 'Hồ sơ của bạn còn thiếu vài thông tin.',
   card_unconfirmed: 'Bạn cần xác nhận thẻ ẩn danh trước đã.',
@@ -43,8 +42,15 @@ export const CONSENT_TEXT = [
   '2. Những gì bạn kể, Bà giữ riêng. Người khác chỉ thấy một thẻ ẩn danh: khoảng tuổi, sở thích, mệnh và vài dòng giới thiệu, không có tên, ngày sinh hay nơi ở cụ thể.',
   '3. Đây là bản thử nghiệm: quản trị viên của Thật Space có thể đọc tin nhắn giữa bạn với Bà Mối và các cuộc trò chuyện ẩn danh.',
   '4. Bạn có thể tạm dừng hoặc xoá dữ liệu mai mối bất cứ lúc nào, chỉ cần nói với Bà. Xoá dữ liệu không xoá các tin nhắn đã có trên diễn đàn.',
-  'Bạn xác nhận mình từ 18 tuổi trở lên và đồng ý chứ?',
+  'Bạn có đồng ý tham gia không?',
 ].join('\n')
+
+/** Expected conversation branch, not an operational error. */
+export const ADULT_CONFIRMATION_PROMPT =
+  'Bạn xác nhận mình từ 18 tuổi trở lên, đúng không?'
+
+export const ADULT_INELIGIBLE_MESSAGE =
+  'Bà Mối chỉ dành cho người từ 18 tuổi trở lên.'
 
 // ── Bà Mối, in the member's own thread with her ─────────────────────────────
 

@@ -2,13 +2,13 @@
   {
     "endpoint": "status",
     "summary": "Where the member stands with Bà Mối",
-    "description": "Check where the member stands: consent (with the exact consent text to show while she hasn't agreed), interview answers still missing, card state, whether today's Duyên box is open, daily allowances, pending signals and open matches. Call it at the start of every conversation and whenever unsure.",
+    "description": "Check where the member stands: consent (with the exact consent text to show while she hasn't agreed), interview answers still missing, card state, whether today's Duyên box is open, daily allowances, pending signals and open matches. Call once at the start of a new chat thread or when no recent tool result provides state. Never call it again after a tool returns requires_user_input or stop_tool_loop.",
     "parameters": []
   },
   {
     "endpoint": "consent",
     "summary": "Opt in, pause, resume or delete",
-    "description": "Record the member's decision. opt_in only after they have read the consent text, said yes and confirmed they are 18 or older (adult_confirmed: true). pause hides them from the pool; resume brings them back. delete is two-step: call without a token to receive a short-lived confirmation_token, explain the deletion and ask for confirmation, then only after the member's next clear yes call again with that token.",
+    "description": "Record the member's decision. For opt_in, first obtain agreement to the current consent text, then ask age as a separate question. Call once with adult_confirmed: true only when the conversation already contains that agreement and the current message explicitly confirms age 18+; if one message explicitly states both, call immediately. If the member says they are under 18, call once with adult_confirmed: false. Never call for a bare agreement before asking age. If any result contains requires_user_input or stop_tool_loop, show message_vi and end the turn without another tool call. pause hides them from the pool; resume brings them back. delete is two-step: call without a token to receive a short-lived confirmation_token, explain the deletion and ask for confirmation, then only after the member's next clear yes call again with that token.",
     "parameters": [
       { "name": "action", "type": "string", "description": "What she decided.", "required": true, "enum": ["opt_in", "pause", "resume", "delete"] },
       { "name": "adult_confirmed", "type": "boolean", "description": "She said she is 18 or older. Required for opt_in.", "required": false },

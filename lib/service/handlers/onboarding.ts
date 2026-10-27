@@ -10,7 +10,7 @@ import { vnDate } from '@/lib/matching/privacy'
 import type { MemberProfile } from '@/lib/matching/types'
 import { SUMMARY_MAX_LENGTH, buildCard, summaryViolations, templateSummary } from '../cards'
 import { confirmationRequired, consumeConfirmation } from '../confirmation'
-import { CONSENT_TEXT, CONSENT_VERSION, MATCH_ENDED } from '../copy'
+import { ADULT_CONFIRMATION_PROMPT, ADULT_INELIGIBLE_MESSAGE, CONSENT_TEXT, CONSENT_VERSION, MATCH_ENDED } from '../copy'
 import { hasCurrentConsent } from '../consent'
 import { INTEREST_DAILY_LIMIT, SEARCH_DAILY_LIMIT, nextVnDayStart, vnDayStart } from '../limits'
 import { deliverAll, queue } from '../outbox'
@@ -60,7 +60,24 @@ export const consent = defineTool(ConsentArgs, async (ctx, args) => {
   const { deps: { db }, member, now } = ctx
   switch (args.action) {
     case 'opt_in':
-      if (args.adult_confirmed !== true) return fail('adult_required')
+      if (args.adult_confirmed === false) {
+        return {
+          ok: true as const,
+          opted_in: false,
+          eligible: false,
+          stop_tool_loop: true,
+          message_vi: ADULT_INELIGIBLE_MESSAGE,
+        }
+      }
+      if (args.adult_confirmed === undefined) {
+        return {
+          ok: true as const,
+          opted_in: false,
+          requires_user_input: 'adult_confirmation',
+          stop_tool_loop: true,
+          message_vi: ADULT_CONFIRMATION_PROMPT,
+        }
+      }
       await recordConsent(db, member.id, CONSENT_VERSION, now)
       return { ok: true, opted_in: true, consent_version: CONSENT_VERSION }
     case 'pause':

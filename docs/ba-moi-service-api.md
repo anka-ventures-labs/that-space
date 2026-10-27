@@ -50,14 +50,17 @@ credentials.
 - 200: every tool outcome, including `ok: false`. `invalid_args` carries
   `issues: [{ path, message }]` so the model can correct its call.
 
-Every failure has the shape `{ ok: false, error, message_vi }`.
+Every failure has the shape `{ ok: false, error, message_vi }`. Expected
+conversation gates may instead return `ok: true`, `stop_tool_loop: true` and a
+service-owned `message_vi`; the Discourse tool posts that message as the final
+reply without another model completion.
 
 ## Tools
 
 | Tool | Args | Success |
 |---|---|---|
 | `status` | none | `opted_in`, `consent` (`{ version, text }` until she agrees to this version; show it word for word), `paused`, `missing` (interview fields still needed), `married_friendship_only`, `card` (`none`, `needs_confirmation` or `confirmed`), `box_available`, `next_box_at`, `search_results_left`, `interests_left`, `pending_signals`, `open_matches` |
-| `consent` | `action`: `opt_in` (needs `adult_confirmed: true`), `pause`, `resume`, or `delete`; delete requires the service-issued `confirmation_token` from the preceding challenge | `opted_in`, `paused` or `deleted` |
+| `consent` | `action`: `opt_in` (needs `adult_confirmed: true`), `pause`, `resume`, or `delete`; delete requires the service-issued `confirmation_token` from the preceding challenge | `opted_in`, `paused` or `deleted`; omitted `adult_confirmed` returns `requires_user_input: adult_confirmation`, while `false` returns `eligible: false`; both stop the model/tool loop and record no consent |
 | `profile_update` | Any of: `intent`, `gender`, `seeking`, `birth_date` (YYYY-MM-DD), `birth_time` (HH:MM, or `null` for "không nhớ"), `city`, `age_min`, `age_max`, `marital`, `children`, `wants_children`, `hobbies` (1–8), `open_answer`, `occupation` | `missing`, `card_needs_confirmation`, `age_range` (defaults to her age ±5 once the birth date is known) |
 | `card_preview` | none | `card`, `template_summary`, `current_summary`, `confirmed`, `summary_max_length` |
 | `card_confirm` | `summary_text` (10–400 characters, written by the persona) | `card`, `in_pool` |
@@ -87,7 +90,7 @@ Every failure has the shape `{ ok: false, error, message_vi }`.
   Interest in a sample returns `sample` and notifies no one.
 
 **Error codes:**
-- `consent_required`, `adult_required`, `paused`
+- `consent_required`, `paused`
 - `profile_incomplete` (with `missing`), `card_unconfirmed`
 - `under_18`, `invalid_birth_date`, `age_range_invalid`
 - `summary_leaks` (with `violations`, for example `dob`, `forbidden_term:<her
