@@ -53,11 +53,27 @@ function invoke(params) {
   if (response.status !== 200) {
     return { ok: false, error: "http_" + response.status, message_vi: FALLBACK };
   }
+  var result;
   try {
-    return JSON.parse(response.body);
+    result = JSON.parse(response.body);
   } catch (e) {
     return { ok: false, error: "bad_response", message_vi: FALLBACK };
   }
+  // Expected conversation gates (for example an explicit 18+ confirmation)
+  // are complete replies, not errors for the model to repair. Let supported
+  // Discourse versions post the service-owned prompt and end the native tool
+  // chain immediately. If the API is unavailable, preserve the valid result
+  // so the persona's stop instruction remains the fallback.
+  if (result && result.stop_tool_loop === true && typeof result.message_vi === "string" && result.message_vi.trim()) {
+    try {
+      if (typeof chain !== "undefined" && chain && typeof chain.setCustomRaw === "function") {
+        chain.setCustomRaw(result.message_vi.trim());
+      }
+    } catch (e) {
+      // Return the service result below; do not misreport it as bad JSON.
+    }
+  }
+  return result;
 }
 
 function details() {

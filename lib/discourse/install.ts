@@ -77,7 +77,9 @@ export function agentPayload(input: { systemPrompt: string; toolIds: number[]; l
       allowed_group_ids: input.allowedGroupIds,
       ...(input.llmId ? { default_llm_id: input.llmId, force_default_llm: true } : {}),
       show_thinking: false,
-      temperature: 0.7,
+      // Keep tool selection deterministic. Bà Mối's warmth comes from the
+      // persona prompt; randomness here previously caused repeated tool calls.
+      temperature: 0.2,
     },
   }
 }
